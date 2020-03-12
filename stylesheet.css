@@ -1,0 +1,50 @@
+h1, h2, h3, h4, p, th, td{
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+body{
+	margin:0;
+	padding:0;
+	background-color:#4ccf59;
+}
+
+div{
+	padding:10px;
+	background-color: white;
+}
+
+.headBox{
+	position: sticky;
+	padding-left: 2%;
+	padding-right: 2%;
+	margin:0;
+	box-shadow: 0px 4px 10px grey;
+}
+
+.headBox h1{
+	font-size: 40px;
+	margin: 10px 0px;
+}
+
+.mainBox{
+	margin-left:2.5%;
+	margin-right:2.5%;
+	padding: 1% 1.5%;
+	width:92%;
+	box-shadow: 0px 4px 10px grey;
+	border-radius: 3px;
+}
+
+.mainBox h1, h3{
+	text-align: center;
+}
+
+.mainBox hr{
+	width:90%;
+	margin-top: 35px;
+	margin-bottom: 35px;
+}
+
+.footnote{
+	text-align: center;
+}
