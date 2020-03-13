@@ -1,8 +1,33 @@
 extends layout
 
 block content
-    h1 You are 11th in the queue.
-    p 
+
+    script.
+        //const WebSocket = require('ws')
+        const url = 'ws://localhost:8080'
+        const connection = new WebSocket(url)
+         
+        connection.onopen = () => {
+          //connection.send('Message From Client') 
+        }
+         
+        connection.onerror = (error) => {
+          console.log(`WebSocket error: ${error}`)
+        }
+         
+        connection.onmessage = (e) => {
+          console.log(e.data)
+        }
+        
+        function buttonHandler() {
+            connection.send(JSON.stringify( { 'request': 'queue-join' } ));
+        }
+        
+    h1(id='header') You are 11th in the queue.
+        
+    p(id='subheader')
         | It'll be about 
-        b 20 minutes 
+        b(id='time-remaining') 20 minutes 
         | before you're called.
+        
+    button(id='action' onclick='buttonHandler()') Leave the queue

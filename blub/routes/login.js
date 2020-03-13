@@ -2,12 +2,12 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 
-var secrets = require('./blub_secrets.js')
+var secrets = require('./blub_secrets.js');
 
 require('ssl-root-cas').addFile('./certs/ldap.pem');
 var flash = require("connect-flash");
 
-var passport = require('passport')
+var passport = require('passport');
 var LdapStrategy = require('passport-ldapauth');
  
 passport.use(new LdapStrategy({
@@ -28,11 +28,12 @@ passport.use(new LdapStrategy({
 }));
 
 passport.serializeUser(function(user, done) {
-  done(null, user);
+    console.log(user)
+    done(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
-  done(null, user);
+    done(null, user);
 });
   
 router.get('/', function(req, res, next) {

@@ -4,8 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var flash = require("connect-flash");
-var session = require('express-sessions');
 var passport = require('passport')
+var session = require('express-session')
 
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
@@ -26,6 +26,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //app.use(express.session({ cookie: { maxAge: 60000 }}));
 //app.use(flash());
+
+megasession = session({ secret: 'beep beep bitch' });
+app.use(megasession);
 
 app.use(passport.initialize());
 app.use(passport.session());
