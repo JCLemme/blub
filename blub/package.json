@@ -14,6 +14,8 @@
     "express-sessions": "^1.0.6",
     "express-ws": "^4.0.0",
     "http-errors": "~1.6.3",
+    "mongodb": "^3.5.5",
+    "mongodb-queue": "^4.0.0",
     "morgan": "~1.9.1",
     "passport-activedirectory": "^1.0.4",
     "passport-ldapauth": "^2.1.4",

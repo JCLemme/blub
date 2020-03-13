@@ -6,6 +6,10 @@ var logger = require('morgan');
 var flash = require("connect-flash");
 var passport = require('passport')
 var session = require('express-session')
+var mongodb = require('mongodb')
+
+var queueclient = require('./queue_client.js');
+var queueworker = require('./queue_backend.js');
 
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');

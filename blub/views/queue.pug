@@ -8,7 +8,7 @@ block content
         const connection = new WebSocket(url)
          
         connection.onopen = () => {
-          //connection.send('Message From Client') 
+            connection.send(JSON.stringify( {'request': 'init' } )); 
         }
          
         connection.onerror = (error) => {
@@ -16,12 +16,40 @@ block content
         }
          
         connection.onmessage = (e) => {
-          console.log(e.data)
+            console.log(e.data)
+            var msg = JSON.parse(e.data);
+            
+            // Handle a request
+            switch(msg["status"]) {
+                case "queued": {
+                    document.getElementById('action').innerHTML = 'Leave the queue';
+                    
+                    if(e.data['place'] == 0) {
+                        document.getElementById('header').innerHTML = "You're next!"
+                    }
+                    else {
+                        document.getElementById('header').innerHTML = 'You are ' + Number(Number(msg['place'])+Number(1)) + ' in the queue';
+                    }
+                }
+                break;
+                
+                case "idle": {
+                    document.getElementById('header').innerHTML = "You are not waiting for a machine."
+                    document.getElementById('action').innerHTML = 'Join the queue';
+                }
+                break;
+            }
         }
         
         function buttonHandler() {
-            connection.send(JSON.stringify( { 'request': 'queue-join' } ));
+            if(document.getElementById('action').innerHTML == "Join the queue") {
+                connection.send(JSON.stringify( { 'request': 'queue-join' } ));
+            }
+            else if(document.getElementById('action').innerHTML == "Leave the queue") {
+                connection.send(JSON.stringify( { 'request': 'queue-leave' } ));
+            }
         }
+        
         
     h1(id='header') You are 11th in the queue.
         
