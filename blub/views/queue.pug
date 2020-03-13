@@ -1,6 +1,8 @@
 extends layout
 
 block content
+    head
+        link(rel='stylesheet', href='/stylesheets/spinner.css')
 
     script.
         //const WebSocket = require('ws')
@@ -12,7 +14,7 @@ block content
         }
          
         connection.onerror = (error) => {
-          console.log(`WebSocket error: ${error}`)
+            console.log(`WebSocket error: ${error}`)
         }
          
         connection.onmessage = (e) => {
@@ -28,7 +30,7 @@ block content
                         document.getElementById('header').innerHTML = "You're next!"
                     }
                     else {
-                        document.getElementById('header').innerHTML = 'You are ' + Number(Number(msg['place'])+Number(1)) + ' in the queue';
+                        document.getElementById('header').innerHTML = 'You are ' + Number(Number(msg['place'])+Number(1)) + ' in the queue.';
                     }
                 }
                 break;
@@ -52,7 +54,8 @@ block content
         
         
     h1(id='header') You are 11th in the queue.
-        
+    div.loaderBox
+        div.loader
     p(id='subheader')
         | It'll be about 
         b(id='time-remaining') 20 minutes 

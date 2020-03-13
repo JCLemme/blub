@@ -1,4 +1,6 @@
-#This gon be a timeup script
+#Connects via WebSockets to blub server
+#When kill request is received (via idle or timeout), displays msgbox and logs out the user
+
 import pymsgbox
 import os
 import asyncio
@@ -20,8 +22,6 @@ async def log_off(websocket, path):
             await websocket.send(message_json)
         elif task_json[task] == 'kill':
             print("\nYou are being logged out...")
+            pymsgbox.alert(text='test', title='test', button='OK')
+            #I assume we need a wait here if that message box is gonna be visible for any length of time
             os.system("shutown -l")
-        
-
-pymsgbox.alert(text='test', title='test', button='OK')
-
