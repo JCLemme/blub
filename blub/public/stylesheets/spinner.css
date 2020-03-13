@@ -1,3 +1,7 @@
+#holder{
+	display: flex;
+}
+
 .loaderBox{
 	height:80px;
 }
@@ -6,18 +10,18 @@
 .loader,
 .loader:before,
 .loader:after {
-  background: #bebebe;
+  background: #707070;
   -webkit-animation: load1 1s infinite ease-in-out;
   animation: load1 1s infinite ease-in-out;
   width: 1em;
   height: 4em;
 }
 .loader {
-  color: #bebebe;
-  text-indent: -9999em;
-  margin: 88px auto;
+  color: #707070;
+
+  margin: 26px 16px;
   position: relative;
-  font-size: 11px;
+  font-size: 4px;
   -webkit-transform: translateZ(0);
   -ms-transform: translateZ(0);
   transform: translateZ(0);

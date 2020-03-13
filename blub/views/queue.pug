@@ -27,7 +27,7 @@ block content
                     document.getElementById('action').innerHTML = 'Leave the queue';
                     
                     if(msg['place'] == 0) {
-                        document.getElementById('header').innerHTML = "You're next!"
+                        document.getElementById('header').innerHTML = "You're next up for a machine."
                     }
                     else {
                         document.getElementById('header').innerHTML = 'You are ' + Number(Number(msg['place'])+Number(1)) + ' in the queue.';
@@ -52,10 +52,10 @@ block content
             }
         }
         
-        
-    h1(id='header') You are 11th in the queue.
-    div.loaderBox
-        div.loader
+    div(id='holder')    
+        h1(id='header') You are 11th in the queue.
+        div.loaderBox
+            div.loader
     p(id='subheader')
         | It'll be about 
         b(id='time-remaining') 20 minutes 
