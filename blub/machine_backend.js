@@ -25,6 +25,16 @@ var open = function(username, reservation) {
     return null;
 }
 
+var check = function(username) {
+    for(var i=0;i<machines.length;i++) {
+        if(machines[i]["user"] == username) {
+            return machines[i];
+        }
+    }
+    
+    return null;
+}
+
 var close = function(username) {
     for(var i=0;i<machines.length;i++) {
         if(machines[i]["user"] == username) {
@@ -39,5 +49,6 @@ var close = function(username) {
 }
 
 module.exports.load = load;
-
-
+module.exports.open = open;
+module.exports.check = check;
+module.exports.close = close;

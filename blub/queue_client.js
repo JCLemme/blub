@@ -1,6 +1,7 @@
 var websocket = require('ws')
 var mongodb = require('mongodb')
 var queueworker = require('./queue_backend.js')
+var machines = require('./machine_backend.js')
 
 // Websocket receiver for clients
 
@@ -29,11 +30,23 @@ wss.on('connection', async (ws, req) => {
             case 'init': {
                 // See if the user is currently queued, and if so send them some queue
                 var place = queueworker.check(req.session.passport.user['sAMAccountName']);
+                
                 if(place != null) {
                     ws.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
                 }
                 else {
-                    ws.send(JSON.stringify( { 'status': 'idle' } ));
+                
+                    // See if the user has a machine attached to them
+                    var machine = machines.check(req.session.passport.user['sAMAccountName']);
+                    
+                    if(machine != null) {
+                        ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine } ));
+                    }
+                    else {
+                    
+                        // User must not be doing anything I guess.
+                        ws.send(JSON.stringify( { 'status': 'idle' } ));
+                    }
                 }
             }
             break;

@@ -23,6 +23,13 @@ block content
             
             // Handle a request
             switch(msg["status"]) {
+                case "in-session": {
+                    document.getElementById('action').innerHTML = 'End your session';
+                    document.getElementById('header').innerHTML = "You are on computer " + msg["machine"]["name"] + "."
+                    document.getElementById('subheader').innerHTML = "You can use this workstation until " + Date(msg["machine"]["until"]) + "."
+                }
+                break;
+                
                 case "queued": {
                     document.getElementById('action').innerHTML = 'Leave the queue';
                     
@@ -54,8 +61,10 @@ block content
         
         
     h1(id='header') You are 11th in the queue.
+    
     div.loaderBox
         div.loader
+        
     p(id='subheader')
         | It'll be about 
         b(id='time-remaining') 20 minutes 
