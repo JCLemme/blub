@@ -1,0 +1,8 @@
+extends layout
+
+block content
+    h1 Login to Blub
+    form(method='POST' action='/login')
+        p: input(name='username' placeholder='Username')
+        p: input(name='password' placeholder='Password' type='password')
+        p: button(type='submit' value='Login') Login
