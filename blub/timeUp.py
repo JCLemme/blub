@@ -15,7 +15,7 @@ async def log_off(websocket, path):
 
 # Prints the thign
 print("\nYou are being logged out...")
-pymsgbox.alert(text='test', title='test', button='OK')
+pymsgbox.alert(text='Your session has timed out. You will be logged out.', title='Session Over', button='OK')
 
 # Logs user out
 os.system("shutown -l")
