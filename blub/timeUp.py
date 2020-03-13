@@ -1,4 +1,4 @@
 #This gon be a timeup script
-from pymsgbox import *
+import pymsgbox
 
-alert(text='test', title='test', button='OK')
+pymsgbox.alert(text='test', title='test', button='OK')
