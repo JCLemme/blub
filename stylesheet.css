@@ -1,4 +1,4 @@
-h1, h2, h3, h4, p, th, td{
+h1, h2, h3, h4, p, th, td, a, button{
 	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
@@ -13,6 +13,14 @@ div{
 	background-color: white;
 }
 
+a{
+	text-decoration: none;
+}
+
+a:hover{
+	text-decoration: underline;
+}
+
 .headBox{
 	position: sticky;
 	padding-left: 2%;
@@ -20,7 +28,7 @@ div{
 	margin:0;
 	box-shadow: 0px 4px 10px grey;
 	display: flex;
-	background: linear-gradient(white, #e9e9e9);
+	background: linear-gradient(white, #c0d6e0);
 }
 
 .headBox h1{
@@ -47,6 +55,53 @@ div{
 	margin-bottom: 35px;
 }
 
-.footnote{
+button{
+	padding:20px;
+	font-size: 16px;
+	border-radius: 4px;
+	background-color: #c3ebff;
+}
+
+button:hover{
+	background-color: #e0f5ff;
+}
+
+button:active{
+	background-color: #a7e3ff;
+}
+
+table{
+	width:95%;
+	margin-left: 2.5%;
+	margin-right: 2.5%;
 	text-align: center;
+	border: 2px solid black;
+	border-collapse: collapse;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+
+tr:hover{
+	background-color: #e2e2e2;
+}
+
+th{
+	background-color: #93d9ff;
+}
+
+th, td{
+	border-bottom: 1px solid #ddd;
+	padding:10px;
+}
+
+.footnote, a.footnote{
+	margin-left:3%;
+	margin-right:3%;
+	color:#c0c0c0;
+}
+
+.footnote2{
+	text-align: center;
+	font-size:13px;
+	color:#9fa3ac;
 }
