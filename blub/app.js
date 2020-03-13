@@ -7,6 +7,7 @@ var flash = require("connect-flash");
 var passport = require('passport')
 var session = require('express-session')
 var mongodb = require('mongodb')
+var machines = require('./machine_backend.js')
 
 var queueclient = require('./queue_client.js');
 var queueworker = require('./queue_backend.js');
@@ -41,6 +42,8 @@ app.use('/', indexRouter);
 app.use('/login', loginRouter);
 app.use('/queue', queueRouter);
 app.use('/users', usersRouter);
+
+machines.load("files");
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
