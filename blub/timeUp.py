@@ -17,3 +17,6 @@ print("\nYou are being logged out...")
 
 # Logs user out
 os.system("shutown -l")
+from pymsgbox import *
+
+alert(text='test', title='test', button='OK')
