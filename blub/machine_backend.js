@@ -1,24 +1,34 @@
 const fs = require('fs');
 
-var machines = [];
+var _machines = [];
 
 var load = function(filename) {
     var rawdata = fs.readFileSync('./machines.json');
-    machines = JSON.parse(rawdata);
-    console.log("Loaded " + machines.length + " machines.");
+    _machines = JSON.parse(rawdata);
+    console.log("Loaded " + _machines.length + " machines.");
 };
 
 var open = function(username, reservation) {
-    for(var i=0;i<machines.length;i++) {
-        if(machines[i]["user"] == "" && machines[i]["reservation"] == reservation) {
+    for(var i=0;i<_machines.length;i++) {
+        if(_machines[i]["user"] == "" && _machines[i]["reservation"] == reservation) {
             // We found a free machine. Expire in two hours plz
             var expiration = new Date();
             expiration.setHours(expiration.getHours() + 2);
             
-            machines[i]["user"] = username;
-            machines[i]["until"] = expiration;
+            _machines[i]["user"] = username;
+            _machines[i]["until"] = expiration;
             
-            return machines[i];
+            return _machines[i];
+        }
+    }
+    
+    return null;
+}
+
+var check = function(username) {
+    for(var i=0;i<_machines.length;i++) {
+        if(_machines[i]["user"] == username) {
+            return _machines[i];
         }
     }
     
@@ -26,10 +36,10 @@ var open = function(username, reservation) {
 }
 
 var close = function(username) {
-    for(var i=0;i<machines.length;i++) {
-        if(machines[i]["user"] == username) {
-            machines[i]["user"] = "";
-            machines[i]["until"] = "";
+    for(var i=0;i<_machines.length;i++) {
+        if(_machines[i]["user"] == username) {
+            _machines[i]["user"] = "";
+            _machines[i]["until"] = "";
             
             return true;
         }
@@ -38,6 +48,12 @@ var close = function(username) {
     return false;
 }
 
+var debuginfo = function() {
+    return _machines;
+};
+
 module.exports.load = load;
-
-
+module.exports.open = open;
+module.exports.check = check;
+module.exports.close = close;
+module.exports.debuginfo = debuginfo;

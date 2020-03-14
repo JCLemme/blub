@@ -5,6 +5,49 @@ block content
         link(rel='stylesheet', href='/stylesheets/spinner.css')
 
     script.
+
+        var mlink = ""
+        
+        const nth = function(d) {
+            if (d > 3 && d < 21) return 'th';
+            switch (d % 10) {
+                case 1:  return "st";
+                case 2:  return "nd";
+                case 3:  return "rd";
+                default: return "th";
+            }
+        };
+        
+        function formatdate(dobj) {
+            var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            var dstr = "" +
+                days[dobj.getDay()] + ", " +
+                months[dobj.getMonth()] + " " +
+                dobj.getDay() + nth(dobj.getDay()) + " at " +
+                dobj.getHours() + ":" +
+                dobj.getMinutes();
+                
+            return dstr;
+        };
+        
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for(var i = 0; i <ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
         //const WebSocket = require('ws')
         const url = 'ws://localhost:8080'
         const connection = new WebSocket(url)
@@ -23,15 +66,25 @@ block content
             
             // Handle a request
             switch(msg["status"]) {
+                case "in-session": {
+                    mlink = msg['link'] + getCookie('passhash');
+                    
+                    document.getElementById('action').innerHTML = 'End your session';
+                    document.getElementById('header').innerHTML = "You are on computer " + msg["machine"]["name"] + "."
+                    document.getElementById('subheader').innerHTML = "You can use this workstation until <b>" + formatdate(new Date(msg["machine"]["until"])) + "</b>."
+                }
+                break;
+                
                 case "queued": {
                     document.getElementById('loader').classList.remove("hidden");
                     document.getElementById('action').innerHTML = 'Leave the queue';
                     
                     if(msg['place'] == 0) {
-                        document.getElementById('header').innerHTML = "You're next up for a machine."
+                        document.getElementById('header').innerHTML = "You're next!"
                     }
                     else {
-                        document.getElementById('header').innerHTML = 'You are ' + Number(Number(msg['place'])+Number(1)) + ' in the queue.';
+                        var placemat = Number(Number(msg['place'])+Number(1));
+                        document.getElementById('header').innerHTML = 'You are ' + placemat + nth(placemat) + ' in the queue.';
                     }
                 }
                 break;
@@ -45,23 +98,44 @@ block content
             }
         }
         
-        function buttonHandler() {
+        function button_handler() {
             if(document.getElementById('action').innerHTML == "Join the queue") {
                 connection.send(JSON.stringify( { 'request': 'queue-join' } ));
             }
             else if(document.getElementById('action').innerHTML == "Leave the queue") {
                 connection.send(JSON.stringify( { 'request': 'queue-leave' } ));
             }
+            else if(document.getElementById('action').innerHTML == "End your session") {
+                connection.send(JSON.stringify( { 'request': 'session-end' } ));
+            }
         }
+        
+
+        function remote_handler() {
+            // Launch Myrtille
+            if(mlink != "")
+                window.open(mlink);
+        }
+        
         
     div(id='holder')
         div.loaderBox(id='loader')
             div.loader    
         h1(id='header') You are 11th in the queue.
 
+        
     p(id='subheader')
         | It'll be about 
         b(id='time-remaining') 20 minutes 
         | before you're called.
-        
-    button(id='action' onclick='buttonHandler()') Leave the queue
+    
+    p    
+        button(id='remote' onclick='remote_handler()') Start your remote session
+        button(id='action' onclick='button_handler()') Leave the queue
+              
+
+    
+    
+    
+    
+    

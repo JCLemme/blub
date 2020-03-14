@@ -1,0 +1,86 @@
+extends layout
+
+block content
+    script.
+        //const WebSocket = require('ws')
+        const url = 'ws://localhost:8081'
+        const connection = new WebSocket(url)
+         
+        function display_machines(minfo) {
+            var mstr = "";
+            
+            for(var i=0;i<minfo.length;i++) {
+                mstr += "<p><b>" + minfo[i]['name'] + ' (' + minfo[i]['ip'] + '):</b> ';
+                
+                if(minfo[i]['user'] != "") {
+                    mstr += 'in use by ' + minfo[i]['user'] + ' until ' + new Date(minfo[i]['until']) + ' ';
+                }
+                else {
+                    mstr += 'not in use ';
+                }
+                
+                if(minfo[i]['reservation'] != "") {
+                    mstr += 'reserved for ' + minfo[i]['reservation'];
+                }
+                
+                mstr += '</p>'
+            }
+            
+            document.getElementById('machineinfo').innerHTML = mstr;
+        }
+        
+        function display_queues(qinfo) {
+            var qstr = "";
+           
+            if(qinfo.length == 0) {
+                qstr = '<p><i>Queue is empty...</i></p>';
+            }
+            
+            for(var i=0;i<qinfo.length;i++) {
+                qstr += '<p><b>' + Number(1+i) + ':</b> ';
+                qstr += qinfo[i]['user'] + ' (since ' + Date(qinfo[i]['date']) + ')</p>';
+            }
+            
+            document.getElementById('queueinfo').innerHTML = qstr;
+        }
+        
+        connection.onopen = () => {
+            connection.send(JSON.stringify( {'request': 'init-admin' } )); 
+        }
+         
+        connection.onerror = (error) => {
+            console.log(`WebSocket error: ${error}`)
+        }
+         
+        connection.onmessage = (e) => {
+            console.log(e.data)
+            var msg = JSON.parse(e.data);
+            
+            // Handle a request
+            switch(msg['status']) {
+                case 'machine-info': {
+                    display_machines(msg['data']);
+                }
+                break;
+
+                case 'queue-info': {
+                    display_queues(msg['data']);
+                }
+                break;                
+            }
+        }
+        
+        function button_handler() {
+            connection.send(JSON.stringify( {'request': 'queue' } )); 
+            connection.send(JSON.stringify( {'request': 'machines' } )); 
+        }
+        
+        
+    h1 Blub debug 
+    button(id='action' onclick='button_handler()') Refresh
+    
+    h3 Queueing info
+    p(id='queueinfo')
+    
+    h3 Machine info
+    p(id='machineinfo')

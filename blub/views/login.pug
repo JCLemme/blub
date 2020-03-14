@@ -1,8 +1,34 @@
 extends layout
 
 block content
+
+    script.
+        const url = 'ws://localhost:8082';
+        const connection = new WebSocket(url);
+         
+        connection.onopen = () => {
+        }
+         
+        connection.onerror = (error) => {
+            console.log(`WebSocket error: ${error}`);
+        }
+         
+        connection.onmessage = (e) => {
+            console.log(e.data)
+            var msg = JSON.parse(e.data);
+            
+            if(msg['hash'] != "") {
+                document.cookie = 'passhash=' + msg['hash'];// + ";domain=.uri.edu;path=/";
+                document.getElementById("logform").submit();
+            }
+        }
+        
+        function login_handler() {
+            connection.send(JSON.stringify( { 'request': 'session-passwd', 'pass': document.getElementById('pwd').value } ) );
+        }
+        
     h1 Login to Blub
-    form(method='POST' action='/login')
+    form(id='logform' method='POST' action='/login')
         p: input(name='username' placeholder='Username')
-        p: input(name='password' placeholder='Password' type='password')
-        p: button(type='submit' value='Login') Login
+        p: input(id='pwd' name='password' placeholder='Password' type='password')
+    p: button(id='logbutton' onclick='login_handler()' value='Login') Login

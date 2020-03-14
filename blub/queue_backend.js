@@ -1,3 +1,4 @@
+var machines = require('./machine_backend.js')
 
 var _entries = [];
 
@@ -42,9 +43,35 @@ var remove = function(username) {
     }
 };
 
+var nextup = function() {
+    // If there are no machines in the queue, do nothing. 
+    if(_entries.length < 1) {
+        return "queue-empty";
+    }
+    
+    // Run the handler
+    var status = _entries[0]['on_called']();
+    
+    // If the handler returned false, they didn't get a machine so do nothing.
+    // Else clear them from the queue
+    if(status) {
+        var name = _entries[0]['user'];
+        remove(name)
+        return name;
+    }
+    else {
+        return "no-machines";
+    }
+};
+
+var debuginfo = function() {
+    return _entries;
+};
 
 module.exports.append = append;
 module.exports.check = check;
 module.exports.remove = remove;
 module.exports.refresh = refresh;
+module.exports.nextup = nextup;
+module.exports.debuginfo = debuginfo;
 
