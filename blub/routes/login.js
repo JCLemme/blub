@@ -37,7 +37,7 @@ passport.deserializeUser(function(user, done) {
 });
   
 router.get('/', function(req, res, next) {
-  res.render('login', { title: 'Blub login' });
+    res.render('login', { title: 'Blub login' });
 });
 
 router.post('/', passport.authenticate('ldapauth',{ successRedirect: '/queue', failureRedirect: '/login', failureFlash: false }), function(req, res) {

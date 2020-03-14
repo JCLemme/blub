@@ -9,6 +9,8 @@ var session = require('express-session')
 var mongodb = require('mongodb')
 var machines = require('./machine_backend.js')
 
+var adminclient = require('./admin_client.js');
+var loginclient = require('./login_client.js');
 var queueclient = require('./queue_client.js');
 var queueworker = require('./queue_backend.js');
 
@@ -16,6 +18,7 @@ var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
 var queueRouter = require('./routes/queue');
 var usersRouter = require('./routes/users');
+var adminRouter = require('./routes/admin');
 
 var app = express();
 
@@ -42,6 +45,7 @@ app.use('/', indexRouter);
 app.use('/login', loginRouter);
 app.use('/queue', queueRouter);
 app.use('/users', usersRouter);
+app.use('/admin', adminRouter);
 
 machines.load("files");
 

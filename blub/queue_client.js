@@ -2,6 +2,32 @@ var websocket = require('ws')
 var mongodb = require('mongodb')
 var queueworker = require('./queue_backend.js')
 var machines = require('./machine_backend.js')
+var https = require('https')
+
+// Queue worker
+
+function queueRunner() {
+    console.log("Another beautiful day in the neighborhood");
+    var status = queueworker.nextup();
+    
+    switch(status) {
+        case 'no-machines':
+            console.log("  No machines are available to give out")
+        break;
+        
+        case 'queue-empty':
+            console.log("  No one's waiting for a machine")
+        break;
+        
+        default:
+            console.log("  Looks like " + status + " got a machine")
+        break;
+    }
+    
+    setTimeout(queueRunner, 10000);
+}
+
+setTimeout(queueRunner, 10000);
 
 // Websocket receiver for clients
 
@@ -57,12 +83,23 @@ wss.on('connection', async (ws, req) => {
                 queueworker.append(req.session.passport.user['sAMAccountName'], 
                 
                 function(place) {
-                    console.log('In place ' + place);
                     ws.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
                 },
                 
-                function() {
-                    console.log("I'm up");
+                function(machine) {
+                    // Otherwise let's find them a machine
+                    var machine = machines.open(req.session.passport.user['sAMAccountName'], "");
+                    
+                    // Exit if there are no free machines. 
+                    if(machine == null) {
+                        return false;
+                    }
+                    else {
+                        // Get a machine and send details to client
+                        var machinelink = "https://lime.egr.uri.edu/Myrtille/?__EVENTTARGET=&__EVENTARGUMENT=&connect=Connect%21&server=" + machine['ip'] + "&domain=ECC&user=" + machine['user'] + "&passwordHash=";
+                        ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': machinelink } ));
+                        return true;
+                    }
                 });
             }
             break;
@@ -73,11 +110,43 @@ wss.on('connection', async (ws, req) => {
                 ws.send(JSON.stringify( { 'status': 'idle' } ));
             }
             break;
+
+            case 'session-end': {
+                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested session end');
+                machines.close(req.session.passport.user['sAMAccountName']);
+                ws.send(JSON.stringify( { 'status': 'idle' } ));
+            }
+            break;
         }
     })
 
-    ws.send('Hello! Message From Server!!');
-
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
