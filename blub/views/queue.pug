@@ -24,6 +24,7 @@ block content
             // Handle a request
             switch(msg["status"]) {
                 case "queued": {
+                    document.getElementById('loader').classList.remove("hidden");
                     document.getElementById('action').innerHTML = 'Leave the queue';
                     
                     if(msg['place'] == 0) {
@@ -36,7 +37,8 @@ block content
                 break;
                 
                 case "idle": {
-                    document.getElementById('header').innerHTML = "You are not waiting for a machine."
+                    document.getElementById('loader').classList.add("hidden");
+                    document.getElementById('header').innerHTML = "You're not waiting for a machine."
                     document.getElementById('action').innerHTML = 'Join the queue';
                 }
                 break;
@@ -52,10 +54,11 @@ block content
             }
         }
         
-    div(id='holder')    
+    div(id='holder')
+        div.loaderBox(id='loader')
+            div.loader    
         h1(id='header') You are 11th in the queue.
-        div.loaderBox
-            div.loader
+
     p(id='subheader')
         | It'll be about 
         b(id='time-remaining') 20 minutes 

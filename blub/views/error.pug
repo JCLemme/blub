@@ -1,6 +1,15 @@
 extends layout
 
 block content
-  h1= message
-  h2= error.status
+  h1= "Error " + (error.status) + " - " + message
+  p(id="desc")
+  script.
+    var error = #{error.status};
+    if (error == "404"){
+      document.getElementById('desc').innerHTML = 'The item you are looking for could not be found. Please make sure the URL you entered is correct.';
+    }else{
+      document.getElementById('desc').innerHTML = 'There was an error processing your request. Please contact the ECC for assistance.';
+    }
+  br
+  h3 Here is the full text of the error:
   pre #{error.stack}

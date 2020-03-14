@@ -6,3 +6,23 @@ body {
 a {
   color: #00B7FF;
 }
+
+#blubHead{
+  padding:0;
+  margin:-40px -0px 15px -35px;
+  line-height: 5px;
+  font-size: 20px;
+}
+
+hr{
+  margin-left:-35px;
+  margin-right:-35px;
+  margin-bottom:30px;
+  height:1px;
+  border: none;
+  background-color: #cecece;
+}
+
+.hidden{
+  display: none;
+}

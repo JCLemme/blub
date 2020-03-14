@@ -3,7 +3,7 @@
 }
 
 .loaderBox{
-	height:80px;
+	height:10px;
 }
 
 /*Loading spinner*/
@@ -19,7 +19,7 @@
 .loader {
   color: #707070;
 
-  margin: 26px 16px;
+  margin: 28px 18px 0 5px;
   position: relative;
   font-size: 4px;
   -webkit-transform: translateZ(0);
