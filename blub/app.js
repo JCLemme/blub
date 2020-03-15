@@ -47,6 +47,7 @@ app.use('/login', loginRouter);
 app.use('/queue', queueRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
+app.use(express.static('guacamole-common-js'))
 
 machines.load("files");
 
