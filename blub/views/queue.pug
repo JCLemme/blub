@@ -18,16 +18,29 @@ block content
             }
         };
         
+        //We would like to thank our heavenly father above, StackOverflow, for writing the following 2 formatting functions for me
+        function hours12(date){return (date.getHours() + 24) % 12 || 12;}
+
+        function pad(value){
+            if(value < 10) {
+                return '0' + value;
+            } else {
+                return value;
+            }
+        }
+
         function formatdate(dobj) {
             var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
             var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            var ampm = (dobj.getHours() > 11) ? "PM" : "AM";
 
             var dstr = "" +
                 days[dobj.getDay()] + ", " +
                 months[dobj.getMonth()] + " " +
-                dobj.getDay() + nth(dobj.getDay()) + " at " +
-                dobj.getHours() + ":" +
-                dobj.getMinutes();
+                dobj.getDate() + nth(dobj.getDay()) + " at " +
+                hours12(dobj) + ":" +
+                pad(dobj.getMinutes()) + " " +
+                ampm;
                 
             return dstr;
         };
@@ -68,49 +81,63 @@ block content
             switch(msg["status"]) {
                 case "in-session": {
                     mlink = msg['link'] + getCookie('passhash');
-                    
-                    document.getElementById('action').innerHTML = 'End your session';
-                    document.getElementById('header').innerHTML = "You are on computer " + msg["machine"]["name"] + "."
-                    document.getElementById('subheader').innerHTML = "You can use this workstation until <b>" + formatdate(new Date(msg["machine"]["until"])) + "</b>."
+                    document.getElementById('loader').classList.add("hidden");
+                    document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"] + ".";
+                    document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + formatdate(new Date(msg["machine"]["until"])) + "</b>.";
+
+                    document.getElementById('join').classList.add("hidden");
+                    document.getElementById('remote').classList.remove("hidden");
+                    document.getElementById('end').classList.remove("hidden");
+                    document.getElementById('leave').classList.add("hidden");
                 }
                 break;
                 
                 case "queued": {
                     document.getElementById('loader').classList.remove("hidden");
-                    document.getElementById('action').innerHTML = 'Leave the queue';
                     
                     if(msg['place'] == 0) {
-                        document.getElementById('header').innerHTML = "You're next!"
+                        document.getElementById('header').innerHTML = "You're next up for a machine.";
+                        document.getElementById('subheader').innerHTML = "The <b>next open machine</b> will be yours.";
                     }
                     else {
                         var placemat = Number(Number(msg['place'])+Number(1));
                         document.getElementById('header').innerHTML = 'You are ' + placemat + nth(placemat) + ' in the queue.';
+                        document.getElementById('subheader').innerHTML = "It'll be about <b>20 minutes</b> before you're called.";
                     }
+                    document.getElementById('join').classList.add("hidden");
+                    document.getElementById('remote').classList.add("hidden");
+                    document.getElementById('end').classList.add("hidden");
+                    document.getElementById('leave').classList.remove("hidden");
                 }
                 break;
                 
                 case "idle": {
                     document.getElementById('loader').classList.add("hidden");
-                    document.getElementById('header').innerHTML = "You're not waiting for a machine."
-                    document.getElementById('action').innerHTML = 'Join the queue';
+                    document.getElementById('header').innerHTML = "You're not waiting for a machine.";
+                    document.getElementById('subheader').innerHTML = "The current wait time is about <b>20 minutes</b>.";
+
+                    document.getElementById('join').classList.remove("hidden");
+                    document.getElementById('remote').classList.add("hidden");
+                    document.getElementById('end').classList.add("hidden");
+                    document.getElementById('leave').classList.add("hidden");
                 }
                 break;
             }
         }
-        
-        function button_handler() {
-            if(document.getElementById('action').innerHTML == "Join the queue") {
-                connection.send(JSON.stringify( { 'request': 'queue-join' } ));
-            }
-            else if(document.getElementById('action').innerHTML == "Leave the queue") {
-                connection.send(JSON.stringify( { 'request': 'queue-leave' } ));
-            }
-            else if(document.getElementById('action').innerHTML == "End your session") {
-                connection.send(JSON.stringify( { 'request': 'session-end' } ));
-            }
+
+        //Button handlers
+        function join_handler(){
+            connection.send(JSON.stringify( { 'request': 'queue-join' } ));
+        }
+
+        function leave_handler(){
+            connection.send(JSON.stringify( { 'request': 'queue-leave' } ));
+        }
+
+        function end_handler(){
+            connection.send(JSON.stringify( { 'request': 'session-end' } ));
         }
         
-
         function remote_handler() {
             // Launch Myrtille
             if(mlink != "")
@@ -125,13 +152,14 @@ block content
 
         
     p(id='subheader')
-        | It'll be about 
-        b(id='time-remaining') 20 minutes 
-        | before you're called.
-    
-    p    
-        button(id='remote' onclick='remote_handler()') Start your remote session
-        button(id='action' onclick='button_handler()') Leave the queue
+        | The current wait time is about 
+        b(id='time-remaining') 20 minutes.
+    br
+    button(id='remote' onclick='remote_handler()') 
+        b() Open your remote session
+    button(id='leave' onclick='leave_handler()') Leave the queue
+    button(id='join' onclick='join_handler()') Join the queue
+    button(id='end' onclick='end_handler()') End your session
               
 
     

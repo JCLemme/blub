@@ -27,8 +27,27 @@ block content
             connection.send(JSON.stringify( { 'request': 'session-passwd', 'pass': document.getElementById('pwd').value } ) );
         }
         
-    h1 Login to Blub
-    form(id='logform' method='POST' action='/login')
-        p: input(name='username' placeholder='Username')
-        p: input(id='pwd' name='password' placeholder='Password' type='password')
-    p: button(id='logbutton' onclick='login_handler()' value='Login') Login
+    h1 Log in to Blub.
+    p Sign in using your ECC account.
+    br
+    form(id='logform' class='loginBox' method='POST' action='/login')
+        table
+            tr
+                td
+                    label(for='username') Username:
+                td
+                    input(name='username' placeholder='Username')
+            tr 
+                td
+                    label(for='password') Password:
+                td
+                    input(id='pwd' name='password' placeholder='Password' type='password')
+    p(id='incorrectText')
+    script.
+        console.log("test: #{failureFlash}");
+        document.getElementById('incorrectText').innerHTML = ("#{failureFlash}" != "") ? "Incorrect username or password." : " ";
+    button(id='logbutton' onclick='login_handler()' value='Login') Login
+    br
+    br
+    br
+    a(href="mailto:eccmanager@egr.uri.edu?subject=Forgotten Password") Forgot your ECC password? Email us here.

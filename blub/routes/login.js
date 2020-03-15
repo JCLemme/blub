@@ -1,11 +1,11 @@
 var express = require('express');
+var flash = require("connect-flash");
 var router = express.Router();
 var fs = require('fs');
 
 var secrets = require('./blub_secrets.js');
 
 require('ssl-root-cas').addFile('./certs/ldap.pem');
-var flash = require("connect-flash");
 
 var passport = require('passport');
 var LdapStrategy = require('passport-ldapauth');
@@ -37,10 +37,10 @@ passport.deserializeUser(function(user, done) {
 });
   
 router.get('/', function(req, res, next) {
-    res.render('login', { title: 'Blub login' });
+    res.render('login', { title: 'Blub login', failureFlash: req.flash('error') });
 });
 
-router.post('/', passport.authenticate('ldapauth',{ successRedirect: '/queue', failureRedirect: '/login', failureFlash: false }), function(req, res) {
+router.post('/', passport.authenticate('ldapauth',{ successRedirect: '/queue', failureRedirect: '/login', failureFlash: true }), function(req, res) {
     res.json(req.user)
 });
 
