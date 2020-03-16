@@ -21,19 +21,9 @@ a {
   margin-top: 14px;
 }
 
-.headBar button{
-  line-height: 5px;
-  background: none;
+#signout{
   font-size: 15px;
-  border:none;
-  margin-left: 0px;
   margin-top: 3px;
-  width:auto;
-}
-
-.headBar button:hover{
-  background: none;
-  text-decoration: underline;
 }
 
 #blubHead{
@@ -105,21 +95,20 @@ input{
   padding:0;
 }
 
-#class{
+.textOnly{
   line-height: 5px;
   background: none;
   border:none;
   font-size: 17px;
-  margin-left: 0px;
-  margin-top: 25px;
   width:auto;
 }
 
-#class:hover{
+.textOnly:hover{
   background: none;
   text-decoration: underline;
 }
 
 #code{
-  width:200px;
+  width:250px;
+  margin-right:30px;
 }

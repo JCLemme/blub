@@ -39,7 +39,7 @@ block content
             var dstr = "" +
                 days[dobj.getDay()] + ", " +
                 months[dobj.getMonth()] + " " +
-                dobj.getDate() + nth(dobj.getDay()) + " at " +
+                dobj.getDate() + nth(dobj.getDate()) + " at " +
                 hours12(dobj) + ":" +
                 pad(dobj.getMinutes()) + " " +
                 ampm;
@@ -83,17 +83,37 @@ block content
             switch(msg["status"]) {
                 case "in-session": {
                     mlink = msg['link'] + getCookie('passhash');
-                    document.getElementById('loader').classList.add("hidden");
                     document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"] + ".";
-                    document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + formatdate(new Date(msg["machine"]["until"])) + "</b>.";
+                    document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
+                                                                      formatdate(new Date(msg["machine"]["until"])) + "</b>.";
+                    toggleHidden('remote', 'end');
+                }
+                break;
 
+                case "in-session-class": {
+                    mlink = msg['link'] + getCookie('passhash');
+                    document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"] + ".";
+                    document.getElementById('subheader').innerHTML = "You can use this workstation until your class ends on <b>" + 
+                                                                      formatdate(new Date(msg["machine"]["until"])) + "</b>.";
                     toggleHidden('remote', 'end');
                 }
                 break;
                 
+                case "invalid-class": {
+                    document.getElementById('header').innerHTML = "You're not waiting for a machine.";
+                    document.getElementById('subheader').innerHTML = "Invalid class code. Make sure you entered it correctly and the class is open.";
+                    toggleHidden('join', 'class');
+                }
+                break;
+                
+                case "full-class": {
+                    document.getElementById('header').innerHTML = "You're not waiting for a machine.";
+                    document.getElementById('subheader').innerHTML = "The class you tried to join is already full.";
+                    toggleHidden('join', 'class');
+                }
+                break;
+
                 case "queued": {
-                    document.getElementById('loader').classList.remove("hidden");
-                    
                     if(msg['place'] == 0) {
                         document.getElementById('header').innerHTML = "You're next up for a machine.";
                         document.getElementById('subheader').innerHTML = "The <b>next open machine</b> will be yours.";
@@ -103,12 +123,11 @@ block content
                         document.getElementById('header').innerHTML = 'You are ' + placemat + nth(placemat) + ' in the queue.';
                         document.getElementById('subheader').innerHTML = "It'll be about <b>20 minutes</b> before you're called.";
                     }
-                    toggleHidden('leave');
+                    toggleHidden('leave', 'loader');
                 }
                 break;
                 
                 case "idle": {
-                    document.getElementById('loader').classList.add("hidden");
                     document.getElementById('header').innerHTML = "You're not waiting for a machine.";
                     document.getElementById('subheader').innerHTML = "The current wait time is about <b>20 minutes</b>.";
                     toggleHidden('join', 'class');
@@ -130,10 +149,12 @@ block content
 
         function leave_handler(){
             connection.send(JSON.stringify( { 'request': 'queue-leave' } ));
+            close_handler();
         }
 
         function end_handler(){
             connection.send(JSON.stringify( { 'request': 'session-end' } ));
+            close_handler();
         }
         
         function remote_handler() {
@@ -143,8 +164,24 @@ block content
         }
 
         function class_handler(){
-            document.getElementById('code').classList.toggle("hidden");
-            hasClassCode = !hasClassCode;
+            document.getElementById('class').classList.add("hidden");
+            document.getElementById('code').classList.remove("hidden");
+            document.getElementById('close').classList.remove("hidden");
+            hasClassCode = true;
+            document.getElementById('join').innerHTML = "Join class";
+        }
+
+        function close_handler(){
+            document.getElementById('class').classList.remove("hidden");
+            document.getElementById('code').classList.add("hidden");
+            document.getElementById('close').classList.add("hidden");
+            hasClassCode = false;
+            document.getElementById('join').innerHTML = "Join the queue";
+        }
+
+        function codeEntered(){ //not in use atm
+            //hasClassCode = (document.getElementById('code').value.trim() === '') ? false : true;
+            //document.getElementById('join').innerHTML = (hasClassCode) ? "Join class" : "Join the queue";
         }
         
         function toggleHidden(...args){
@@ -154,6 +191,8 @@ block content
             document.getElementById('leave').classList.add("hidden");
             document.getElementById('class').classList.add("hidden");
             document.getElementById('code').classList.add("hidden");
+            document.getElementById('close').classList.add("hidden");
+            document.getElementById('loader').classList.add("hidden");  //Spinner
             args.forEach(element => document.getElementById(element).classList.remove("hidden"));
         }
         
@@ -169,11 +208,12 @@ block content
     br
     button(id='remote' onclick='remote_handler()') 
         b() Open your remote session
+    input(id='code' name='code' autocomplete="off" oninput="codeEntered()" placeholder='Enter class code')
     button(id='leave' onclick='leave_handler()') Leave the queue
     button(id='join' onclick='join_handler()') Join the queue
     button(id='end' onclick='end_handler()') End your session
-    button(id='class' onclick='class_handler()') I have a class code...
-    input(id='code' name='code' placeholder='Enter class code')
+    button(id='class' class="textOnly" onclick='class_handler()') I have a class code...
+    button(id='close' class="textOnly" onclick='close_handler()') I don't have a class code...
               
 
     

@@ -51,7 +51,6 @@ block content
     p(id='incorrectText')
     
     script.
-        //console.log("#{failureFlash}");
         document.getElementById('incorrectText').innerHTML = ("#{failureFlash}" != "") ? "Incorrect username or password." : " ";
         
     button(id='logbutton' onclick='login_handler()' value='Login') Login
