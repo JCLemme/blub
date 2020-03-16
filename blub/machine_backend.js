@@ -8,7 +8,7 @@ var load = function(filename) {
     console.log("Loaded " + _machines.length + " machines.");
 };
 
-var open = function(username, reservation, onTerminate, onKill) {
+var open = function(socket, username, reservation, onTerminate, onKill) {
     for(var i=0;i<_machines.length;i++) {
         if(_machines[i]["user"] == "" && _machines[i]["reservation"] == reservation) {
             // We found a free machine. Expire in two hours plz
@@ -17,6 +17,7 @@ var open = function(username, reservation, onTerminate, onKill) {
             expiration.setMinutes(expiration.getMinutes() + 1);
             
             _machines[i]["user"] = username;
+            _machines[i]["socket"] = socket;
             _machines[i]["until"] = expiration;
             _machines[i]["on_terminate"] = onTerminate;
             _machines[i]["on_kill"] = onKill;
@@ -38,10 +39,22 @@ var check = function(username) {
     return null;
 }
 
+var redirect = function(username, socket) {
+    for(var i=0;i<_machines.length;i++) {
+        if(_machines[i]["user"] == username) {
+            _machines[i]["socket"] = socket;
+            return true;
+        }
+    }
+    
+    return false;
+}
+
 var close = function(username) {
     for(var i=0;i<_machines.length;i++) {
         if(_machines[i]["user"] == username) {
             _machines[i]["user"] = "";
+            _machines[i]["socket"] = "";
             _machines[i]["until"] = "";
             _machines[i]["on_terminate"] = "";
             _machines[i]["on_kill"] = "";
@@ -71,12 +84,12 @@ var cull = function() {
                 expiration.setMinutes(expiration.getMinutes() + 1);
                 
                 _machines[i]["until"] = expiration;
-                _machines[i]["on_terminate"]();
+                _machines[i]["on_terminate"](_machines[i]["socket"]);
                 _machines[i]["on_terminate"] = "";
             }
             else {
                 // F-F-F-FATALITY
-                _machines[i]["on_kill"]();
+                _machines[i]["on_kill"](_machines[i]["socket"]);
                 close(_machines[i]["user"]);
             }
         }
@@ -109,6 +122,7 @@ var reservation = function(reservation) {
 module.exports.load = load;
 module.exports.open = open;
 module.exports.check = check;
+module.exports.redirect = redirect;
 module.exports.close = close;
 module.exports.debuginfo = debuginfo;
 module.exports.cull = cull;
