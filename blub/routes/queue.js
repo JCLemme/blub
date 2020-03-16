@@ -11,4 +11,9 @@ router.get('/', function(req, res, next) {
     }
 });
 
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
 module.exports = router;

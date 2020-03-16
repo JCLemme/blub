@@ -118,6 +118,23 @@ var reservation = function(reservation) {
         return found-full;
 }
 
+var reserve = function(reservation, original, amount) {
+    var found = 0;
+    
+    for(var i=0;i<_machines.length;i++) {
+        if(_machines[i]["user"] != "") {
+            if(_machines[i]["reservation"] == original) {
+                found++;
+                _machines[i]["reservation"] = reservation;
+                
+                if(found == amount) 
+                    return found;
+            }
+        }
+    }
+    
+    return found;
+}
 
 module.exports.load = load;
 module.exports.open = open;
