@@ -5,7 +5,11 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
     //Header
-    h1(id='blubHead') ECC Blub
+    .headBar
+      h1(id='blubHead') ECC Blub
+      p ▪
+      p(id='userLabel') Logged in as username
+      button(id='signout' onclick='') (Logout)
     hr
 
   script.
@@ -22,11 +26,18 @@ html
       }
         
       webConnection.onmessage = (e) => {
-          console.log(e.data)
-          var msg = JSON.parse(e.data);
-          
-          // Handle a request
+        var msg = JSON.parse(e.data);
+        if (msg["data"] != "none"){
+          //logged in
           console.log(msg["data"]);
+          document.getElementById('userLabel').innerHTML = "Logged in as " + msg["data"]["displayName"];
+          document.getElementById('signout').classList.remove("hidden");
+        }else{
+          //logged out
+          console.log("Logged out");
+          document.getElementById('userLabel').innerHTML = "Not logged in";
+          document.getElementById('signout').classList.add("hidden");
+        }
       }
 
   block content

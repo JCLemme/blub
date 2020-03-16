@@ -7,16 +7,43 @@ a {
   color: black;
 }
 
-#blubHead{
+.headBar{
+  display: flex;
+  height:0;
   padding:0;
-  margin:-40px -0px 15px -35px;
+  margin:-50px -0px 15px -35px;
   line-height: 5px;
+}
+
+.headBar p{
+  font-size: 17px;
+  margin-left: 20px;
+  margin-top: 14px;
+}
+
+.headBar button{
+  line-height: 5px;
+  background: none;
+  font-size: 15px;
+  border:none;
+  margin-left: 0px;
+  margin-top: 3px;
+  width:auto;
+}
+
+.headBar button:hover{
+  background: none;
+  text-decoration: underline;
+}
+
+#blubHead{
   font-size: 20px;
 }
 
 hr{
   margin-left:-35px;
   margin-right:-35px;
+  margin-top:40px;
   margin-bottom:60px;
   height:1px;
   border: none;
@@ -76,4 +103,23 @@ input{
   line-height: 2px;
   margin-top:-10px;
   padding:0;
+}
+
+#class{
+  line-height: 5px;
+  background: none;
+  border:none;
+  font-size: 17px;
+  margin-left: 0px;
+  margin-top: 25px;
+  width:auto;
+}
+
+#class:hover{
+  background: none;
+  text-decoration: underline;
+}
+
+#code{
+  width:200px;
 }

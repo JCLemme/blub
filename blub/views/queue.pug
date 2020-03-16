@@ -6,6 +6,8 @@ block content
 
     script.
 
+        var hasClassCode;
+
         var mlink = ""
         
         const nth = function(d) {
@@ -72,7 +74,7 @@ block content
         connection.onerror = (error) => {
             console.log(`WebSocket error: ${error}`)
         }
-         
+
         connection.onmessage = (e) => {
             console.log(e.data)
             var msg = JSON.parse(e.data);
@@ -85,10 +87,7 @@ block content
                     document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"] + ".";
                     document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + formatdate(new Date(msg["machine"]["until"])) + "</b>.";
 
-                    document.getElementById('join').classList.add("hidden");
-                    document.getElementById('remote').classList.remove("hidden");
-                    document.getElementById('end').classList.remove("hidden");
-                    document.getElementById('leave').classList.add("hidden");
+                    toggleHidden('remote', 'end');
                 }
                 break;
                 
@@ -104,10 +103,7 @@ block content
                         document.getElementById('header').innerHTML = 'You are ' + placemat + nth(placemat) + ' in the queue.';
                         document.getElementById('subheader').innerHTML = "It'll be about <b>20 minutes</b> before you're called.";
                     }
-                    document.getElementById('join').classList.add("hidden");
-                    document.getElementById('remote').classList.add("hidden");
-                    document.getElementById('end').classList.add("hidden");
-                    document.getElementById('leave').classList.remove("hidden");
+                    toggleHidden('leave');
                 }
                 break;
                 
@@ -115,11 +111,7 @@ block content
                     document.getElementById('loader').classList.add("hidden");
                     document.getElementById('header').innerHTML = "You're not waiting for a machine.";
                     document.getElementById('subheader').innerHTML = "The current wait time is about <b>20 minutes</b>.";
-
-                    document.getElementById('join').classList.remove("hidden");
-                    document.getElementById('remote').classList.add("hidden");
-                    document.getElementById('end').classList.add("hidden");
-                    document.getElementById('leave').classList.add("hidden");
+                    toggleHidden('join', 'class');
                 }
                 break;
             }
@@ -127,7 +119,13 @@ block content
 
         //Button handlers
         function join_handler(){
-            connection.send(JSON.stringify( { 'request': 'queue-join' } ));
+            if (document.getElementById('code').value.trim() === '' || !hasClassCode){
+                //No class code, regular queue
+                connection.send(JSON.stringify( { 'request': 'queue-join' } ));
+            }else{
+                //Class code
+                connection.send(JSON.stringify( { 'request': 'queue-join-class', 'reservation': document.getElementById('code').value.trim() } ));
+            }
         }
 
         function leave_handler(){
@@ -143,7 +141,21 @@ block content
             if(mlink != "")
                 window.open(mlink);
         }
+
+        function class_handler(){
+            document.getElementById('code').classList.toggle("hidden");
+            hasClassCode = !hasClassCode;
+        }
         
+        function toggleHidden(...args){
+            document.getElementById('join').classList.add("hidden");
+            document.getElementById('remote').classList.add("hidden");
+            document.getElementById('end').classList.add("hidden");
+            document.getElementById('leave').classList.add("hidden");
+            document.getElementById('class').classList.add("hidden");
+            document.getElementById('code').classList.add("hidden");
+            args.forEach(element => document.getElementById(element).classList.remove("hidden"));
+        }
         
     div(id='holder')
         div.loaderBox(id='loader')
@@ -160,6 +172,8 @@ block content
     button(id='leave' onclick='leave_handler()') Leave the queue
     button(id='join' onclick='join_handler()') Join the queue
     button(id='end' onclick='end_handler()') End your session
+    button(id='class' onclick='class_handler()') I have a class code...
+    input(id='code' name='code' placeholder='Enter class code')
               
 
     
