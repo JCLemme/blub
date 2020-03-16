@@ -21,7 +21,7 @@ var append = function(username, onMovement, onCalled) {
 
     // Backup logic: dumps current _entries array to a .json file.
     currentTime = Date.now()
-    fileName = `./queueBackup $currentTime`;
+    fileName = `./queueBackup ${currentTime}`;
     fs.writeFile(fileName, JSON.stringify(_entries), (err) => {
         if (err) {
             console.error(err);
@@ -54,7 +54,7 @@ var remove = function(username) {
 
         // Backup logic: dumps current _entries array to a .json file.
         currentTime = Date.now()
-        fileName = `./queueBackup $currentTime`;
+        fileName = `./queueBackup ${currentTime}`;
         fs.writeFile(fileName, JSON.stringify(_entries), (err) => {
             if (err) {
                 console.error(err);
