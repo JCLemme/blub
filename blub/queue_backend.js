@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 var machines = require('./machine_backend.js')
 
 var _entries = [];
@@ -16,6 +18,17 @@ var append = function(username, onMovement, onCalled) {
     entry = { 'user': username, 'date': Date.now(), 'on_movement': onMovement, 'on_called': onCalled };
     _entries.push(entry);
     console.log(_entries);
+
+    // Backup logic: dumps current _entries array to a .json file.
+    currentTime = Date.now()
+    fileName = `./queueBackup $currentTime`;
+    fs.writeFile(fileName, JSON.stringify(_entries), (err) => {
+        if (err) {
+            console.error(err);
+            return;
+        };
+        console.log('Backup created');
+    });
     
     refresh();
     return true;
@@ -38,6 +51,18 @@ var remove = function(username) {
     }
     else {
         _entries.splice(place, 1);
+
+        // Backup logic: dumps current _entries array to a .json file.
+        currentTime = Date.now()
+        fileName = `./queueBackup $currentTime`;
+        fs.writeFile(fileName, JSON.stringify(_entries), (err) => {
+            if (err) {
+                console.error(err);
+                return;
+            };
+            console.log('Backup created');
+        });
+
         refresh();
         return true;
     }
@@ -57,6 +82,18 @@ var nextup = function() {
     if(status) {
         var name = _entries[0]['user'];
         remove(name)
+
+        // Backup logic: dumps current _entries array to a .json file.
+        currentTime = Date.now()
+        fileName = `./queueBackup $currentTime`;
+        fs.writeFile(fileName, JSON.stringify(_entries), (err) => {
+            if (err) {
+                console.error(err);
+                return;
+            };
+            console.log('Backup created');
+        });
+
         return name;
     }
     else {

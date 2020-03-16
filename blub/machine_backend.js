@@ -20,6 +20,18 @@ var open = function(username, reservation, onTerminate, onKill) {
             _machines[i]["until"] = expiration;
             _machines[i]["on_terminate"] = onTerminate;
             _machines[i]["on_kill"] = onKill;
+
+            // Backup logic: dumps current _machines array to a .json file.
+            currentTime = Date.now()
+            fileName = `./machineBackup $currentTime`;
+            fs.writeFile(fileName, JSON.stringify(_machines), (err) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                };
+                console.log('Backup created');
+            });
+
             
             return _machines[i];
         }
@@ -45,6 +57,18 @@ var close = function(username) {
             _machines[i]["until"] = "";
             _machines[i]["on_terminate"] = "";
             _machines[i]["on_kill"] = "";
+
+            // Backup logic: dumps current _machines array to a .json file.
+            currentTime = Date.now()
+            fileName = `./machineBackup $currentTime`;
+            fs.writeFile(fileName, JSON.stringify(_machines), (err) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                };
+                console.log('Backup created');
+            });
+
             
             return true;
         }
