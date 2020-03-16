@@ -51,7 +51,7 @@ wss.on('connection', async (ws, req) => {
         
         // Parse the message out
         msg = JSON.parse(message);
-        
+                                    console.log(req.session.passport.user);
         switch(msg['request']) {
             case 'init': {
                 // See if the user is currently queued, and if so send them some queue
@@ -77,6 +77,10 @@ wss.on('connection', async (ws, req) => {
             }
             break;
             
+            
+            
+            /// Queue functions
+
             case 'queue-join': {
                 console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested queue join');
                 
@@ -111,6 +115,20 @@ wss.on('connection', async (ws, req) => {
             }
             break;
 
+
+
+            // User data functions
+            
+            case 'user-info': {
+                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested all their info');
+                ws.send(JSON.stringify( { 'response': 'info',  'data': req.session.passport.user} ));
+            }
+            break;
+            
+            
+            
+            // Session functions
+            
             case 'session-end': {
                 console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested session end');
                 machines.close(req.session.passport.user['sAMAccountName']);
