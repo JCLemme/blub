@@ -8,6 +8,27 @@ html
     h1(id='blubHead') ECC Blub
     hr
 
-    block content
+  script.
+      //const WebSocket = require('ws')
+      const webUrl = 'ws://localhost:8082';
+      const webConnection = new WebSocket(webUrl);
+        
+      webConnection.onopen = () => {
+          webConnection.send(JSON.stringify( {'request': 'user-info' } )); 
+      }
+        
+      webConnection.onerror = (error) => {
+          console.log(`WebSocket error: ${error}`)
+      }
+        
+      webConnection.onmessage = (e) => {
+          console.log(e.data)
+          var msg = JSON.parse(e.data);
+          
+          // Handle a request
+          console.log(msg["data"]);
+      }
+
+  block content
 
       

@@ -79,7 +79,6 @@ wss.on('connection', async (ws, req) => {
         
         // Parse the message out
         msg = JSON.parse(message);
-
         switch(msg['request']) {
             case 'init': {
                 // See if the user is currently queued, and if so send them some queue
