@@ -107,9 +107,7 @@ wss.on('connection', async (ws, req) => {
                         ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': machinelink } ));
                         return true;
                     }
-                },
-                
-                function(machine));
+                });
             }
             break;
             
