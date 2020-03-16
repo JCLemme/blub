@@ -79,12 +79,14 @@ wss.on('connection', async (ws, req) => {
         
         // Parse the message out
         msg = JSON.parse(message);
+        
         switch(msg['request']) {
             case 'init': {
                 // See if the user is currently queued, and if so send them some queue
                 var place = queueworker.check(req.session.passport.user['sAMAccountName']);
                 
                 if(place != null) {
+                    queueworker.redirect(req.session.passport.user['sAMAccountName'], ws);
                     ws.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
                 }
                 else {
@@ -93,6 +95,7 @@ wss.on('connection', async (ws, req) => {
                     var machine = machines.check(req.session.passport.user['sAMAccountName']);
                     
                     if(machine != null) {
+                        machines.redirect(req.session.passport.user['sAMAccountName'], ws);
                         ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine } ));
                     }
                     else {
@@ -111,25 +114,25 @@ wss.on('connection', async (ws, req) => {
             case 'queue-join': {
                 console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested queue join');
                 
-                queueworker.append(req.session.passport.user['sAMAccountName'], 
+                queueworker.append(ws, req.session.passport.user['sAMAccountName'], 
                 
-                function(place) {
-                    ws.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
+                function(socket, place) {
+                    socket.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
                 },
                 
-                function(machine) {
+                function(socket, machine) {
                     // Otherwise let's find them a machine
-                    var machine = machines.open(req.session.passport.user['sAMAccountName'], "", 
-                    function() {
+                    var machine = machines.open(socket, req.session.passport.user['sAMAccountName'], "", 
+                    function(socket) {
                         // This handler tells the client that their time is up.
                         console.log('User ' + req.session.passport.user['sAMAccountName'] + ' has ten minutes to get their shit together.');
-                        ws.send(JSON.stringify( { 'status': 'closing' } ));
+                        socket.send(JSON.stringify( { 'status': 'closing' } ));
                     },
                     
-                    function() {
+                    function(socket) {
                         // This handler tells the client to forcibly kill the connection.
                         console.log('User ' + req.session.passport.user['sAMAccountName'] + '\'s session just ended.');
-                        ws.send(JSON.stringify( { 'status': 'idle' } ));
+                        socket.send(JSON.stringify( { 'status': 'idle' } ));
                     });
                     
                     // Exit if there are no free machines. 
@@ -139,7 +142,7 @@ wss.on('connection', async (ws, req) => {
                     else {
                         // Get a machine and send details to client
                         var machinelink = "https://lime.egr.uri.edu/Myrtille/?__EVENTTARGET=&__EVENTARGUMENT=&connect=Connect%21&server=" + machine['ip'] + "&domain=ECC&user=" + machine['user'] + "&passwordHash=";
-                        ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': machinelink } ));
+                        socket.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': machinelink } ));
                         return true;
                     }
                 });
@@ -162,16 +165,16 @@ wss.on('connection', async (ws, req) => {
                     console.log('That class above has ' + available + ' spots left.');
                     
                     var machine = machines.open(req.session.passport.user['sAMAccountName'], msg['reservation'], 
-                    function() {
+                    function(socket) {
                         // This handler tells the client that their time is up.
                         console.log('User ' + req.session.passport.user['sAMAccountName'] + ' has ten minutes to get their shit together.');
-                        ws.send(JSON.stringify( { 'status': 'closing' } ));
+                        socket.send(JSON.stringify( { 'status': 'closing' } ));
                     },
                     
-                    function() {
+                    function(socket) {
                         // This handler tells the client to forcibly kill the connection.
                         console.log('User ' + req.session.passport.user['sAMAccountName'] + '\'s session just ended.');
-                        ws.send(JSON.stringify( { 'status': 'idle' } ));
+                        socket.send(JSON.stringify( { 'status': 'idle' } ));
                     });
                     
                     if(machine == null) {
@@ -182,39 +185,6 @@ wss.on('connection', async (ws, req) => {
                         ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'link': machinelink, 'reservation': msg['reservation'] } ));
                     }
                 }
-                
-                queueworker.append(req.session.passport.user['sAMAccountName'], 
-                
-                function(place) {
-                    ws.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
-                },
-                
-                function(machine) {
-                    // Otherwise let's find them a machine
-                    var machine = machines.open(req.session.passport.user['sAMAccountName'], "", 
-                    function() {
-                        // This handler tells the client that their time is up.
-                        console.log('User ' + req.session.passport.user['sAMAccountName'] + ' has ten minutes to get their shit together.');
-                        ws.send(JSON.stringify( { 'status': 'closing' } ));
-                    },
-                    
-                    function() {
-                        // This handler tells the client to forcibly kill the connection.
-                        console.log('User ' + req.session.passport.user['sAMAccountName'] + '\'s session just ended.');
-                        ws.send(JSON.stringify( { 'status': 'idle' } ));
-                    });
-                    
-                    // Exit if there are no free machines. 
-                    if(machine == null) {
-                        return false;
-                    }
-                    else {
-                        // Get a machine and send details to client
-                        var machinelink = "https://lime.egr.uri.edu/Myrtille/?__EVENTTARGET=&__EVENTARGUMENT=&connect=Connect%21&server=" + machine['ip'] + "&domain=ECC&user=" + machine['user'] + "&passwordHash=";
-                        ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': machinelink } ));
-                        return true;
-                    }
-                });
             }
             break;
             

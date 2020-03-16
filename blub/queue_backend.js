@@ -4,16 +4,16 @@ var _entries = [];
 
 var refresh = function() {
     for(var i=0;i<_entries.length;i++) {
-        _entries[i]['on_movement'](i)
+        _entries[i]['on_movement'](_entries[i]['socket'], i)
     }
 };
 
-var append = function(username, onMovement, onCalled) {
+var append = function(socket, username, onMovement, onCalled) {
     if(check(username) != null) {
         return false;
     }
     
-    entry = { 'user': username, 'date': Date.now(), 'on_movement': onMovement, 'on_called': onCalled };
+    entry = { 'socket': socket, 'user': username, 'date': Date.now(), 'on_movement': onMovement, 'on_called': onCalled };
     _entries.push(entry);
     console.log(_entries);
     
@@ -28,6 +28,16 @@ var check = function(username) {
     }
     
     return null;
+};
+
+var redirect = function(username, socket) {
+    for(var i=0;i<_entries.length;i++) {
+        if(_entries[i]['user'] == username)
+            _entries[i]['socket'] = socket;
+            return true;
+    }
+    
+    return false;
 };
 
 var remove = function(username) {
@@ -50,7 +60,7 @@ var nextup = function() {
     }
     
     // Run the handler
-    var status = _entries[0]['on_called']();
+    var status = _entries[0]['on_called'](_entries[0]['socket'])
     
     // If the handler returned false, they didn't get a machine so do nothing.
     // Else clear them from the queue
@@ -70,6 +80,7 @@ var debuginfo = function() {
 
 module.exports.append = append;
 module.exports.check = check;
+module.exports.redirect = redirect;
 module.exports.remove = remove;
 module.exports.refresh = refresh;
 module.exports.nextup = nextup;
