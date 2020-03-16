@@ -101,15 +101,19 @@ block content
                 
                 case "invalid-class": {
                     document.getElementById('header').innerHTML = "You're not waiting for a machine.";
-                    document.getElementById('subheader').innerHTML = "Invalid class code. Make sure you entered it correctly and the class is open.";
-                    toggleHidden('join', 'class');
+                    document.getElementById('subheader').innerHTML = "The current wait time is about <b>20 minutes</b>.";
+                    toggleHidden('join', 'close', 'code');
+                    document.getElementById('err').innerHTML = "Invalid code. Make sure that the code is correct and you're not too early to join this class.";
+                    hasClassCode = true;
                 }
                 break;
                 
                 case "full-class": {
                     document.getElementById('header').innerHTML = "You're not waiting for a machine.";
-                    document.getElementById('subheader').innerHTML = "The class you tried to join is already full.";
-                    toggleHidden('join', 'class');
+                    document.getElementById('subheader').innerHTML = "The current wait time is about <b>20 minutes</b>.";
+                    toggleHidden('join', 'close', 'code');
+                    document.getElementById('err').innerHTML = "The class you are trying to join is already full.";
+                    hasClassCode = true;
                 }
                 break;
 
@@ -130,7 +134,11 @@ block content
                 case "idle": {
                     document.getElementById('header').innerHTML = "You're not waiting for a machine.";
                     document.getElementById('subheader').innerHTML = "The current wait time is about <b>20 minutes</b>.";
-                    toggleHidden('join', 'class');
+                    if (hasClassCode){
+                        toggleHidden('join', 'close', 'code');
+                    }else{
+                        toggleHidden('join', 'class');
+                    }
                 }
                 break;
             }
@@ -138,7 +146,7 @@ block content
 
         // Button handlers
         function join_handler(){
-            if (document.getElementById('code').value.trim() === '' || !hasClassCode){
+            if (!hasClassCode){
                 //No class code, regular queue
                 connection.send(JSON.stringify( { 'request': 'queue-join' } ));
             }else{
@@ -149,12 +157,10 @@ block content
 
         function leave_handler(){
             connection.send(JSON.stringify( { 'request': 'queue-leave' } ));
-            close_handler();
         }
 
         function end_handler(){
             connection.send(JSON.stringify( { 'request': 'session-end' } ));
-            close_handler();
         }
         
         function remote_handler() {
@@ -169,6 +175,7 @@ block content
             document.getElementById('close').classList.remove("hidden");
             hasClassCode = true;
             document.getElementById('join').innerHTML = "Join class";
+            document.getElementById('err').innerHTML = "";
         }
 
         function close_handler(){
@@ -177,6 +184,7 @@ block content
             document.getElementById('close').classList.add("hidden");
             hasClassCode = false;
             document.getElementById('join').innerHTML = "Join the queue";
+            document.getElementById('err').innerHTML = "";
         }
 
         function codeEntered(){ //not in use atm
@@ -185,6 +193,7 @@ block content
         }
         
         function toggleHidden(...args){
+            document.getElementById('err').innerHTML = "";              //Error text is cleared on state transition
             document.getElementById('join').classList.add("hidden");
             document.getElementById('remote').classList.add("hidden");
             document.getElementById('end').classList.add("hidden");
@@ -214,6 +223,8 @@ block content
     button(id='end' onclick='end_handler()') End your session
     button(id='class' class="textOnly" onclick='class_handler()') I have a class code...
     button(id='close' class="textOnly" onclick='close_handler()') I don't have a class code...
+
+    p(id='err')
               
 
     
