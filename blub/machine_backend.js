@@ -8,7 +8,7 @@ var load = function(filename) {
     console.log("Loaded " + _machines.length + " machines.");
 };
 
-var open = function(username, reservation) {
+var open = function(username, reservation, onCull, onKill) {
     for(var i=0;i<_machines.length;i++) {
         if(_machines[i]["user"] == "" && _machines[i]["reservation"] == reservation) {
             // We found a free machine. Expire in two hours plz
@@ -17,6 +17,8 @@ var open = function(username, reservation) {
             
             _machines[i]["user"] = username;
             _machines[i]["until"] = expiration;
+            _machines[i]["on_cull"] = onCull;
+            _machines[i]["on_kill"] = onKill;
             
             return _machines[i];
         }

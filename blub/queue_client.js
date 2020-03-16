@@ -51,8 +51,6 @@ wss.on('connection', async (ws, req) => {
         
         // Parse the message out
         msg = JSON.parse(message);
-        console.log(msg);
-                                    console.log(req.session.passport.user);
         switch(msg['request']) {
             case 'init': {
                 // See if the user is currently queued, and if so send them some queue
@@ -93,7 +91,10 @@ wss.on('connection', async (ws, req) => {
                 
                 function(machine) {
                     // Otherwise let's find them a machine
-                    var machine = machines.open(req.session.passport.user['sAMAccountName'], "");
+                    var machine = machines.open(req.session.passport.user['sAMAccountName'], "", 
+                    function() {
+                        // This handler tells the client that their time is up.
+                    });
                     
                     // Exit if there are no free machines. 
                     if(machine == null) {
@@ -113,16 +114,6 @@ wss.on('connection', async (ws, req) => {
                 console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested queue leave');
                 queueworker.remove(req.session.passport.user['sAMAccountName']);
                 ws.send(JSON.stringify( { 'status': 'idle' } ));
-            }
-            break;
-
-
-
-            // User data functions
-            
-            case 'user-info': {
-                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested all their info');
-                ws.send(JSON.stringify( { 'response': 'info',  'data': req.session.passport.user} ));
             }
             break;
             
