@@ -51,6 +51,7 @@ wss.on('connection', async (ws, req) => {
         
         // Parse the message out
         msg = JSON.parse(message);
+        console.log(msg);
                                     console.log(req.session.passport.user);
         switch(msg['request']) {
             case 'init': {
