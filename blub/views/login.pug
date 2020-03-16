@@ -44,7 +44,7 @@ block content
                     input(id='pwd' name='password' placeholder='Password' type='password')
     p(id='incorrectText')
     script.
-        console.log("test: #{failureFlash}");
+        //console.log("#{failureFlash}");
         document.getElementById('incorrectText').innerHTML = ("#{failureFlash}" != "") ? "Incorrect username or password." : " ";
     button(id='logbutton' onclick='login_handler()' value='Login') Login
     br
