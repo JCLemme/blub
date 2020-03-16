@@ -46,6 +46,21 @@ wss.on('connection', async (ws, req) => {
             }
             break;
             
+            
+
+
+            // User data functions
+            
+            case 'user-info': {
+                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested all their info');
+                ws.send(JSON.stringify( { 'response': 'info',  'data': req.session.passport.user} ));
+            }
+            break;
+            
+            
+            
+            
+            
             case 'guac-encrypt': {
             
                 const crypto = require('crypto');
