@@ -27,6 +27,12 @@ block content
             connection.send(JSON.stringify( { 'request': 'session-passwd', 'pass': document.getElementById('pwd').value } ) );
         }
         
+        function help_handler() {
+            document.getElementById('helplogin1').classList.toggle("hidden");
+            document.getElementById('helplogin2').classList.toggle("hidden");
+        }
+        
+        
     h1 Log in to Blub.
     p Sign in using your ECC account.
     br
@@ -43,11 +49,15 @@ block content
                 td
                     input(id='pwd' name='password' placeholder='Password' type='password')
     p(id='incorrectText')
+    
     script.
         //console.log("#{failureFlash}");
         document.getElementById('incorrectText').innerHTML = ("#{failureFlash}" != "") ? "Incorrect username or password." : " ";
+        
     button(id='logbutton' onclick='login_handler()' value='Login') Login
     br
     br
     br
-    a(href="mailto:eccmanager@egr.uri.edu?subject=Forgotten Password") Forgot your ECC password? Email us here.
+    button(id='boop' onclick='help_handler() ' value='Help') Need help logging in?
+    p(id='helplogin1' style='class: hidden;') Send an email to eccmanager@egr.uri.edu
+    p(id='helplogin2' style='class: hidden;') Hit us up at @uri_ecc on Snapchat or Instagram
