@@ -23,7 +23,7 @@ var open = function(username, reservation, onTerminate, onKill) {
 
             // Backup logic: dumps current _machines array to a .json file.
             currentTime = Date.now()
-            fileName = `./machineBackup $currentTime`;
+            fileName = `./machineBackup ${currentTime}`;
             fs.writeFile(fileName, JSON.stringify(_machines), (err) => {
                 if (err) {
                     console.error(err);
@@ -60,7 +60,7 @@ var close = function(username) {
 
             // Backup logic: dumps current _machines array to a .json file.
             currentTime = Date.now()
-            fileName = `./machineBackup $currentTime`;
+            fileName = `./machineBackup ${currentTime}`;
             fs.writeFile(fileName, JSON.stringify(_machines), (err) => {
                 if (err) {
                     console.error(err);
