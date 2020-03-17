@@ -41,10 +41,6 @@ wss.on('connection', async (ws, req) => {
             
             case 'user-info': {
                 if (req.session.passport != null){
-                    console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested all their info');
-                    ws.send(JSON.stringify( { 'response': 'info',  'data': req.session.passport.user} ));
-                }
-                else {
                     if (req.session.passport.user != null){
                         console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested all their info');
                         ws.send(JSON.stringify( { 'response': 'info',  'data': req.session.passport.user} ));
