@@ -32,7 +32,7 @@ html
         if (msg["data"] != "none"){
           //logged in
           console.log(msg["data"]);
-          document.getElementById('userLabel').innerHTML = "Logged in as " + msg["data"]["displayName"];
+          document.getElementById('userLabel').innerHTML = "Logged in as " + msg["data"]["cn"];
           document.getElementById('signout').classList.remove("hidden");
         }else{
           //logged out
