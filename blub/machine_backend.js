@@ -96,10 +96,10 @@ var cull = function() {
                 var un = '.\\a';
                 var pw = 'sbte';
 
-                var _host = '';
-                var _port = '';
+                var host = '';
+                var port = '';
 
-                WebGLUniformLocation.runCommand('logoff');
+                winrm.runCommand('logoff', host, un, pw, port);
 
             }
         }
