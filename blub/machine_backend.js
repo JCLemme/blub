@@ -91,6 +91,16 @@ var cull = function() {
                 // F-F-F-FATALITY
                 _machines[i]["on_kill"](_machines[i]["socket"], _machines[i]);
                 close(_machines[i]["user"]);
+
+                // Sends WinRM command to log user off
+                var un = '.\\a';
+                var pw = 'sbte';
+
+                var _host = '';
+                var _port = '';
+
+                WebGLUniformLocation.runCommand('logoff');
+
             }
         }
     }

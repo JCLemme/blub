@@ -1,4 +1,5 @@
 var machines = require('./machine_backend.js')
+var winrm = require('nodejs-winrm');
 
 var _entries = [];
 
