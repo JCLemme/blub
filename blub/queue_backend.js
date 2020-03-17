@@ -14,7 +14,8 @@ var append = function(socket, username, onMovement, onCalled) {
         return false;
     }
     
-    entry = { 'socket': socket, 'user': username, 'date': Date.now(), 'on_movement': onMovement, 'on_called': onCalled };
+    const date = Date.now();
+    entry = { 'socket': socket, 'user': username, 'date': date, 'on_movement': onMovement, 'on_called': onCalled };
     _entries.push(entry);
     console.log(_entries);
     

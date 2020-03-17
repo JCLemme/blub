@@ -88,7 +88,8 @@ block content
             
             for(var i=0;i<qinfo.length;i++) {
                 qstr += '<p><b>' + Number(1+i) + ':</b> ';
-                qstr += qinfo[i]['user'] + ' (since ' + Date(qinfo[i]['date']) + ')</p>';
+                console.log(qinfo[i]);
+                qstr += qinfo[i]['user'] + ' (since ' + new Date(qinfo[i]['date']) + ')</p>';
             }
             
             document.getElementById('queueinfo').innerHTML = qstr;
