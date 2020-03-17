@@ -45,6 +45,14 @@ wss.on('connection', async (ws, req) => {
                     ws.send(JSON.stringify( { 'response': 'info',  'data': req.session.passport.user} ));
                 }
                 else {
+                    if (req.session.passport.user != null){
+                        console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested all their info');
+                        ws.send(JSON.stringify( { 'response': 'info',  'data': req.session.passport.user} ));
+                    }else{
+                        console.log("User-info request was made but no user is logged in, sending logged-out message");
+                        ws.send(JSON.stringify( { 'response': 'info',  'data': 'none'} ));
+                    }
+                }else{
                     console.log("User-info request was made but no user is logged in, sending logged-out message");
                     ws.send(JSON.stringify( { 'response': 'info',  'data': 'none'} ));
                 }
