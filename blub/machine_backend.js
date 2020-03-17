@@ -84,12 +84,12 @@ var cull = function() {
                 expiration.setMinutes(expiration.getMinutes() + 1);
                 
                 _machines[i]["until"] = expiration;
-                _machines[i]["on_terminate"](_machines[i]["socket"]);
+                _machines[i]["on_terminate"](_machines[i]["socket"], _machines[i]);
                 _machines[i]["on_terminate"] = "";
             }
             else {
                 // F-F-F-FATALITY
-                _machines[i]["on_kill"](_machines[i]["socket"]);
+                _machines[i]["on_kill"](_machines[i]["socket"], _machines[i]);
                 close(_machines[i]["user"]);
             }
         }

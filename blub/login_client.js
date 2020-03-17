@@ -3,6 +3,7 @@ var mongodb = require('mongodb')
 var queueworker = require('./queue_backend.js')
 var machines = require('./machine_backend.js')
 var {https} = require('follow-redirects')
+var remotes = require('./remote_backend.js')
 
 // Websocket receiver for clients
 
@@ -27,21 +28,8 @@ wss.on('connection', async (ws, req) => {
             
             case 'session-passwd': {
                 console.log("Beep boop hash request");
-                
-                https.get("https://lime.egr.uri.edu/myrtille/GetHash.aspx?password=" + encodeURIComponent(msg['pass']), {rejectUnauthorized: false}, res => {
-                    res.setEncoding("utf8");
-                    
-                    let phash = "";
-                    
-                    res.on("data", data => {
-                        phash += data;
-                    });
-                    
-                    res.on("end", () => {
-                        console.log("Generated hash " + phash);
-                        
-                        ws.send(JSON.stringify( { 'status': 'passwd-hash', 'hash': phash } ));
-                    });
+                var phash = remotes.myrtille_hash(msg['pass'], function(phash) {
+                    ws.send(JSON.stringify( { 'status': 'passwd-hash', 'hash': phash } ));
                 });
             }
             break;
@@ -55,7 +43,8 @@ wss.on('connection', async (ws, req) => {
                 if (req.session.passport != null){
                     console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested all their info');
                     ws.send(JSON.stringify( { 'response': 'info',  'data': req.session.passport.user} ));
-                }else{
+                }
+                else {
                     console.log("User-info request was made but no user is logged in, sending logged-out message");
                     ws.send(JSON.stringify( { 'response': 'info',  'data': 'none'} ));
                 }

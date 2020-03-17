@@ -3,6 +3,7 @@ var mongodb = require('mongodb')
 var queueworker = require('./queue_backend.js')
 var machines = require('./machine_backend.js')
 var https = require('https')
+var remotes = require('./remote_backend.js')
 
 // Queue worker
 
@@ -96,7 +97,22 @@ wss.on('connection', async (ws, req) => {
                     
                     if(machine != null) {
                         machines.redirect(req.session.passport.user['sAMAccountName'], ws);
-                        ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine } ));
+                        
+                        // Split based on class or no class
+                        if(machine['on_terminate'] != "") {
+                            if(machine['reservation'] != "") {
+                                ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': remotes.myrtille_link(machine, ""), 'reservation': machine['reservation'] } ));
+                            }
+                            else {
+                                ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
+                            }
+                        }
+                        else if(machine['on_kill'] != "") {
+                            ws.send(JSON.stringify( { 'status': 'closing', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
+                        }
+                        else if(machine['on_kill'] == "") {
+                            ws.send(JSON.stringify( { 'status': 'idle' } ));
+                        }
                     }
                     else {
                     
@@ -123,13 +139,13 @@ wss.on('connection', async (ws, req) => {
                 function(socket, machine) {
                     // Otherwise let's find them a machine
                     var machine = machines.open(socket, req.session.passport.user['sAMAccountName'], "", 
-                    function(socket) {
+                    function(socket, machine) {
                         // This handler tells the client that their time is up.
                         console.log('User ' + req.session.passport.user['sAMAccountName'] + ' has ten minutes to get their shit together.');
-                        socket.send(JSON.stringify( { 'status': 'closing' } ));
+                        socket.send(JSON.stringify( { 'status': 'closing', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
                     },
                     
-                    function(socket) {
+                    function(socket, machine) {
                         // This handler tells the client to forcibly kill the connection.
                         console.log('User ' + req.session.passport.user['sAMAccountName'] + '\'s session just ended.');
                         socket.send(JSON.stringify( { 'status': 'idle' } ));
@@ -141,8 +157,7 @@ wss.on('connection', async (ws, req) => {
                     }
                     else {
                         // Get a machine and send details to client
-                        var machinelink = "https://lime.egr.uri.edu/Myrtille/?__EVENTTARGET=&__EVENTARGUMENT=&connect=Connect%21&server=" + machine['ip'] + "&domain=ECC&user=" + machine['user'] + "&passwordHash=";
-                        socket.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': machinelink } ));
+                        socket.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
                         return true;
                     }
                 });
@@ -165,13 +180,13 @@ wss.on('connection', async (ws, req) => {
                     console.log('That class above has ' + available + ' spots left.');
                     
                     var machine = machines.open(req.session.passport.user['sAMAccountName'], msg['reservation'], 
-                    function(socket) {
+                    function(socket, machine) {
                         // This handler tells the client that their time is up.
                         console.log('User ' + req.session.passport.user['sAMAccountName'] + ' has ten minutes to get their shit together.');
-                        socket.send(JSON.stringify( { 'status': 'closing' } ));
+                        socket.send(JSON.stringify( { 'status': 'closing', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
                     },
                     
-                    function(socket) {
+                    function(socket, machine) {
                         // This handler tells the client to forcibly kill the connection.
                         console.log('User ' + req.session.passport.user['sAMAccountName'] + '\'s session just ended.');
                         socket.send(JSON.stringify( { 'status': 'idle' } ));
