@@ -11,7 +11,9 @@ html
       p ▪
       p(id='userLabel') Logged in as username
       button(class="textOnly" id='signout' onclick='')
-        a(class="textOnly" href="/logout") (Logout)
+        a(class="textOnly" href="/logout") (Log out)
+      button(class="textOnly" id='signin' onclick='')
+        a(class="textOnly" href="/login") (Log in)
     hr
 
   script.
@@ -34,11 +36,13 @@ html
           console.log(msg["data"]);
           document.getElementById('userLabel').innerHTML = "Logged in as " + msg["data"]["cn"];
           document.getElementById('signout').classList.remove("hidden");
+          document.getElementById('signin').classList.add("hidden");
         }else{
           //logged out
           console.log("Logged out");
           document.getElementById('userLabel').innerHTML = "Not logged in";
           document.getElementById('signout').classList.add("hidden");
+          document.getElementById('signin').classList.remove("hidden");
         }
       }
 

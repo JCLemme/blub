@@ -1,6 +1,9 @@
 extends layout
 
 block content
+    head
+        link(rel='stylesheet', href='/stylesheets/admin.css')
+   
     script.
         //const WebSocket = require('ws')
         const url = 'ws://localhost:8081'
@@ -19,7 +22,7 @@ block content
             tbl = document.getElementById('machineTable');
             clearTable(tbl);
             
-            //TODO: This should really be a template instead of manually creating all these
+            //TODO: This should really be a template instead of manually creating all these objs
             for(var i=0;i<minfo.length;i++){
                 var row = document.createElement("tr");
 
@@ -35,12 +38,7 @@ block content
 
                 //Session Info
                 var use;
-                if(minfo[i]['user'] != "") {
-                    use = 'in use by ' + minfo[i]['user'] + ' until ' + new Date(minfo[i]['until']) + ' ';
-                }
-                else {
-                    use = 'not in use ';
-                }
+                use = (minfo[i]['user'] != "") ? ('in use by ' + minfo[i]['user'] + ' until ' + new Date(minfo[i]['until']) + ' ') : 'not in use ';
                 var useCell = document.createElement("td");
                 useCell.style.width = "300px"; 
                 useCell.innerHTML = use;
@@ -136,7 +134,7 @@ block content
     br
     br
     div(style="display:flex;")
-        div(style="width:15%;")
+        div(style="width:20%;")
             h3 Here is the current queue.
             div(id='queueinfo')
         

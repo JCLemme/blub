@@ -83,7 +83,7 @@ block content
             switch(msg["status"]) {
                 case "in-session": {
                     mlink = msg['link'] + getCookie('passhash');
-                    document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"] + ".";
+                    document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"].toUpperCase() + ".";
                     document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
                                                                       formatdate(new Date(msg["machine"]["until"])) + "</b>.";
                     toggleHidden('remote', 'end');
@@ -207,7 +207,7 @@ block content
         
     div(id='holder')
         div.loaderBox(id='loader')
-            div.loader    
+            div.loader
         h1(id='header') You are 11th in the queue.
 
         

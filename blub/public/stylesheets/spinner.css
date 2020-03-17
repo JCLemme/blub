@@ -1,9 +1,17 @@
 #holder{
-	display: flex;
+  display: flex;
+  align-items:center;
+  flex-wrap:nowrap;
+}
+
+#holder h1{
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .loaderBox{
-	height:10px;
+  height:10px;
+  margin-top:-5px;
 }
 
 /*Loading spinner*/
@@ -19,7 +27,7 @@
 .loader {
   color: #707070;
 
-  margin: 41px 25px 0 15px;
+  margin: 0 25px 0 15px;
   position: relative;
   font-size: 5px;
   -webkit-transform: translateZ(0);

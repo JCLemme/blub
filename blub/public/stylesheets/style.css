@@ -7,41 +7,6 @@ input, button, a{
   font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-table{
-  /*
-	width:95%;
-	margin-left: 2.5%;
-	margin-right: 2.5%;
-  text-align: center;
-  */
-	border: 2px solid black;
-	border-collapse: collapse;
-}
-
-tr:nth-child(odd) {background-color: #f2f2f2;}
-
-tr:hover{
-	background-color: #e2e2e2;
-}
-
-th{
-  background-color: #d3d3d3;
-}
-
-th, td{
-  padding:15px 25px 15px 5px;
-  font-size: 20px;
-}
-
-button.admin{
-  margin-left:20px;
-  width:110px;
-}
-
-input.admin{
-  width:160px;
-}
-
 a {
   color: black;
   text-decoration: none;
@@ -65,12 +30,12 @@ a.lined{
   margin-top: 14px;
 }
 
-#signout a{
+#signout a, #signin a{
   font-size: 15px;
 }
 
-#signout{
-  margin-top: 3px;
+#signout, #signin{
+  margin-top: 4px;
 }
 
 #blubHead{
@@ -118,28 +83,6 @@ input{
   width:500px;
   padding:10px;
   border:2px solid black;
-}
-
-.loginBox table{
-  width:800px;
-  margin-bottom:10px;
-}
-
-#logbutton{
-  width:663px;
-}
-
-.loginBox td{
-  padding-right: 10px;
-  height:90px;
-}
-
-#incorrectText{
-  color:red;
-  height:6px;
-  line-height: 2px;
-  margin-top:-10px;
-  padding:0;
 }
 
 .textOnly{

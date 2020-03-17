@@ -1,0 +1,36 @@
+table{
+	/*
+	  width:95%;
+	  margin-left: 2.5%;
+	  margin-right: 2.5%;
+	text-align: center;
+	*/
+	  border: 2px solid black;
+	  border-collapse: collapse;
+  }
+  
+  tr:nth-child(odd) {background-color: #f2f2f2;}
+  
+  tr:hover{
+	  background-color: #e2e2e2;
+  }
+  
+  th{
+	background-color: #d3d3d3;
+  }
+  
+  th, td{
+	padding:12px 15px 12px 5px;
+	font-size: 17px;
+  }
+  
+  button.admin{
+	margin-left:20px;
+	width:110px;
+	font-size: 17px;
+  }
+  
+  input.admin{
+	width:160px;
+	font-size: 16px;
+  }

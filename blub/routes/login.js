@@ -9,7 +9,7 @@ require('ssl-root-cas').addFile('./certs/ldap.pem');
 
 var passport = require('passport');
 var LdapStrategy = require('passport-ldapauth');
- 
+
 passport.use(new LdapStrategy({
     passReqToCallback : true,
     server: {
