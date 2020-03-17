@@ -6,27 +6,81 @@ block content
         const url = 'ws://localhost:8081'
         const connection = new WebSocket(url)
          
-        function display_machines(minfo) {
-            var mstr = "";
+        //StackOverflow is god
+        function clearTable(table){
+            var rows = table.rows;
+            var i = rows.length;
+            while (--i) {
+                rows[i].parentNode.removeChild(rows[i]);
+            }
+        }
+
+        function display_machines(minfo){
+            tbl = document.getElementById('machineTable');
+            clearTable(tbl);
             
-            for(var i=0;i<minfo.length;i++) {
-                mstr += "<p><b>" + minfo[i]['name'] + ' (' + minfo[i]['ip'] + '):</b> ';
-                
+            //TODO: This should really be a template instead of manually creating all these
+            for(var i=0;i<minfo.length;i++){
+                var row = document.createElement("tr");
+
+                //Machine Name
+                var machineCell = document.createElement("td");
+                machineCell.innerHTML = "<b>" + minfo[i]['name'].toUpperCase() + "</b>";
+                row.appendChild(machineCell);
+
+                //IP Address
+                var ipCell = document.createElement("td");
+                ipCell.innerHTML = (minfo[i]['ip']);
+                row.appendChild(ipCell);
+
+                //Session Info
+                var use;
                 if(minfo[i]['user'] != "") {
-                    mstr += 'in use by ' + minfo[i]['user'] + ' until ' + new Date(minfo[i]['until']) + ' ';
+                    use = 'in use by ' + minfo[i]['user'] + ' until ' + new Date(minfo[i]['until']) + ' ';
                 }
                 else {
-                    mstr += 'not in use ';
+                    use = 'not in use ';
                 }
-                
+                var useCell = document.createElement("td");
+                useCell.style.width = "300px"; 
+                useCell.innerHTML = use;
+                row.appendChild(useCell);
+
+                //Reservation Info
+                res = "<i>(none)</i>"
                 if(minfo[i]['reservation'] != "") {
-                    mstr += 'reserved for ' + minfo[i]['reservation'];
+                    res = 'reserved for ' + minfo[i]['reservation'];
                 }
-                
-                mstr += '</p>'
+                var resCell = document.createElement("td");
+                resCell.innerHTML = res;
+                row.appendChild(resCell);
+
+                //Change Code
+                var changeCell = document.createElement("td");
+                var box = document.createElement("div");
+                var changeField = document.createElement("input");
+                var changeButton = document.createElement("button");
+                changeButton.innerHTML = "Change";
+                changeField.placeholder = "Enter new code";
+                changeField.classList.add("admin");
+                changeButton.classList.add("admin");
+                box.appendChild(changeField);
+                box.appendChild(changeButton);
+                changeCell.appendChild(box);
+                row.appendChild(changeCell);
+
+                //Actions
+                var actCell = document.createElement("td");
+                var box = document.createElement("div");
+                var termButton = document.createElement("button");
+                termButton.innerHTML = "Terminate";
+                termButton.classList.add("admin");
+                box.appendChild(termButton);
+                actCell.appendChild(box);
+                row.appendChild(actCell);
+
+                tbl.appendChild(row);
             }
-            
-            document.getElementById('machineinfo').innerHTML = mstr;
         }
         
         function display_queues(qinfo) {
@@ -45,7 +99,9 @@ block content
         }
         
         connection.onopen = () => {
-            connection.send(JSON.stringify( {'request': 'init-admin' } )); 
+            connection.send(JSON.stringify( {'request': 'init-admin' } ));
+            connection.send(JSON.stringify( {'request': 'queue' } )); 
+            connection.send(JSON.stringify( {'request': 'machines' } )); 
         }
          
         connection.onerror = (error) => {
@@ -75,17 +131,28 @@ block content
             connection.send(JSON.stringify( {'request': 'machines' } )); 
         }
         
-        
     h1 Here's your Blub status report.
     button(id='action' onclick='button_handler()') Refresh
-    
-    h3 Queueing info
-    p(id='queueinfo')
+    br
+    br
+    div(style="display:flex;")
+        div(style="width:15%;")
+            h3 Here is the current queue.
+            div(id='queueinfo')
         
-    
-    h3 Machine info
-    p(id='machineinfo')
-        template
-            button(id='meepe') butts
-            b(id='machine') Machine
+        div()
+            h3 Here are the machines in the pool.
+            table(id="machineTable")
+                tr
+                    th Machine
+                    th IP Address
+                    th Current Session
+                    th Reservation Code
+                    th Change Code
+                    th Actions
+                tr
+                    td test!
+                    td test!
+                    td test!
+                    td test!
             

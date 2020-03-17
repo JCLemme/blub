@@ -6,9 +6,17 @@ block content
   script.
     var error = #{error.status};
     if (error == "404"){
-      document.getElementById('desc').innerHTML = 'The item you are looking for could not be found. Please make sure the URL you entered is correct.';
+      document.getElementById('desc').innerHTML =
+      'The item you are looking for could not be found. Please make sure the URL you entered is correct.';
+    }else if (error == "401"){
+      document.getElementById('desc').innerHTML =
+      'You need to be logged in to access this page. Please <a class="lined" href="/login">log in</a> before returning to this page.';
+    }else if (error == "403"){
+      document.getElementById('desc').innerHTML =
+      'You do not have permission to access this page. If you should be able to access this page, make sure that you are logged into the correct account.';
     }else{
-      document.getElementById('desc').innerHTML = 'There was an error processing your request. Please contact the ECC for assistance.';
+      document.getElementById('desc').innerHTML =
+      'There was an error processing your request. Please contact the ECC for assistance.';
     }
   br
   h3 Here is the full text of the error:

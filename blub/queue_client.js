@@ -101,7 +101,7 @@ wss.on('connection', async (ws, req) => {
                         // Split based on class or no class
                         if(machine['on_terminate'] != "") {
                             if(machine['reservation'] != "") {
-                                ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': remotes.myrtille_link(machine, ""), 'reservation': machine['reservation'] } ));
+                                ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'link': remotes.myrtille_link(machine, ""), 'reservation': machine['reservation'] } ));
                             }
                             else {
                                 ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
