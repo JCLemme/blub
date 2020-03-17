@@ -3,9 +3,17 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+input, button, a{
+  font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
 a {
   color: black;
   text-decoration: none;
+}
+
+a.lined{
+  text-decoration: underline;
 }
 
 .headBar{
