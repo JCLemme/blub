@@ -37,7 +37,13 @@ passport.deserializeUser(function(user, done) {
 });
   
 router.get('/', function(req, res, next) {
-    res.render('login', { title: 'Blub login', failureFlash: req.flash('error') });
+    if (!req.user) {
+        res.render('login', { title: 'Blub login', failureFlash: req.flash('error') });
+    }
+    else {
+        res.redirect('/');
+    }
+    
 });
 
 router.post('/', passport.authenticate('ldapauth',{ successRedirect: '/queue', failureRedirect: '/login', failureFlash: true }), function(req, res) {
