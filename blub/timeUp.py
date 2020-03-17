@@ -18,10 +18,9 @@ async def log_off(websocket, path):
         
         if task_json[task] == 'info':
             message = {'logged_on': True, 'username': username}
-            message_json = json.dump(message)
-            await websocket.send(message_json)
+            await websocket.send(message)
         elif task_json[task] == 'kill':
             print("\nYou are being logged out...")
             pymsgbox.alert(text='test', title='test', button='OK')
             #I assume we need a wait here if that message box is gonna be visible for any length of time
-            os.system("shutdown -l")
+            # os.system("shutdown -l")
