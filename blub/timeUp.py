@@ -10,7 +10,7 @@ import json
 username = os.getlogin()
 
 async def log_off(websocket, path):
-    uri = "ws://johnlemmetown.com"
+    uri = "ws://localhost:3000"
     async with websockets.connect(uri) as websocket:
 
         task = await websocket.recv()
