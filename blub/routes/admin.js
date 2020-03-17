@@ -2,12 +2,14 @@ var express = require('express');
 var createError = require('http-errors');
 var router = express.Router();
 
+var blubsetup = require('../blub_setup.js');
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
     if (req.user) {
         if(req.user['memberOf'] != undefined) {
-            if (req.user['memberOf'].includes("CN=ECC_Administrators,OU=ECC Administrators,OU=ECC,OU=Engineering Users,DC=ecc,DC=egr,DC=uri,DC=edu")) {
-                res.render('admin', { title: 'Blub admin' });
+            if (req.user['memberOf'].includes(blubsetup.ldap_admins)) {
+                res.render('admin', { title: 'Blub admin', admin_server: "ws://" + blubsetup.host + ':' + blubsetup.admin_port });
             }
             else {
                 next(createError(403));

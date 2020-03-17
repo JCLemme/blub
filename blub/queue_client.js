@@ -5,6 +5,8 @@ var machines = require('./machine_backend.js')
 var https = require('https')
 var remotes = require('./remote_backend.js')
 
+var blubsetup = require('./blub_setup.js')
+
 // Queue worker
 
 function queueRunner() {
@@ -61,7 +63,7 @@ setTimeout(updateRunner, 15000);
 // Websocket receiver for clients
 
 wss = new websocket.Server({
-    port: 8080,
+    port: blubsetup.client_port,
     
     verifyClient: (info, done) => {
         megasession(info.req, {}, () => {

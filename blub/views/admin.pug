@@ -5,9 +5,7 @@ block content
         link(rel='stylesheet', href='/stylesheets/admin.css')
    
     script.
-        //const WebSocket = require('ws')
-        const url = 'ws://localhost:8081'
-        const connection = new WebSocket(url)
+        const connection = new WebSocket('#{admin_server}')
          
         //StackOverflow is god
         function clearTable(table){

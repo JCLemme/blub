@@ -5,10 +5,12 @@ var machines = require('./machine_backend.js')
 var {https} = require('follow-redirects')
 var remotes = require('./remote_backend.js')
 
+var blubsetup = require('./blub_setup.js')
+
 // Websocket receiver for clients
 
 wss = new websocket.Server({
-    port: 8082,
+    port: blubsetup.login_port,
     
     verifyClient: (info, done) => {
         megasession(info.req, {}, () => {
@@ -65,7 +67,7 @@ wss.on('connection', async (ws, req) => {
                  
                 const clientOptions = {
                     cypher: 'AES-256-CBC',
-                    key: 'MySuperSecretKeyForParamsToken12'
+                    key: blubsetup.guac_key,
                 }
                  
                 const encrypt = (value) => {

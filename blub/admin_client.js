@@ -2,11 +2,12 @@ var websocket = require('ws')
 var mongodb = require('mongodb')
 var queueworker = require('./queue_backend.js')
 var machines = require('./machine_backend.js')
+var blubsetup = require('./blub_setup.js')
 
 // Websocket receiver for clients
 
 wss = new websocket.Server({
-    port: 8081,
+    port: blubsetup.admin_port,
     
     verifyClient: (info, done) => {
         megasession(info.req, {}, () => {
@@ -28,7 +29,7 @@ wss.on('connection', async (ws, req) => {
         
         // Confirm user is part of the right OU.
         // I don't know if Passport is doing this for me but this'll do for now
-        if(!req.session.passport.user['memberOf'].includes("CN=ECC_Administrators,OU=ECC Administrators,OU=ECC,OU=Engineering Users,DC=ecc,DC=egr,DC=uri,DC=edu")) {
+        if(!req.session.passport.user['memberOf'].includes(blubsetup.ldap_admins)) {
             ws.send(JSON.stringify( { 'status': 'error', 'error': "Invalid user permissions" } ));
             return;
         }

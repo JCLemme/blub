@@ -63,9 +63,7 @@ block content
             return "";
         }
 
-        //const WebSocket = require('ws')
-        const url = 'ws://localhost:8080'
-        const connection = new WebSocket(url)
+        const connection = new WebSocket('#{client_server}')
          
         connection.onopen = () => {
             connection.send(JSON.stringify( {'request': 'init' } )); 

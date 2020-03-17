@@ -1,4 +1,5 @@
 var machines = require('./machine_backend.js')
+var blubsetup = require('./blub_setup.js')
 
 var _entries = [];
 

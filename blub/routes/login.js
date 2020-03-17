@@ -3,7 +3,7 @@ var flash = require("connect-flash");
 var router = express.Router();
 var fs = require('fs');
 
-var secrets = require('./blub_secrets.js');
+var blubsetup = require('../blub_setup.js');
 
 require('ssl-root-cas').addFile('./certs/ldap.pem');
 
@@ -13,10 +13,10 @@ var LdapStrategy = require('passport-ldapauth');
 passport.use(new LdapStrategy({
     passReqToCallback : true,
     server: {
-        url: 'ldaps://dc1.ecc.egr.uri.edu',
-        bindDN: secrets.user,
-        bindCredentials: secrets.pass,
-        searchBase: 'dc=ecc,dc=egr,dc=uri,dc=edu',
+        url: blubsetup.ldap_server,
+        bindDN: blubsetup.ldap_user,
+        bindCredentials: blubsetup.ldap_pass,
+        searchBase: blubsetup.ldap_base,
         searchFilter: '(&(objectcategory=person)(objectclass=user)(|(samaccountname={{username}})(mail={{username}})))',
         tlsOptions: {
             rejectUnauthorized: false,
@@ -38,7 +38,7 @@ passport.deserializeUser(function(user, done) {
   
 router.get('/', function(req, res, next) {
     if (!req.user) {
-        res.render('login', { title: 'Blub login', failureFlash: req.flash('error') });
+        res.render('login', { title: 'Blub login', failureFlash: req.flash('error'), login_server: "ws://" + blubsetup.host + ':' + blubsetup.login_port  });
     }
     else {
         res.redirect('/');

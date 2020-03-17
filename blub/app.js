@@ -8,6 +8,7 @@ var passport = require('passport')
 var session = require('express-session')
 var mongodb = require('mongodb')
 var machines = require('./machine_backend.js')
+var blubsetup = require('./blub_setup.js')
 
 var adminclient = require('./admin_client.js');
 var loginclient = require('./login_client.js');
@@ -36,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //app.use(express.session({ cookie: { maxAge: 60000 }}));
 //app.use(flash());
 
-megasession = session({ secret: 'beep beep bitch' });
+megasession = session({ secret: blubsetup.cookie_secret });
 app.use(megasession);
 
 app.use(passport.initialize());
@@ -49,7 +50,7 @@ app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 app.use(express.static('guacamole-common-js'))
 
-machines.load("files");
+machines.load(blubsetup.machines_default);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

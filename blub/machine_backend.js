@@ -1,9 +1,10 @@
 const fs = require('fs');
+var blubsetup = require('./blub_setup.js')
 
 var _machines = [];
 
 var load = function(filename) {
-    var rawdata = fs.readFileSync('./machines.json');
+    var rawdata = fs.readFileSync(filename);
     _machines = JSON.parse(rawdata);
     console.log("Loaded " + _machines.length + " machines.");
 };
