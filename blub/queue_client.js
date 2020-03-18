@@ -11,20 +11,20 @@ var blubsetup = require('./blub_setup.js')
 // Queue worker
 
 function queueRunner() {
-    console.log("Another beautiful day in the neighborhood");
+    console.log("  Another beautiful day in the neighborhood");
     var status = queueworker.nextup();
     
     switch(status) {
         case 'no-machines':
-            console.log("  No machines are available to give out")
+            console.log("    No machines are available to give out")
         break;
         
         case 'queue-empty':
-            console.log("  No one's waiting for a machine")
+            console.log("    No one's waiting for a machine")
         break;
         
         default:
-            console.log("  Looks like " + status + " got a machine")
+            console.log("    Looks like " + status + " got a machine")
         break;
     }
     queueworker.save('./queue.json.last');
@@ -34,7 +34,7 @@ function queueRunner() {
 
 
 function cullRunner() {
-    console.log("Time to die");
+    console.log("  Time to cull the users");
     var status = machines.cull();
     
     /*switch(status) {
@@ -56,8 +56,10 @@ function cullRunner() {
 
 
 function updateRunner() {
+    console.log('Updating at ' + Date.now());
     cullRunner();
     queueRunner();
+    console.log(' ');
     setTimeout(updateRunner, 15000);
 }
 
@@ -79,10 +81,10 @@ wss = new websocket.Server({
 wss.on('connection', async (ws, req) => {
 
     // Initialize queue object
-    console.log('New connection from ' + req.session.passport.user['sAMAccountName'] + '...');
+    console.log('# New connection from ' + req.session.passport.user['sAMAccountName'] + '...');
     
     ws.on('message', message => {
-        console.log(`${message}`);
+        console.log(`  ${message}`);
         
         // Parse the message out
         var msg = JSON.parse(message);
@@ -135,7 +137,7 @@ wss.on('connection', async (ws, req) => {
             /// Queue functions
 
             case 'queue-join': {
-                console.log('User ' + username + ' requested queue join');
+                console.log('  User ' + username + ' requested queue join');
                 
                 queueworker.append(username, 
                 
@@ -148,14 +150,14 @@ wss.on('connection', async (ws, req) => {
                     var machine = machines.open(username, "", 
                     function(machine) {
                         // This handler tells the client that their time is up.
-                        console.log('User ' + username + ' has ten minutes to get their shit together.');
+                        console.log('  User ' + username + ' has ten minutes to get their shit together.');
                         kicker.send_message(machine['ip'], username, "Sup boi");
                         sockets.send(username, JSON.stringify( { 'status': 'closing', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
                     },
                     
                     function(machine) {
                         // This handler tells the client to forcibly kill the connection.
-                        console.log('User ' + username + '\'s session just ended.');
+                        console.log('  User ' + username + '\'s session just ended.');
                         sockets.send(username, JSON.stringify( { 'status': 'idle' } ));
                     });
                     
@@ -173,7 +175,7 @@ wss.on('connection', async (ws, req) => {
             break;
             
             case 'queue-join-class': {
-                console.log('User ' + username + ' requested to join a class "' + msg['reservation'] + '"');
+                console.log('  User ' + username + ' requested to join a class "' + msg['reservation'] + '"');
                 
                 // Funny enough, there isn't a queue involved. Just look for a machine.
                 var available = machines.reservation(msg['reservation']);
@@ -185,18 +187,18 @@ wss.on('connection', async (ws, req) => {
                     ws.send(JSON.stringify( { 'status': 'invalid-class' } ));
                 }
                 else {
-                    console.log('That class above has ' + available + ' spots left.');
+                    console.log('  That class above has ' + available + ' spots left.');
                     
                     var machine = machines.open(username, msg['reservation'], 
                     function(machine) {
                         // This handler tells the client that their time is up.
-                        console.log('User ' + username + ' has ten minutes to get their shit together.');
+                        console.log('  User ' + username + ' has ten minutes to get their shit together.');
                         sockets.send(username, JSON.stringify( { 'status': 'closing', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
                     },
                     
                     function(machine) {
                         // This handler tells the client to forcibly kill the connection.
-                        console.log('User ' + username + '\'s session just ended.');
+                        console.log('  User ' + username + '\'s session just ended.');
                         sockets.send(username, JSON.stringify( { 'status': 'idle' } ));
                     });
                     

@@ -7,12 +7,12 @@ var _entries = [];
 var load = function(filename) {
     var rawdata = fs.readFileSync(filename);
     _entries = JSON.parse(rawdata);
-    console.log("Loaded " + _entries.length + " entries.");
+    console.log("  Loaded " + _entries.length + " entries.");
 };
 
 var save = function(filename) { 
     fs.writeFileSync(filename, JSON.stringify(_entries));
-    console.log("Saved " + _entries.length + " entries.");
+    console.log("  Saved " + _entries.length + " entries.");
 };
 
 var refresh = function() {
@@ -29,7 +29,6 @@ var append = function(username, onMovement, onCalled) {
     const date = Date.now();
     entry = { 'user': username, 'date': date, 'on_movement': onMovement, 'on_called': onCalled };
     _entries.push(entry);
-    console.log(_entries);
     
     refresh();
     return true;
