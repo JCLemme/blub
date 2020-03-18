@@ -19,6 +19,7 @@
     "guacamole-common-js": "^1.1.0-b",
     "guacamole-lite": "^0.6.2",
     "http-errors": "~1.6.3",
+    "js-file-download": "^0.4.10",
     "mongodb": "^3.5.5",
     "mongodb-queue": "^4.0.0",
     "morgan": "~1.9.1",

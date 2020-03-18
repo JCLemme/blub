@@ -207,7 +207,7 @@ wss.on('connection', async (ws, req) => {
                         ws.send(JSON.stringify( { 'status': 'invalid-class' } ));
                     }
                     else {
-                        ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'myrtille-link': remotes.myrtille_link(machine, ""), 'rdp-file': remotes.rdp_file(machine), 'reservation': msg['reservation'] } ));
+                        ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'reservation': msg['reservation'], 'myrtille-link': remotes.myrtille_link(machine, ""), 'rdp-file': remotes.rdp_file(machine)  } ));
                     }
                 }
             }
