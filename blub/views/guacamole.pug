@@ -60,6 +60,7 @@ block content
             
             if(msg['token'] != "") {
                 rtok = msg['token'];
+                geddit();
             }
         }
 
@@ -77,7 +78,7 @@ block content
         }
         
 
-        window.addEventListener("resize", myFunction);
+        window.addEventListener("resize", resize);
 
         function resize(){
             console.log("size!");
@@ -85,4 +86,4 @@ block content
 
     h1= title
     p(id='boop') Welcome to #{title}
-    button(onclick='geddit()') booper
+    //button(onclick='geddit()') booper
