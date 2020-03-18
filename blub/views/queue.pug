@@ -129,8 +129,9 @@ block content
                     }
                     else {
                         var placemat = Number(Number(msg['place'])+Number(1));
+                        var minutes = new Date(msg['wait']);
                         document.getElementById('header').innerHTML = 'You are ' + placemat + nth(placemat) + ' in the queue.';
-                        document.getElementById('subheader').innerHTML = "It'll be about <b>20 minutes</b> before you're called.";
+                        document.getElementById('subheader').innerHTML = "It'll be about <b>" + minutes.getMinutes() + " minutes</b> before you're called.";
                     }
                     toggleHidden('leave', 'loader');
                 }

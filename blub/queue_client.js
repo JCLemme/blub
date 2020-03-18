@@ -35,7 +35,7 @@ function queueRunner() {
 
 function cullRunner() {
     console.log("  Time to cull the users");
-    var status = machines.cull();
+    var status = machines.cull("");
     
     /*switch(status) {
         case 'no-machines':
@@ -142,7 +142,8 @@ wss.on('connection', async (ws, req) => {
                 queueworker.append(username, 
                 
                 function(place) {
-                    sockets.send(username, JSON.stringify( { 'status': 'queued', 'place': place } ));
+                    var wait = machines.time_at(place);
+                    sockets.send(username, JSON.stringify( { 'status': 'queued', 'place': place, 'wait': wait } ));
                 },
                 
                 function(machine) {
