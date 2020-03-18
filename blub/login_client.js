@@ -61,7 +61,7 @@ wss.on('connection', async (ws, req) => {
             
             
             
-            case 'guac-encrypt': {
+            case 'guac-token': {
             
                 const crypto = require('crypto');
                  
@@ -86,8 +86,32 @@ wss.on('connection', async (ws, req) => {
 
                 };
                 
-                var token = encrypt(msg['token']);
-                ws.send(JSON.stringify({'status': 'rdp-token', 'token': token}));
+                
+                // Runnin shit bouiz
+                
+                var machine = machines.check(req.session.passport.user['sAMAccountName']);
+                
+                if(machine == null) {
+                    ws.send(JSON.stringify({'status': 'error', 'error': 'no-session'}));
+                }
+                else{
+                    var newrdp = {
+                        "connection": {
+                            "type": "rdp",
+                            "settings": {
+                                "hostname": machine['ip'],
+                                "username": "ECC\\" + machine['user'],
+                                "password": msg['pass'],
+                                "security": "tls",
+                                "ignore-cert": true,
+                                "enable-wallpaper": false,
+                            }
+                        }
+                    }
+                    
+                    var token = encrypt(newrdp);
+                    ws.send(JSON.stringify({'status': 'rdp-token', 'token': token}));
+                }
             }
             break;
         }
