@@ -9,6 +9,7 @@ block content
         var hasClassCode;
 
         var mlink = ""
+        var rdpfile;
         
         const nth = function(d) {
             if (d > 3 && d < 21) return 'th';
@@ -80,6 +81,8 @@ block content
             // Handle a request
             switch(msg["status"]) {
                 case "closing": {
+                    mlink = msg['myrtille-link'] + getCookie('passhash');
+                    rdpfile = msg['rdp-file'];
                     document.getElementById('header').innerHTML = "Your session with " + msg["machine"]["name"] + " is ending soon.";
                     document.getElementById('subheader').innerHTML = "You will be disconnected from your computer on <b>" + 
                                                                       formatdate(new Date(msg["machine"]["until"])) + "</b>.";
@@ -89,6 +92,7 @@ block content
                 
                 case "in-session": {
                     mlink = msg['myrtille-link'] + getCookie('passhash');
+                    rdpfile = msg['rdp-file'];
                     document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"].toUpperCase() + ".";
                     document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
                                                                       formatdate(new Date(msg["machine"]["until"])) + "</b>.";
@@ -98,6 +102,7 @@ block content
 
                 case "in-session-class": {
                     mlink = msg['myrtille-link'] + getCookie('passhash');
+                    rdpfile = msg['rdp-file'];
                     document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"] + ".";
                     document.getElementById('subheader').innerHTML = "You can use this workstation until your class ends";
                     toggleHidden('remote', 'end', 'options');
