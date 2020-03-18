@@ -111,6 +111,15 @@ var reservation = function(reservation) {
         return found-full;
 }
 
+var reserve_machine = function(machine, reservation) {
+    if (_machines[machine]){
+        _machines[machine]["reservation"] = reservation;
+        return true;
+    } else {
+        return false;
+    }
+};
+
 var reserve = function(reservation, original, amount) {
     var found = 0;
     
@@ -136,4 +145,6 @@ module.exports.check = check;
 module.exports.close = close;
 module.exports.debuginfo = debuginfo;
 module.exports.cull = cull;
+module.exports.reserve = reserve;
+module.exports.reserve_machine = reserve_machine;
 module.exports.reservation = reservation;

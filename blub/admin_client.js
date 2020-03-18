@@ -54,6 +54,16 @@ wss.on('connection', async (ws, req) => {
                 ws.send(JSON.stringify( { 'status': 'queue-info', 'data': queueinfo } ));
             }
             break;
+
+            case 'reserve': {
+                cd = (msg['code']) ? "code " + msg['code'] : 'no code';
+                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' wants to reserve machine ' + msg['machine'] + ' with ' + cd);
+                worked = machines.reserve_machine(msg['machine'], msg['code']);
+                //shouldn't hardcode, but send back a refresh signal to update the page automatically
+                var machineinfo = machines.debuginfo();
+                ws.send(JSON.stringify( { 'status': 'machine-info', 'data': machineinfo } ));
+            }
+            break;
         }
     })
 

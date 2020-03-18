@@ -1,6 +1,9 @@
 extends layout
 
 block content
+    head
+        link(rel='stylesheet', href='/stylesheets/guacamole.css')
+
     script(src='./src/main/webapp/modules/ArrayBufferReader.js')
     script(src='./src/main/webapp/modules/ArrayBufferWriter.js')
     script(src='./src/main/webapp/modules/AudioContextFactory.js')
@@ -58,9 +61,12 @@ block content
             console.log(e.data)
             var msg = JSON.parse(e.data);
             
-            if(msg['token'] != "") {
+            if(msg['token'] != null) {
                 rtok = msg['token'];
+                console.log(rtok);
                 geddit();
+            }else{
+                //null token
             }
         }
 
@@ -78,7 +84,7 @@ block content
         }
         
 
-        window.addEventListener("resize", resize);
+        //window.addEventListener("resize", resize);
 
         function resize(){
             console.log("size!");

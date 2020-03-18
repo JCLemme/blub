@@ -47,7 +47,7 @@ block content
                 //Reservation Info
                 res = "<i>(none)</i>"
                 if(minfo[i]['reservation'] != "") {
-                    res = 'reserved for ' + minfo[i]['reservation'];
+                    res = minfo[i]['reservation'];
                 }
                 var resCell = document.createElement("td");
                 resCell.innerHTML = res;
@@ -141,7 +141,7 @@ block content
             //Oh god I'm so sorry
             return function(){
                 console.log("changing machine " + machine + " to use code " + document.getElementById(machine + '-codeField').value);
-                //Do all the fun stuff here
+                connection.send(JSON.stringify( {'request': 'reserve' , 'machine': machine, 'code': document.getElementById(machine + '-codeField').value } )); 
                 document.getElementById(machine + '-codeField').value = '';
             }
         }
