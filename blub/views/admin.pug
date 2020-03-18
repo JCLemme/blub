@@ -68,6 +68,7 @@ block content
                 changeCell.appendChild(box);
                 changeField.id = (i + '-codeField');
                 changeButton.id = (i + '-codeChange');
+                changeButton.onclick = changeCode(i);
                 row.appendChild(changeCell);
                 
 
@@ -80,12 +81,10 @@ block content
                 box.appendChild(termButton);
                 actCell.appendChild(box);
                 termButton.id = (i + '-terminate');
+                termButton.onclick = terminate(i);
                 row.appendChild(actCell);
 
                 tbl.appendChild(row);
-
-                changeButton.onclick = changeCode(i);
-                termButton.onclick = terminate(i);
             }
         }
         
