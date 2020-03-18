@@ -110,14 +110,14 @@ wss.on('connection', async (ws, req) => {
                         // Split based on class or no class
                         if(machine['on_terminate'] != "") {
                             if(machine['reservation'] != "") {
-                                ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'myrtille-link': machinelink, 'rdp-file': remotes.rdp_file(machine), 'reservation': machine['reservation'] } ));
+                                ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'myrtille-link': remotes.myrtille_link(machine, ""), 'rdp-file': remotes.rdp_file(machine), 'reservation': machine['reservation'] } ));
                             }
                             else {
-                                ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'myrtille-link': machinelink, 'rdp-file': remotes.rdp_file(machine) } ));
+                                ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'myrtille-link': remotes.myrtille_link(machine, ""), 'rdp-file': remotes.rdp_file(machine) } ));
                             }
                         }
                         else if(machine['on_kill'] != "") {
-                            ws.send(JSON.stringify( { 'status': 'closing', 'machine': machine, 'myrtille-link': machinelink, 'rdp-file': remotes.rdp_file(machine) } ));
+                            ws.send(JSON.stringify( { 'status': 'closing', 'machine': machine, 'myrtille-link': remotes.myrtille_link(machine, ""), 'rdp-file': remotes.rdp_file(machine) } ));
                         }
                         else if(machine['on_kill'] == "") {
                             ws.send(JSON.stringify( { 'status': 'idle' } ));
@@ -153,7 +153,7 @@ wss.on('connection', async (ws, req) => {
                         // This handler tells the client that their time is up.
                         console.log('  User ' + username + ' has ten minutes to get their shit together.');
                         kicker.send_message(machine['ip'], username, "Sup boi");
-                        sockets.send(username, JSON.stringify( { 'status': 'closing', 'machine': machine, 'myrtille-link': machinelink, 'rdp-file': remotes.rdp_file(machine) } ));
+                        sockets.send(username, JSON.stringify( { 'status': 'closing', 'machine': machine, 'myrtille-link': remotes.myrtille_link(machine, ""), 'rdp-file': remotes.rdp_file(machine) } ));
                     },
                     
                     function(machine) {
@@ -168,7 +168,7 @@ wss.on('connection', async (ws, req) => {
                     }
                     else {
                         // Get a machine and send details to client
-                        sockets.send(username, JSON.stringify( { 'status': 'in-session', 'machine': machine, 'myrtille-link': machinelink, 'rdp-file': remotes.rdp_file(machine) } ));
+                        sockets.send(username, JSON.stringify( { 'status': 'in-session', 'machine': machine, 'myrtille-link': remotes.myrtille_link(machine, ""), 'rdp-file': remotes.rdp_file(machine) } ));
                         return true;
                     }
                 });
@@ -194,7 +194,7 @@ wss.on('connection', async (ws, req) => {
                     function(machine) {
                         // This handler tells the client that their time is up.
                         console.log('  User ' + username + ' has ten minutes to get their shit together.');
-                        sockets.send(username, JSON.stringify( { 'status': 'closing', 'machine': machine, 'myrtille-link': machinelink, 'rdp-file': remotes.rdp_file(machine) } ));
+                        sockets.send(username, JSON.stringify( { 'status': 'closing', 'machine': machine, 'myrtille-link': remotes.myrtille_link(machine, ""), 'rdp-file': remotes.rdp_file(machine) } ));
                     },
                     
                     function(machine) {
@@ -207,7 +207,7 @@ wss.on('connection', async (ws, req) => {
                         ws.send(JSON.stringify( { 'status': 'invalid-class' } ));
                     }
                     else {
-                        ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'myrtille-link': machinelink, 'rdp-file': remotes.rdp_file(machine), 'reservation': msg['reservation'] } ));
+                        ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'myrtille-link': remotes.myrtille_link(machine, ""), 'rdp-file': remotes.rdp_file(machine), 'reservation': msg['reservation'] } ));
                     }
                 }
             }
