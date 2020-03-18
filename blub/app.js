@@ -20,6 +20,7 @@ var loginRouter = require('./routes/login');
 var queueRouter = require('./routes/queue');
 var usersRouter = require('./routes/users');
 var adminRouter = require('./routes/admin');
+var guacRouter = require('./routes/guacamole');
 
 var app = express();
 
