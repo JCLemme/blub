@@ -1,6 +1,7 @@
 const fs = require('fs');
 var machines = require('./machine_backend.js')
 var blubsetup = require('./blub_setup.js')
+var blubglobals = require('./blub_globals.js')
 
 var _entries = [];
 

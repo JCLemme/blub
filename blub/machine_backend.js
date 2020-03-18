@@ -20,7 +20,7 @@ var open = function(username, reservation, onTerminate, onKill) {
             // We found a free machine. Expire in two hours plz
             var expiration = new Date();
             //expiration.setHours(expiration.getHours() + 2);
-            expiration.setMinutes(expiration.getMinutes() + 1);
+            expiration.setMinutes(expiration.getMinutes() + blubglobals.data['time-term']);
             
             _machines[i]["user"] = username;
             _machines[i]["until"] = expiration;
@@ -74,7 +74,7 @@ var cull = function() {
             // Then run the required battery of tests
             if(_machines[i]["on_terminate"] != "") {
                 var expiration = new Date();
-                expiration.setMinutes(expiration.getMinutes() + 1);
+                expiration.setMinutes(expiration.getMinutes() + blubglobals.data['time-kill']);
                 
                 _machines[i]["until"] = expiration;
                 _machines[i]["on_terminate"](_machines[i]);

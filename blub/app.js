@@ -9,6 +9,7 @@ var session = require('express-session')
 var mongodb = require('mongodb')
 var machines = require('./machine_backend.js')
 var blubsetup = require('./blub_setup.js')
+var blubglobals = require('./blub_globals.js')
 
 var adminclient = require('./admin_client.js');
 var loginclient = require('./login_client.js');
@@ -51,6 +52,10 @@ app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/guacamole', guacRouter);
 app.use(express.static('guacamole-common-js'))
+
+// Defaults
+blubglobals.data['time-term'] = 2;
+blubglobals.data['time-kill'] = 2;
 
 machines.load(blubsetup.machines_default);
 
