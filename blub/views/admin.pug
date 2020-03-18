@@ -154,8 +154,27 @@ block content
         }
 
     h1 Here's your Blub status report.
-    button(id='action' onclick='button_handler()') Refresh
+    button(id='action' onclick='button_handler()') Refresh page
     h3 These are the admin controls.
+    div(style="display:flex;")
+        div()
+            button(class="cPanel" id='termClassButton' onclick='button_handler()') Add code to all machines:
+            input(class="cPanel" id='termClassInput' name='code' placeholder='Enter code' type='text')
+            br
+            br
+            button(class="cPanel" id='termClassButton' onclick='button_handler()') Remove code from all machines:
+            input(class="cPanel" id='termClassInput' name='code' placeholder='Enter code' type='text')
+            br
+            br
+            button(class="cPanel" id='termClassButton' onclick='button_handler()') Terminate sessions with code:
+            input(class="cPanel" id='termClassInput' name='code' placeholder='Enter code' type='text')
+            br
+            br
+        div(style="border-left:2px solid black; margin-left:30px; padding-left:30px;")
+            button(class="cPanel" id='termClassButton' onclick='button_handler()') Remove ALL codes
+            br
+            br
+            button(class="cPanel" id='termClassButton' onclick='button_handler()') Terminate ALL sessions
     br
     br
     div(style="display:flex;")

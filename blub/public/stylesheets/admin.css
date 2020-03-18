@@ -34,3 +34,11 @@ table{
 	width:160px;
 	font-size: 16px;
   }
+
+  button.cPanel{
+	width:400px;
+  }
+
+  input.cPanel{
+	width:300px;
+  }
