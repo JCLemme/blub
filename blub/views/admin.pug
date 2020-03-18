@@ -69,6 +69,7 @@ block content
                 changeField.id = (i + '-codeField');
                 changeButton.id = (i + '-codeChange');
                 row.appendChild(changeCell);
+                
 
                 //Actions
                 var actCell = document.createElement("td");
@@ -82,6 +83,9 @@ block content
                 row.appendChild(actCell);
 
                 tbl.appendChild(row);
+
+                changeButton.onclick = changeCode(i);
+                termButton.onclick = terminate(i);
             }
         }
         
@@ -134,6 +138,22 @@ block content
             connection.send(JSON.stringify( {'request': 'machines' } )); 
         }
         
+        function changeCode(machine){
+            //Oh god I'm so sorry
+            return function(){
+                console.log("changing machine " + machine + " to use code " + document.getElementById(machine + '-codeField').value);
+                //Do all the fun stuff here
+                document.getElementById(machine + '-codeField').value = '';
+            }
+        }
+
+        function terminate(machine){
+            //It has to be this way
+            return function(){
+                console.log("terminating machine " + machine);
+            }
+        }
+
     h1 Here's your Blub status report.
     button(id='action' onclick='button_handler()') Refresh
     br
