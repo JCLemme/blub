@@ -83,7 +83,7 @@ block content
                     document.getElementById('header').innerHTML = "Your session with " + msg["machine"]["name"] + " is ending soon.";
                     document.getElementById('subheader').innerHTML = "You will be disconnected from your computer on <b>" + 
                                                                       formatdate(new Date(msg["machine"]["until"])) + "</b>.";
-                    toggleHidden('remote', 'end');
+                    toggleHidden('remote', 'end', 'options');
                 }
                 break;
                 
@@ -92,16 +92,15 @@ block content
                     document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"].toUpperCase() + ".";
                     document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
                                                                       formatdate(new Date(msg["machine"]["until"])) + "</b>.";
-                    toggleHidden('remote', 'end');
+                    toggleHidden('remote', 'end', 'options');
                 }
                 break;
 
                 case "in-session-class": {
                     mlink = msg['link'] + getCookie('passhash');
                     document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"] + ".";
-                    document.getElementById('subheader').innerHTML = "You can use this workstation until your class ends on <b>" + 
-                                                                      formatdate(new Date(msg["machine"]["until"])) + "</b>.";
-                    toggleHidden('remote', 'end');
+                    document.getElementById('subheader').innerHTML = "You can use this workstation until your class ends";
+                    toggleHidden('remote', 'end', 'options');
                 }
                 break;
                 
@@ -157,7 +156,11 @@ block content
                 connection.send(JSON.stringify( { 'request': 'queue-join' } ));
             }else{
                 //Class code
-                connection.send(JSON.stringify( { 'request': 'queue-join-class', 'reservation': document.getElementById('code').value.trim() } ));
+                if (document.getElementById('code').value != ""){
+                    connection.send(JSON.stringify( { 'request': 'queue-join-class', 'reservation': document.getElementById('code').value.trim().toUpperCase() } ));
+                } else {
+                    document.getElementById('err').innerHTML = "Please enter a class code.";
+                }
             }
         }
 
@@ -169,10 +172,18 @@ block content
             connection.send(JSON.stringify( { 'request': 'session-end' } ));
         }
         
-        function remote_handler() {
+        function myrt_handler() {
             // Launch Myrtille
             if(mlink != "")
                 window.open(mlink);
+        }
+
+        function rdp_handler() {
+
+        }
+
+        function guac_handler() {
+            
         }
 
         function class_handler(){
@@ -207,6 +218,9 @@ block content
             document.getElementById('class').classList.add("hidden");
             document.getElementById('code').classList.add("hidden");
             document.getElementById('close').classList.add("hidden");
+            document.getElementById('options').classList.add("hidden");
+            document.getElementById('opt1').classList.add("hidden");
+            document.getElementById('opt2').classList.add("hidden");
             document.getElementById('loader').classList.add("hidden");  //Spinner
             args.forEach(element => document.getElementById(element).classList.remove("hidden"));
         }
@@ -221,7 +235,7 @@ block content
         | The current wait time is about 
         b(id='time-remaining') 20 minutes.
     br
-    button(id='remote' onclick='remote_handler()') 
+    button(id='remote' onclick='myrt_handler()') 
         b() Open your remote session
     input(id='code' name='code' autocomplete="off" oninput="codeEntered()" placeholder='Enter class code')
     button(id='leave' onclick='leave_handler()') Leave the queue
@@ -231,3 +245,16 @@ block content
     button(id='close' class="textOnly" onclick='close_handler()') I don't have a class code...
 
     p(id='err')
+
+    script.
+        function opt_handler() {
+            document.getElementById('opt1').classList.toggle("hidden");
+            document.getElementById('opt2').classList.toggle("hidden");
+        }
+
+    button(id="options" class='textOnly' onclick='opt_handler()') Other connection options...
+    br
+    br
+    button(id='opt1' class="hidden" onclick='rdp_handler()') RDP file
+    button(id='opt2' class="hidden" onclick='guac_handler()') Guacamole client
+    //Myrtille client

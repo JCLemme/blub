@@ -140,8 +140,8 @@ block content
         function changeCode(machine){
             //Oh god I'm so sorry
             return function(){
-                console.log("changing machine " + machine + " to use code " + document.getElementById(machine + '-codeField').value);
-                connection.send(JSON.stringify( {'request': 'reserve' , 'machine': machine, 'code': document.getElementById(machine + '-codeField').value } )); 
+                console.log("changing machine " + machine + " to use code " + document.getElementById(machine + '-codeField').value.toUpperCase());
+                connection.send(JSON.stringify( {'request': 'reserve' , 'machine': machine, 'code': document.getElementById(machine + '-codeField').value.toUpperCase() } )); 
                 document.getElementById(machine + '-codeField').value = '';
             }
         }
@@ -155,6 +155,7 @@ block content
 
     h1 Here's your Blub status report.
     button(id='action' onclick='button_handler()') Refresh
+    h3 These are the admin controls.
     br
     br
     div(style="display:flex;")
