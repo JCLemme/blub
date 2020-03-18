@@ -39,7 +39,7 @@ block content
         var mouse;
         
         const connection = new WebSocket('#{uname_server}');
-         
+        
         connection.onopen = () => {
             var password;
             do {
@@ -48,11 +48,11 @@ block content
             
             connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password } ));
         }
-         
+        
         connection.onerror = (error) => {
             console.log(`WebSocket error: ${error}`);
         }
-         
+        
         connection.onmessage = (e) => {
             console.log(e.data)
             var msg = JSON.parse(e.data);
@@ -75,6 +75,13 @@ block content
             client.connect('token=' + rtok);
         }
         
+
+        window.addEventListener("resize", myFunction);
+
+        function resize(){
+            console.log("size!");
+        }
+
     h1= title
     p(id='boop') Welcome to #{title}
     button(onclick='geddit()') booper
