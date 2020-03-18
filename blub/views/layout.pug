@@ -17,9 +17,7 @@ html
     hr
 
   script.
-      //const WebSocket = require('ws')
-      const webUrl = 'ws://localhost:8082';
-      const webConnection = new WebSocket(webUrl);
+      const webConnection = new WebSocket('#{login_server}');
         
       webConnection.onopen = () => {
           webConnection.send(JSON.stringify( {'request': 'user-info' } )); 
