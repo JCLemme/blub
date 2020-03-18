@@ -151,7 +151,7 @@ wss.on('connection', async (ws, req) => {
                     function(machine) {
                         // This handler tells the client that their time is up.
                         console.log('  User ' + username + ' has ten minutes to get their shit together.');
-                        kicker.send_message(machine['hostname']+'ecc.egr.uri.edu', username, "Sup boi");
+                        kicker.send_message(machine['host']+'ecc.egr.uri.edu', username, "Sup boi");
                         sockets.send(username, JSON.stringify( { 'status': 'closing', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
                     },
                     
