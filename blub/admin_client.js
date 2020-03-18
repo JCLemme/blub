@@ -43,8 +43,7 @@ wss.on('connection', async (ws, req) => {
             
             case 'machines': {
                 console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested admin machine information');
-                var machineinfo = machines.debuginfo();
-                ws.send(JSON.stringify( { 'status': 'machine-info', 'data': machineinfo } ));
+                sendMachines();
             }
             break;
             
@@ -59,11 +58,14 @@ wss.on('connection', async (ws, req) => {
                 cd = (msg['code']) ? "code " + msg['code'] : 'no code';
                 console.log('User ' + req.session.passport.user['sAMAccountName'] + ' wants to reserve machine ' + msg['machine'] + ' with ' + cd);
                 worked = machines.reserve_machine(msg['machine'], msg['code']);
-                //shouldn't hardcode, but send back a refresh signal to update the page automatically
-                var machineinfo = machines.debuginfo();
-                ws.send(JSON.stringify( { 'status': 'machine-info', 'data': machineinfo } ));
+                sendMachines();
             }
             break;
+        }
+
+        function sendMachines(){
+            var machineinfo = machines.debuginfo();
+            ws.send(JSON.stringify( { 'status': 'machine-info', 'data': machineinfo } ));
         }
     })
 
