@@ -1,21 +1,33 @@
+const fs = require('fs');
 var machines = require('./machine_backend.js')
 var blubsetup = require('./blub_setup.js')
 
 var _entries = [];
 
+var load = function(filename) {
+    var rawdata = fs.readFileSync(filename);
+    _entries = JSON.parse(rawdata);
+    console.log("Loaded " + _entries.length + " entries.");
+};
+
+var save = function(filename) { 
+    fs.writeFileSync(filename, JSON.stringify(_entries));
+    console.log("Saved " + _entries.length + " entries.");
+};
+
 var refresh = function() {
     for(var i=0;i<_entries.length;i++) {
-        _entries[i]['on_movement'](_entries[i]['socket'], i)
+        _entries[i]['on_movement'](i)
     }
 };
 
-var append = function(socket, username, onMovement, onCalled) {
+var append = function(username, onMovement, onCalled) {
     if(check(username) != null) {
         return false;
     }
     
     const date = Date.now();
-    entry = { 'socket': socket, 'user': username, 'date': date, 'on_movement': onMovement, 'on_called': onCalled };
+    entry = { 'user': username, 'date': date, 'on_movement': onMovement, 'on_called': onCalled };
     _entries.push(entry);
     console.log(_entries);
     
@@ -30,16 +42,6 @@ var check = function(username) {
     }
     
     return null;
-};
-
-var redirect = function(username, socket) {
-    for(var i=0;i<_entries.length;i++) {
-        if(_entries[i]['user'] == username)
-            _entries[i]['socket'] = socket;
-            return true;
-    }
-    
-    return false;
 };
 
 var remove = function(username) {
@@ -62,7 +64,7 @@ var nextup = function() {
     }
     
     // Run the handler
-    var status = _entries[0]['on_called'](_entries[0]['socket'])
+    var status = _entries[0]['on_called']()
     
     // If the handler returned false, they didn't get a machine so do nothing.
     // Else clear them from the queue
@@ -80,9 +82,10 @@ var debuginfo = function() {
     return _entries;
 };
 
+module.exports.load = load;
+module.exports.save = save;
 module.exports.append = append;
 module.exports.check = check;
-module.exports.redirect = redirect;
 module.exports.remove = remove;
 module.exports.refresh = refresh;
 module.exports.nextup = nextup;

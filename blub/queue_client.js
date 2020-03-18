@@ -4,7 +4,8 @@ var queueworker = require('./queue_backend.js')
 var machines = require('./machine_backend.js')
 var https = require('https')
 var remotes = require('./remote_backend.js')
-
+var sockets = require('./socket_backend.js')
+var kicker = require('./kicker_backend.js')
 var blubsetup = require('./blub_setup.js')
 
 // Queue worker
@@ -26,6 +27,7 @@ function queueRunner() {
             console.log("  Looks like " + status + " got a machine")
         break;
     }
+    queueworker.save('./queue.json.last');
 }
 
 
@@ -48,6 +50,8 @@ function cullRunner() {
             console.log("  Looks like " + status + " got a machine")
         break;
     }*/
+    
+    machines.save('./machines.json.last');
 }
 
 
@@ -81,25 +85,26 @@ wss.on('connection', async (ws, req) => {
         console.log(`${message}`);
         
         // Parse the message out
-        msg = JSON.parse(message);
+        var msg = JSON.parse(message);
+        var username = req.session.passport.user['sAMAccountName'] ;
         
         switch(msg['request']) {
             case 'init': {
+                // Refresh their websocket
+                sockets.register(username, ws);
+                
                 // See if the user is currently queued, and if so send them some queue
-                var place = queueworker.check(req.session.passport.user['sAMAccountName']);
+                var place = queueworker.check(username);
                 
                 if(place != null) {
-                    queueworker.redirect(req.session.passport.user['sAMAccountName'], ws);
                     ws.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
                 }
                 else {
                 
                     // See if the user has a machine attached to them
-                    var machine = machines.check(req.session.passport.user['sAMAccountName']);
+                    var machine = machines.check(username);
                     
                     if(machine != null) {
-                        machines.redirect(req.session.passport.user['sAMAccountName'], ws);
-                        
                         // Split based on class or no class
                         if(machine['on_terminate'] != "") {
                             if(machine['reservation'] != "") {
@@ -130,27 +135,28 @@ wss.on('connection', async (ws, req) => {
             /// Queue functions
 
             case 'queue-join': {
-                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested queue join');
+                console.log('User ' + username + ' requested queue join');
                 
-                queueworker.append(ws, req.session.passport.user['sAMAccountName'], 
+                queueworker.append(username, 
                 
-                function(socket, place) {
-                    socket.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
+                function(place) {
+                    sockets.send(username, JSON.stringify( { 'status': 'queued', 'place': place } ));
                 },
                 
-                function(socket, machine) {
+                function(machine) {
                     // Otherwise let's find them a machine
-                    var machine = machines.open(socket, req.session.passport.user['sAMAccountName'], "", 
-                    function(socket, machine) {
+                    var machine = machines.open(username, "", 
+                    function(machine) {
                         // This handler tells the client that their time is up.
-                        console.log('User ' + req.session.passport.user['sAMAccountName'] + ' has ten minutes to get their shit together.');
-                        socket.send(JSON.stringify( { 'status': 'closing', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
+                        console.log('User ' + username + ' has ten minutes to get their shit together.');
+                        kicker.send_message(machine['ip'], username, "Sup boi");
+                        sockets.send(username, JSON.stringify( { 'status': 'closing', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
                     },
                     
-                    function(socket, machine) {
+                    function(machine) {
                         // This handler tells the client to forcibly kill the connection.
-                        console.log('User ' + req.session.passport.user['sAMAccountName'] + '\'s session just ended.');
-                        socket.send(JSON.stringify( { 'status': 'idle' } ));
+                        console.log('User ' + username + '\'s session just ended.');
+                        sockets.send(username, JSON.stringify( { 'status': 'idle' } ));
                     });
                     
                     // Exit if there are no free machines. 
@@ -159,7 +165,7 @@ wss.on('connection', async (ws, req) => {
                     }
                     else {
                         // Get a machine and send details to client
-                        socket.send(JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
+                        sockets.send(username, JSON.stringify( { 'status': 'in-session', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
                         return true;
                     }
                 });
@@ -167,7 +173,7 @@ wss.on('connection', async (ws, req) => {
             break;
             
             case 'queue-join-class': {
-                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested to join a class "' + msg['reservation'] + '"');
+                console.log('User ' + username + ' requested to join a class "' + msg['reservation'] + '"');
                 
                 // Funny enough, there isn't a queue involved. Just look for a machine.
                 var available = machines.reservation(msg['reservation']);
@@ -181,17 +187,17 @@ wss.on('connection', async (ws, req) => {
                 else {
                     console.log('That class above has ' + available + ' spots left.');
                     
-                    var machine = machines.open(req.session.passport.user['sAMAccountName'], msg['reservation'], 
-                    function(socket, machine) {
+                    var machine = machines.open(username, msg['reservation'], 
+                    function(machine) {
                         // This handler tells the client that their time is up.
-                        console.log('User ' + req.session.passport.user['sAMAccountName'] + ' has ten minutes to get their shit together.');
-                        socket.send(JSON.stringify( { 'status': 'closing', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
+                        console.log('User ' + username + ' has ten minutes to get their shit together.');
+                        sockets.send(username, JSON.stringify( { 'status': 'closing', 'machine': machine, 'link': remotes.myrtille_link(machine, "") } ));
                     },
                     
-                    function(socket, machine) {
+                    function(machine) {
                         // This handler tells the client to forcibly kill the connection.
-                        console.log('User ' + req.session.passport.user['sAMAccountName'] + '\'s session just ended.');
-                        socket.send(JSON.stringify( { 'status': 'idle' } ));
+                        console.log('User ' + username + '\'s session just ended.');
+                        sockets.send(username, JSON.stringify( { 'status': 'idle' } ));
                     });
                     
                     if(machine == null) {
@@ -206,8 +212,8 @@ wss.on('connection', async (ws, req) => {
             break;
             
             case 'queue-leave': {
-                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested queue leave');
-                queueworker.remove(req.session.passport.user['sAMAccountName']);
+                console.log('User ' + username + ' requested queue leave');
+                queueworker.remove(username);
                 ws.send(JSON.stringify( { 'status': 'idle' } ));
             }
             break;
@@ -217,8 +223,8 @@ wss.on('connection', async (ws, req) => {
             // Session functions
             
             case 'session-end': {
-                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested session end');
-                machines.close(req.session.passport.user['sAMAccountName']);
+                console.log('User ' + username + ' requested session end');
+                machines.close(username);
                 ws.send(JSON.stringify( { 'status': 'idle' } ));
             }
             break;
