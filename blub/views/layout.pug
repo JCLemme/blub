@@ -18,7 +18,7 @@ html
     hr
 
   script.
-      const webConnection = new WebSocket('#{login_server}');
+      const webConnection = new WebSocket('#{uname_server}');
         
       webConnection.onopen = () => {
           webConnection.send(JSON.stringify( {'request': 'user-info' } )); 
