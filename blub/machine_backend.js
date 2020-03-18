@@ -64,13 +64,13 @@ var debuginfo = function() {
     return _machines;
 };
 
-var cull = function() {
+var cull = function(reservation) {
 
     // Mark them for DEATH
     for(var i=_machines.length-1;i>=0;i--) {
         
-        // First - see if they're active and if their time is up
-        if(_machines[i]["user"] != "" && Date.now() > Number(_machines[i]["until"]) ) {
+        // First - see if they're active and if their time is up and if they aren't reserved
+        if(_machines[i]["user"] != "" && Date.now() > Number(_machines[i]["until"]) && _machines[i]['reservation'] == reservation) {
         
             // Then run the required battery of tests
             if(_machines[i]["on_terminate"] != "") {
@@ -139,6 +139,18 @@ var reserve = function(reservation, original, amount) {
     return found;
 }
 
+var time_at = function(place) {
+    // Sort the array
+    var filtered = _machines.slice().filter(function(a) { return a['until'] != "" });
+    filtered.sort(function(a, b) { return a['until'] - b['until'] });
+    
+    if(place >= filtered.length) 
+        return -1;
+    else 
+        return filtered[place]['until'] - Date.now();
+    
+}
+
 module.exports.load = load;
 module.exports.save = save;
 module.exports.open = open;
@@ -149,3 +161,4 @@ module.exports.cull = cull;
 module.exports.reserve = reserve;
 module.exports.reserve_machine = reserve_machine;
 module.exports.reservation = reservation;
+module.exports.time_at = time_at;
