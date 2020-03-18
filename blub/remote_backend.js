@@ -26,12 +26,12 @@ var myrtille_link = function(machine, hash) {
 
 var rdp_file = function(machine) {
     // Generate and save the connection
-    var rdpfile = [];
+    var rdpfile = ""
     
-    rdpfile.push('domain:s:ECC');
-    rdpfile.push('full address:s:' + machine['ip']);
-    rdpfile.push('public mode:i:1');
-    rdpfile.push('username:s:' + machine['user']);
+    rdpfile += 'domain:s:ECC\n';
+    rdpfile += 'full address:s:' + machine['ip'] + '\n';
+    rdpfile += 'public mode:i:1');
+    rdpfile += 'username:s:' + machine['user'] + '\n';
     
     return rdpfile;
 }
