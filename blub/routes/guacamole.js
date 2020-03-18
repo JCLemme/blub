@@ -4,7 +4,12 @@ var blubsetup = require('../blub_setup.js')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('guacamole', { title: 'Guac', guac_server: blubsetup.guac_host, uname_server: "ws://" + blubsetup.host + ':' + blubsetup.login_port });
+    if (req.user) {
+        res.render('guacamole', { title: 'Guac', guac_server: blubsetup.guac_host, uname_server: "ws://" + blubsetup.host + ':' + blubsetup.login_port });
+      }
+    else {
+        res.redirect('/login');
+    }
 });
 
 router.get('/logout', function(req, res){

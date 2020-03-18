@@ -41,12 +41,13 @@ block content
         const connection = new WebSocket('#{uname_server}');
          
         connection.onopen = () => {
-            var password;
+            var password = "";
             do {
                 password = window.prompt("Please enter your ECC password...", "");
-            } while(password == null || password == "")
+            } while(password == "")
             
-            connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password } ));
+            if(password != null) 
+                connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password } ));
         }
          
         connection.onerror = (error) => {
@@ -75,6 +76,5 @@ block content
             client.connect('token=' + rtok);
         }
         
-    h1= title
     p(id='boop') Welcome to #{title}
     button(onclick='geddit()') booper
