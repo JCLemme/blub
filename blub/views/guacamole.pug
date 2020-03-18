@@ -46,7 +46,7 @@ block content
                 password = window.prompt("Please enter your ECC password...", "");
             } while(password == null || password == "")
             
-            connection.send(JSON.stringify( { 'request': 'guac-encrypt', 'pass': password } ));
+            connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password } ));
         }
          
         connection.onerror = (error) => {
