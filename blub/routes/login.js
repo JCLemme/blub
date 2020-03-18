@@ -46,7 +46,7 @@ router.get('/', function(req, res, next) {
     
 });
 
-router.post('/', passport.authenticate('ldapauth',{ successRedirect: '/', failureRedirect: '/login', failureFlash: true }), function(req, res) {
+router.post('/', passport.authenticate('ldapauth',{ successRedirect: '/queue', failureRedirect: '/login', failureFlash: true }), function(req, res) {
     res.json(req.user)
 });
 
