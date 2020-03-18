@@ -79,6 +79,15 @@ block content
             
             // Handle a request
             switch(msg["status"]) {
+                case "closing": {
+                    document.getElementById('header').innerHTML = "Your session with " + msg["machine"]["name"] + " is ending soon.";
+                    document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
+                                                                      formatdate(new Date(msg["machine"]["until"])) + "</b>.";
+                    }
+                    toggleHidden('remote', 'end');
+                }
+                break;
+                
                 case "in-session": {
                     mlink = msg['link'] + getCookie('passhash');
                     document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"].toUpperCase() + ".";
