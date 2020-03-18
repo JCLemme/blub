@@ -35,10 +35,10 @@ block content
     
     script.
         var rtok;
-        var client = new Guacamole.Client(new Guacamole.WebSocketTunnel('ws://coronaman.egr.uri.edu:8192'));
+        var client = new Guacamole.Client(new Guacamole.WebSocketTunnel('ws://puff.ele.uri.edu:8192'));
         var mouse;
         
-        const url = 'ws://localhost:8082';
+        const url = 'ws://beer.egr.uri.edu:9924';
         const connection = new WebSocket(url);
          
         connection.onopen = () => {
@@ -47,7 +47,7 @@ block content
                 "connection": {
                     "type": "rdp",
                     "settings": {
-                        "hostname": "131.128.50.28",
+                        "hostname": "131.128.50.30",
                         "username": "ECC\\RT1",
                         "password": "$hrkB8!!",
                         "security": "tls",
