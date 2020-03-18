@@ -38,7 +38,7 @@ passport.deserializeUser(function(user, done) {
   
 router.get('/', function(req, res, next) {
     if (!req.user) {
-        res.render('login', { title: 'Blub login', failureFlash: req.flash('error'), login_server: "ws://" + blubsetup.host + ':' + blubsetup.login_port  });
+        res.render('login', { title: 'Blub login', failureFlash: req.flash('error'), login_server: "ws://" + blubsetup.host + ':' + blubsetup.login_port, uname_server: "ws://" + blubsetup.host + ':' + blubsetup.login_port, uname_server: "ws://" + blubsetup.host + ':' + blubsetup.login_port    });
     }
     else {
         res.redirect('/');
