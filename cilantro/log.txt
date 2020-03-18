@@ -1,0 +1,8 @@
+
+> cilantro@0.0.0 start /home/jlemme/cilantro
+> node ./bin/www
+
+Starting guacamole-lite websocket server
+Sat, 14 Mar 2020 07:21:48 GMT cilantro:server Listening on port 3000
+Closing all connections and exiting...
+Closing all connections and exiting...
