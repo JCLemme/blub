@@ -121,18 +121,16 @@ var reserve_machine = function(machine, reservation) {
     }
 };
 
-var reserve = function(reservation, original, amount) {
+var reserve = function(reservation, original, all = false, amount = -1) {
     var found = 0;
     
     for(var i=0;i<_machines.length;i++) {
-        if(_machines[i]["user"] != "") {
-            if(_machines[i]["reservation"] == original) {
-                found++;
-                _machines[i]["reservation"] = reservation;
-                
-                if(found == amount) 
-                    return found;
-            }
+        if(_machines[i]["reservation"] == original || all) {
+            found++;
+            _machines[i]["reservation"] = reservation;
+            
+            if(found == amount) 
+                return found;
         }
     }
     

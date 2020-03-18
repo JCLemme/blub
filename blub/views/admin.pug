@@ -153,35 +153,71 @@ block content
             }
         }
 
+        confirmation = false;
+
+        function check_handler(){
+            document.getElementById("termAllCheck").innerHTML = (document.getElementById("termAllCheck").innerHTML == " ") ? "✔" : " ";
+        }
+
+        function termAll_handler(){
+            if (confirm){
+                //terminates ALL machines
+                connection.send(JSON.stringify( {'request': 'terminate-all' } ));
+                //Reset confirmation
+                confirm = false;
+                document.getElementById("termAllCheck").innerHTML = " ";
+            }
+        }
+
+        function termCode_handler(){
+            //terminates all machines with given code
+            connection.send(JSON.stringify( {'request': 'terminate-code' , 'code': document.getElementById('termCodeInput').value.toUpperCase() } ));
+        }
+
+        function addCode_handler(){
+            //Adds code to all machines
+            connection.send(JSON.stringify( {'request': 'change-code-all' , 'code': document.getElementById('addCodeInput').value.toUpperCase() } ));
+        }
+
+        function removeCode_handler(){
+            //Removes code from all machines
+            connection.send(JSON.stringify( {'request': 'remove-code' , 'code': document.getElementById('rmvCodeInput').value.toUpperCase() } ));
+        }
+
+        function removeAll_handler(){
+            //Removes all codes from all machines
+            connection.send(JSON.stringify( {'request': 'change-code-all' } ));
+        }
+
     h1 Here's your Blub status report.
     button(id='action' onclick='button_handler()') Refresh page
     h3 These are the admin controls.
     div(style="display:flex;")
         div()
-            button(class="cPanel" id='termClassButton' onclick='button_handler()') Add code to all machines:
-            input(class="cPanel" id='termClassInput' name='code' placeholder='Enter code' type='text')
+            button(class="cPanel" id='addCodeButton' onclick='addCode_handler()') Add code to all machines:
+            input(class="cPanel" id='addCodeInput' autocomplete="off" name='code' placeholder='Enter code' type='text')
             br
             br
-            button(class="cPanel" id='termClassButton' onclick='button_handler()') Remove code from all machines:
-            input(class="cPanel" id='termClassInput' name='code' placeholder='Enter code' type='text')
+            button(class="cPanel" id='rmvCodeButton' onclick='removeCode_handler()') Remove code from all machines:
+            input(class="cPanel" id='rmvCodeInput' autocomplete="off" name='code' placeholder='Enter code' type='text')
             br
             br
-            button(class="cPanel" id='termClassButton' onclick='button_handler()') Terminate sessions with code:
-            input(class="cPanel" id='termClassInput' name='code' placeholder='Enter code' type='text')
+            button(class="cPanel" id='termCodeButton' onclick='termCode_handler()') Terminate sessions with code:
+            input(class="cPanel" id='termCodeInput' autocomplete="off" name='code' placeholder='Enter code' type='text')
             br
             br
         div(style="border-left:2px solid black; margin-left:30px; padding-left:30px;")
-            button(class="cPanel" id='termClassButton' onclick='button_handler()') Remove ALL codes
+            button(class="cPanel" id='rmvAllCodeButton' onclick='removeAll_handler()') Remove ALL codes
             br
             br
-            button(class="cPanel" id='termClassButton' onclick='button_handler()') Terminate ALL sessions
-    br
-    br
+            button(class="cPanel" id='termAllButton' onclick='termAll_handler()') Terminate ALL sessions
+            br
+            br
+            p(class="chk") I am absolutely sure I want to do this
+            button(class="cPanel chk" id='termAllCheck' onclick='check_handler()') 
+            
+    
     div(style="display:flex;")
-        div(style="width:20%;")
-            h3 Here is the current queue.
-            div(id='queueinfo')
-        
         div()
             h3 Here are the machines in the pool.
             table(id="machineTable")
@@ -197,4 +233,7 @@ block content
                     td test!
                     td test!
                     td test!
-            
+        div(style="border-left:2px solid black; margin-left:15px; padding-left:15px; width:20%;")
+            h3 Here is the current queue.
+            div(id='queueinfo')
+        

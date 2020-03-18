@@ -61,6 +61,39 @@ wss.on('connection', async (ws, req) => {
                 sendMachines();
             }
             break;
+
+            case 'change-code-all': {
+                cd = (msg['code']) ? "reserve all machines with code " + msg['code'] : 'remove all codes from all machines';
+                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' wants to ' + cd);
+                if (msg['code']){
+                    changed = machines.reserve(msg['code'], "", true);
+                } else {
+                    changed = machines.reserve("", "", true);
+                }
+                sendMachines();
+            }
+            break;
+
+            case 'remove-code': {
+                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' wants to unreserve all machines using code ' + msg['code']);
+                changed = machines.reserve("", msg['code']);
+                sendMachines();
+            }
+            break;
+
+            case 'terminate-code': {
+                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' wants to terminate all machines using code ' + msg['code']);
+                //worked = machines.reserve_machine(msg['machine'], msg['code']);
+                sendMachines();
+            }
+            break;
+
+            case 'terminate-all': {
+                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' wants to terminate all machines (something must be very wrong)');
+                //worked = machines.reserve_machine(msg['machine']);
+                sendMachines();
+            }
+            break;
         }
 
         function sendMachines(){
