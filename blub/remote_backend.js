@@ -24,5 +24,18 @@ var myrtille_link = function(machine, hash) {
     return blubsetup.myrtille_server + "/Myrtille/?__EVENTTARGET=&__EVENTARGUMENT=&connect=Connect%21&server=" + machine['ip'] + "&domain=ECC&user=" + machine['user'] + "&passwordHash=" + hash;
 };
 
+var rdp_file = function(machine) {
+    // Generate and save the connection
+    var rdpfile = ""
+    
+    rdpfile += 'domain:s:ECC\n';
+    rdpfile += 'full address:s:' + machine['ip'] + '\n';
+    rdpfile += 'public mode:i:1');
+    rdpfile += 'username:s:' + machine['user'] + '\n';
+    
+    return rdpfile;
+}
+
 module.exports.myrtille_hash = myrtille_hash;
 module.exports.myrtille_link = myrtille_link;
+module.exports.rdp_file = rdp_file;

@@ -142,11 +142,15 @@ var time_at = function(place) {
     var filtered = _machines.slice().filter(function(a) { return a['until'] != "" });
     filtered.sort(function(a, b) { return a['until'] - b['until'] });
     
-    if(place >= filtered.length) 
-        return -1;
-    else 
-        return filtered[place]['until'] - Date.now();
-    
+    if(_machines.length == filtered.length) {
+        if(place >= filtered.length) 
+            return -1;
+        else 
+            return filtered[place]['until'] - Date.now();
+    }
+    else {
+        return 0;
+    }
 }
 
 module.exports.load = load;
