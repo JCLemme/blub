@@ -81,7 +81,7 @@ block content
             switch(msg["status"]) {
                 case "closing": {
                     document.getElementById('header').innerHTML = "Your session with " + msg["machine"]["name"] + " is ending soon.";
-                    document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
+                    document.getElementById('subheader').innerHTML = "You will be disconnected from your computer on <b>" + 
                                                                       formatdate(new Date(msg["machine"]["until"])) + "</b>.";
                     toggleHidden('remote', 'end');
                 }

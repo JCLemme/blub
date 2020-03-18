@@ -27,6 +27,7 @@ block content
                 //Machine Name
                 var machineCell = document.createElement("td");
                 machineCell.innerHTML = "<b>" + minfo[i]['name'].toUpperCase() + "</b>";
+                machineCell.id = (i + '-name');
                 row.appendChild(machineCell);
 
                 //IP Address
@@ -40,6 +41,7 @@ block content
                 var useCell = document.createElement("td");
                 useCell.style.width = "300px"; 
                 useCell.innerHTML = use;
+                useCell.id = (i + '-use');
                 row.appendChild(useCell);
 
                 //Reservation Info
@@ -49,6 +51,7 @@ block content
                 }
                 var resCell = document.createElement("td");
                 resCell.innerHTML = res;
+                resCell.id = (i + '-res');
                 row.appendChild(resCell);
 
                 //Change Code
@@ -63,6 +66,8 @@ block content
                 box.appendChild(changeField);
                 box.appendChild(changeButton);
                 changeCell.appendChild(box);
+                changeField.id = (i + '-codeField');
+                changeButton.id = (i + '-codeChange');
                 row.appendChild(changeCell);
 
                 //Actions
@@ -73,6 +78,7 @@ block content
                 termButton.classList.add("admin");
                 box.appendChild(termButton);
                 actCell.appendChild(box);
+                termButton.id = (i + '-terminate');
                 row.appendChild(actCell);
 
                 tbl.appendChild(row);
