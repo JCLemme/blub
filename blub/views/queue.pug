@@ -4,6 +4,8 @@ block content
     head
         link(rel='stylesheet', href='/stylesheets/spinner.css')
 
+    script(src='./scripts/download.js')
+    
     script.
 
         var hasClassCode;
@@ -195,6 +197,8 @@ block content
         }
 
         function rdp_handler() {
+            download(rdpfile, "connection.rdp", "text/plain");
+
 
         }
 
