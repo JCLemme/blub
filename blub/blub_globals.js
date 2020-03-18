@@ -1,5 +1,5 @@
 module.exports = {
-    data: {};
+    data: {},
 };
 
 
