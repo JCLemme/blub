@@ -83,7 +83,6 @@ block content
                     document.getElementById('header').innerHTML = "Your session with " + msg["machine"]["name"] + " is ending soon.";
                     document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
                                                                       formatdate(new Date(msg["machine"]["until"])) + "</b>.";
-                    }
                     toggleHidden('remote', 'end');
                 }
                 break;
