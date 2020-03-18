@@ -7,12 +7,12 @@ var _entries = [];
 var load = function(filename) {
     var rawdata = fs.readFileSync(filename);
     _entries = JSON.parse(rawdata);
-    console.log("  Loaded " + _entries.length + " entries.");
+    console.log("    Loaded " + _entries.length + " entries.");
 };
 
 var save = function(filename) { 
     fs.writeFileSync(filename, JSON.stringify(_entries));
-    console.log("  Saved " + _entries.length + " entries.");
+    console.log("    Saved " + _entries.length + " entries.");
 };
 
 var refresh = function() {

@@ -6,12 +6,12 @@ var _machines = [];
 var load = function(filename) {
     var rawdata = fs.readFileSync(filename);
     _machines = JSON.parse(rawdata);
-    console.log("  Loaded " + _machines.length + " machines.");
+    console.log("    Loaded " + _machines.length + " machines.");
 };
 
 var save = function(filename) { 
     fs.writeFileSync(filename, JSON.stringify(_machines));
-    console.log("  Saved " + _machines.length + " machines.");
+    console.log("    Saved " + _machines.length + " machines.");
 };
 
 var open = function(username, reservation, onTerminate, onKill) {

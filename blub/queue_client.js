@@ -56,7 +56,7 @@ function cullRunner() {
 
 
 function updateRunner() {
-    console.log('Updating at ' + Date.now());
+    console.log('\nUpdating at ' + Date.now());
     cullRunner();
     queueRunner();
     console.log(' ');
@@ -84,7 +84,7 @@ wss.on('connection', async (ws, req) => {
     console.log('# New connection from ' + req.session.passport.user['sAMAccountName'] + '...');
     
     ws.on('message', message => {
-        console.log(`  ${message}`);
+        console.log('# Message from ' + req.session.passport.user['sAMAccountName'] + ': ' + `${message}`);
         
         // Parse the message out
         var msg = JSON.parse(message);
