@@ -1,105 +1,104 @@
-extends layout
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/guacamole.css')
+    body
+        script(src='./src/main/webapp/modules/ArrayBufferReader.js')
+        script(src='./src/main/webapp/modules/ArrayBufferWriter.js')
+        script(src='./src/main/webapp/modules/AudioContextFactory.js')
+        script(src='./src/main/webapp/modules/AudioPlayer.js')
+        script(src='./src/main/webapp/modules/AudioRecorder.js')
+        script(src='./src/main/webapp/modules/BlobReader.js')
+        script(src='./src/main/webapp/modules/BlobWriter.js')
+        script(src='./src/main/webapp/modules/Client.js')
+        script(src='./src/main/webapp/modules/DataURIReader.js')
+        script(src='./src/main/webapp/modules/Display.js')
+        script(src='./src/main/webapp/modules/InputSink.js')
+        script(src='./src/main/webapp/modules/InputStream.js')
+        script(src='./src/main/webapp/modules/IntegerPool.js')
+        script(src='./src/main/webapp/modules/JSONReader.js')
+        script(src='./src/main/webapp/modules/Keyboard.js')
+        script(src='./src/main/webapp/modules/Layer.js')
+        script(src='./src/main/webapp/modules/Mouse.js')
+        script(src='./src/main/webapp/modules/Namespace.js')
+        script(src='./src/main/webapp/modules/Object.js')
+        script(src='./src/main/webapp/modules/OnScreenKeyboard.js')
+        script(src='./src/main/webapp/modules/OutputStream.js')
+        script(src='./src/main/webapp/modules/Parser.js')
+        script(src='./src/main/webapp/modules/RawAudioFormat.js')
+        script(src='./src/main/webapp/modules/SessionRecording.js')
+        script(src='./src/main/webapp/modules/Status.js')
+        script(src='./src/main/webapp/modules/StringReader.js')
+        script(src='./src/main/webapp/modules/StringWriter.js')
+        script(src='./src/main/webapp/modules/Tunnel.js')
+        script(src='./src/main/webapp/modules/Version.js')
+        script(src='./src/main/webapp/modules/VideoPlayer.js')
 
-block content
-    head
-        link(rel='stylesheet', href='/stylesheets/guacamole.css')
-
-    script(src='./src/main/webapp/modules/ArrayBufferReader.js')
-    script(src='./src/main/webapp/modules/ArrayBufferWriter.js')
-    script(src='./src/main/webapp/modules/AudioContextFactory.js')
-    script(src='./src/main/webapp/modules/AudioPlayer.js')
-    script(src='./src/main/webapp/modules/AudioRecorder.js')
-    script(src='./src/main/webapp/modules/BlobReader.js')
-    script(src='./src/main/webapp/modules/BlobWriter.js')
-    script(src='./src/main/webapp/modules/Client.js')
-    script(src='./src/main/webapp/modules/DataURIReader.js')
-    script(src='./src/main/webapp/modules/Display.js')
-    script(src='./src/main/webapp/modules/InputSink.js')
-    script(src='./src/main/webapp/modules/InputStream.js')
-    script(src='./src/main/webapp/modules/IntegerPool.js')
-    script(src='./src/main/webapp/modules/JSONReader.js')
-    script(src='./src/main/webapp/modules/Keyboard.js')
-    script(src='./src/main/webapp/modules/Layer.js')
-    script(src='./src/main/webapp/modules/Mouse.js')
-    script(src='./src/main/webapp/modules/Namespace.js')
-    script(src='./src/main/webapp/modules/Object.js')
-    script(src='./src/main/webapp/modules/OnScreenKeyboard.js')
-    script(src='./src/main/webapp/modules/OutputStream.js')
-    script(src='./src/main/webapp/modules/Parser.js')
-    script(src='./src/main/webapp/modules/RawAudioFormat.js')
-    script(src='./src/main/webapp/modules/SessionRecording.js')
-    script(src='./src/main/webapp/modules/Status.js')
-    script(src='./src/main/webapp/modules/StringReader.js')
-    script(src='./src/main/webapp/modules/StringWriter.js')
-    script(src='./src/main/webapp/modules/Tunnel.js')
-    script(src='./src/main/webapp/modules/Version.js')
-    script(src='./src/main/webapp/modules/VideoPlayer.js')
-
-    
-    script.
-        var rtok;
-        var client = new Guacamole.Client(new Guacamole.WebSocketTunnel('wss://#{guac_server}:443'));
-        var mouse;
         
-        const connection = new WebSocket('#{uname_server}');
-        
-        connection.onopen = () => {
-            var password = "";
-            do {
-                password = window.prompt("Please enter your ECC password...", "");
-            } while(password == "")
+        script.
+            var rtok;
+            var client = new Guacamole.Client(new Guacamole.WebSocketTunnel('wss://#{guac_server}:443'));
+            var mouse;
             
-            if(password != null) 
-                wd = document.documentElement.clientWidth;
-                ht = document.documentElement.clientHeight - 56;
-                connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password, 'width': wd, 'height': ht } ));
-        }
-        
-        connection.onerror = (error) => {
-            console.log(`WebSocket error: ${error}`);
-        }
-        
-        connection.onmessage = (e) => {
-            console.log(e.data)
-            var msg = JSON.parse(e.data);
+            const connection = new WebSocket('#{uname_server}');
             
-            if(msg['token'] != null) {
-                rtok = msg['token'];
-                console.log(rtok);
-                geddit();
-            }else{
-                //null token
+            connection.onopen = () => {
+                var password = "";
+                do {
+                    password = window.prompt("Please enter your ECC password...", "");
+                } while(password == "")
+                
+                if(password != null) 
+                    wd = document.documentElement.clientWidth;
+                    ht = document.documentElement.clientHeight;
+                    connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password, 'width': wd, 'height': ht } ));
             }
-        }
+            
+            connection.onerror = (error) => {
+                console.log(`WebSocket error: ${error}`);
+            }
+            
+            connection.onmessage = (e) => {
+                console.log(e.data)
+                var msg = JSON.parse(e.data);
+                
+                if(msg['token'] != null) {
+                    rtok = msg['token'];
+                    console.log(rtok);
+                    geddit();
+                }else{
+                    //null token
+                }
+            }
 
-        function geddit() {
-            document.getElementById('mainView').appendChild(client.getDisplay().getElement());
-            mouse = new Guacamole.Mouse(document.getElementById("mainView"));
-            mouse.onmousedown =
-            mouse.onmousemove =
-            mouse.onmouseup   = function(state) {
+            function geddit() {
+                document.getElementById('mainView').appendChild(client.getDisplay().getElement());
+                mouse = new Guacamole.Mouse(document.getElementById("mainView"));
+                mouse.onmousedown =
+                mouse.onmousemove =
+                mouse.onmouseup   = function(state) {
 
-                client.sendMouseState(state);
+                    client.sendMouseState(state);
+                    wd = document.documentElement.clientWidth;
+                    ht = document.documentElement.clientHeight;
+                    client.sendSize(wd, ht);
+
+                };
+                client.connect('token=' + rtok);
+            }
+            
+
+            window.addEventListener("resize", resize);
+
+            function resize(){
                 wd = document.documentElement.clientWidth;
-                ht = document.documentElement.clientHeight - 56;
+                ht = document.documentElement.clientHeight;
+                //console.log("resizing to " + wd + " " + ht);
+                //console.log(client.getDisplay());
+                //console.log(client);
+                //client.getDisplay().resize(client.getDisplay().getDefaultLayer(), wd, ht);
                 client.sendSize(wd, ht);
+            }
 
-            };
-            client.connect('token=' + rtok);
-        }
-        
-
-        window.addEventListener("resize", resize);
-
-        function resize(){
-            wd = document.documentElement.clientWidth;
-            ht = document.documentElement.clientHeight - 56;
-            console.log("resizing to " + wd + " " + ht);
-            console.log(client.getDisplay());
-            console.log(client);
-            client.getDisplay().resize(client.getDisplay().getDefaultLayer(), wd, ht);
-            client.sendSize(wd, ht);
-        }
-
-    div(id='mainView')
-
+        div(id='mainView')
