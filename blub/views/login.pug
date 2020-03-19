@@ -29,6 +29,8 @@ block content
         function login_handler() {
             if (!clicked){
                 clicked = true;
+                document.getElementById('logbutton').innerHTML = "Logging in...";
+                document.getElementById('logbutton').setAttribute("disabled");
                 connection.send(JSON.stringify( { 'endpoint': 'login', 'request': 'session-passwd', 'user': document.getElementById('usr').value, 'pass': document.getElementById('pwd').value } ) );
             }
         }
