@@ -24,8 +24,13 @@ block content
             }
         }
         
+        clicked = false;
+
         function login_handler() {
-            connection.send(JSON.stringify( { 'request': 'session-passwd', 'user': document.getElementById('usr').value, 'pass': document.getElementById('pwd').value } ) );
+            if (!clicked){
+                clicked = true;
+                connection.send(JSON.stringify( { 'request': 'session-passwd', 'user': document.getElementById('usr').value, 'pass': document.getElementById('pwd').value } ) );
+            }
         }
         
         function help_handler() {

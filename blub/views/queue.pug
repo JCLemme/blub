@@ -240,6 +240,10 @@ block content
             document.getElementById('loader').classList.add("hidden");  //Spinner
             args.forEach(element => document.getElementById(element).classList.remove("hidden"));
         }
+
+        window.addEventListener("load", function(event) {
+            toggleHidden();
+        });
         
     div(id='holder')
         div.loaderBox(id='loader')
