@@ -47,3 +47,5 @@ credentials = function(username) {
 
 module.exports.send = send;
 module.exports.register = register;
+module.exports.pass = pass;
+module.exports.credentials = credentials;
