@@ -84,7 +84,9 @@ wss.on('connection', async (ws, req) => {
             
         // Parse the message out
         var msg = JSON.parse(message);
-        console.log(msg);
+        
+        // V dangerous
+        //console.log(msg);
         
         if(msg['endpoint'] == 'queue') {
             var username = req.session.passport.user['sAMAccountName'] ;
