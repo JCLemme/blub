@@ -400,14 +400,23 @@ wss.on('connection', async (ws, req) => {
         }
         
         else if(msg['endpoint'] == 'computer') {
-            console.log('Connection received on lab machine');
             switch(msg['request']) {
                 case 'watchdog': {
-                    console.log('Session approved on lab machine');
                     SessionWorker.watchdog_connection(msg['user'], ws);
-                    SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog'}));
-                    //ws.send(JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'fuck you'}));
-                    //ws.send(JSON.stringify({'endpoint': 'computer', 'action': 'kill-session', 'timer': 15}));
+                    
+                    console.log('Checking connection state for user ' + msg['user'] + ' on machine ' + msg['host']);
+                    var machine = MachineWorker.check(msg['user']);
+                    
+                    if(machine == null) {
+                        console.log('They are gettin banned');
+                        SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog-fail', 'error': 'no-session'}));
+                    }
+                    else {
+                        if(machine['name'] != msg['host'])
+                            SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog-fail', 'error': 'no-session'}));
+                        else
+                            SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog-success'}));
+                    }
                 }
             }
         }
