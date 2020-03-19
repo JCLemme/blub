@@ -31,7 +31,7 @@ register = function(username, socket) {
 
 pass = function(username, password) {
     if(!(username in _sockets)) {
-        _sockets[username] = {sockets = [], pass = ""};
+        _sockets[username] = {'sockets': [], 'pass': ""};
     }
     
     _sockets[username]['pass'] = password;
