@@ -23,7 +23,7 @@ send = function(username, message) {
 
 register = function(username, socket) {
     if(!(username in _sockets)) {
-        _sockets[username] = {'sockets': [], 'pass': ""};
+        _sockets[username] = {'sockets': [], 'pass': "", 'computer-socket': ""};
     }
     
     _sockets[username]['sockets'].push(socket);
@@ -31,7 +31,7 @@ register = function(username, socket) {
 
 pass = function(username, password) {
     if(!(username in _sockets)) {
-        _sockets[username] = {'sockets': [], 'pass': ""};
+        _sockets[username] = {'sockets': [], 'pass': "", 'computer-socket': ""};
     }
     
     _sockets[username]['pass'] = password;
@@ -45,7 +45,25 @@ credentials = function(username) {
     return "";
 };
 
+watchdog_connection = function(username, socket) {
+    if(!(username in _sockets)) {
+        _sockets[username] = {'sockets': [], 'pass': "", 'computer-socket': ""};
+    }
+    
+    _sockets[username]['pass'] = password;
+};
+
+send_watchdog = function(username, message) {
+    if(username in _sockets) {
+        if(_sockets[username]['sockets'][i] instanceof websocket) {
+            _sockets[username]['computer-socket'].send(message);
+        }
+    }
+}
+
 module.exports.send = send;
 module.exports.register = register;
 module.exports.pass = pass;
 module.exports.credentials = credentials;
+module.exports.watchdog_connection = watchdog_connection;
+module.exports.send_watchdog = send_watchdog;
