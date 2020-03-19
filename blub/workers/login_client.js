@@ -128,7 +128,7 @@ wss.on('connection', async (ws, req) => {
                             }
                         }
                     }
-                    console.log(nenewrdp_safe);
+                    //console.log(nenewrdp_safe);
                     
                     var token = encrypt(newrdp);
                     ws.send(JSON.stringify({'status': 'rdp-token', 'token': token}));
