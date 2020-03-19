@@ -88,14 +88,14 @@ html
 
                 };
                 
-                keyboard = new Guacamole.Keyboard(document.getElementById("mainView"));
+                keyboard = new Guacamole.Keyboard(document);
 
                 keyboard.onkeydown = function(keysym) {
-                    client.sendKeyEvent(true, keysym);
+                    client.sendKeyEvent(1, keysym);
                 };
 
                 keyboard.onkeyup = function(keysym) {
-                    client.sendKeyEvent(false, keysym);
+                    client.sendKeyEvent(0, keysym);
                 };
 
                 
