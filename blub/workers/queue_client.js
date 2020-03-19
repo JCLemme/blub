@@ -152,12 +152,15 @@ wss.on('connection', async (ws, req) => {
                         function(machine) {
                             // This handler tells the client that their time is up.
                             console.log('  User ' + username + ' has ten minutes to get their shit together.');
+                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'Your session is expiring soon. Please save all work and leave the remote session.'}));
                             SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'closing', 'machine': machine, 'myrtille-link': RemoteConnectionWorker.myrtille_link(machine, ""), 'rdp-file': RemoteConnectionWorker.rdp_file(machine) } ));
                         },
                         
                         function(machine) {
                             // This handler tells the client to forcibly kill the connection.
                             console.log('  User ' + username + '\'s session just ended.');
+                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'Your session is over. You will be logged out in thirty seconds.'}));
+                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'kill-session', 'timer': 30}));
                             SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'idle' } ));
                         });
                         
@@ -193,15 +196,15 @@ wss.on('connection', async (ws, req) => {
                         function(machine) {
                             // This handler tells the client that their time is up.
                             console.log('  User ' + username + ' has ten minutes to get their shit together.');
-                            SessionWorker.send(username, JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'Your session is expiring soon. Please save all work and leave the remote session.'}));
+                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'Your session is expiring soon. Please save all work and leave the remote session.'}));
                             SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'closing', 'machine': machine, 'myrtille-link': RemoteConnectionWorker.myrtille_link(machine, ""), 'rdp-file': RemoteConnectionWorker.rdp_file(machine) } ));
                         },
                         
                         function(machine) {
                             // This handler tells the client to forcibly kill the connection.
                             console.log('  User ' + username + '\'s session just ended.');
-                            SessionWorker.send(username, JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'Your session is over. You will be logged out in thirty seconds.'}));
-                            SessionWorker.send(username, JSON.stringify({'endpoint': 'computer', 'action': 'kill-session', 'timer': 30}));
+                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'Your session is over. You will be logged out in thirty seconds.'}));
+                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'kill-session', 'timer': 30}));
                             SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'idle' } ));
                         });
                         
@@ -226,7 +229,8 @@ wss.on('connection', async (ws, req) => {
                 
                 case 'session-end': {
                     console.log('User ' + username + ' requested session end');
-                    MachineWorker.close(username);
+                    MachineWorker.terminate(username);
+                    MachineWorker.terminate(username);
                     SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'idle' } ));
                 }
                 break;
