@@ -23,7 +23,7 @@ send = function(username, message) {
 
 register = function(username, socket) {
     if(!(username in _sockets)) {
-        _sockets[username] = {sockets = [], pass = ""};
+        _sockets[username] = {'sockets': [], 'pass': ""};
     }
     
     _sockets[username]['sockets'].push(socket);
