@@ -28,7 +28,7 @@ var open = function(username, reservation, onTerminate, onKill) {
             _machines[i]["on_terminate"] = onTerminate;
             _machines[i]["on_kill"] = onKill;
             
-            machines.save(blubsetup.machines_default = '.last');
+            save(blubsetup.machines_default = '.last');
             return _machines[i];
         }
     }
@@ -39,7 +39,7 @@ var open = function(username, reservation, onTerminate, onKill) {
 var check = function(username) {
     for(var i=0;i<_machines.length;i++) {
         if(_machines[i]["user"] == username) {
-            machines.save(blubsetup.machines_default = '.last');
+            save(blubsetup.machines_default = '.last');
             return _machines[i];
         }
     }
@@ -55,7 +55,7 @@ var close = function(username) {
             _machines[i]["on_terminate"] = "";
             _machines[i]["on_kill"] = "";
             
-            machines.save(blubsetup.machines_default = '.last');
+            save(blubsetup.machines_default = '.last');
             return true;
         }
     }
@@ -152,7 +152,7 @@ var reserve_machine = function(machine, reservation) {
         return false;
     }
     
-    machines.save(blubsetup.machines_default = '.last');
+    save(blubsetup.machines_default = '.last');
 };
 
 var reserve = function(reservation, original, all = false, amount = -1) {
@@ -168,7 +168,7 @@ var reserve = function(reservation, original, all = false, amount = -1) {
         }
     }
 
-    machines.save(blubsetup.machines_default = '.last');
+    save(blubsetup.machines_default = '.last');
     return found;
 }
 
@@ -199,3 +199,4 @@ module.exports.reserve = reserve;
 module.exports.reserve_machine = reserve_machine;
 module.exports.reservation = reservation;
 module.exports.time_at = time_at;
+module.exports.terminate = terminate;

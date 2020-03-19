@@ -81,7 +81,7 @@ block content
                 box.appendChild(termButton);
                 actCell.appendChild(box);
                 termButton.id = (i + '-terminate');
-                termButton.onclick = terminate(i);
+                termButton.onclick = terminate(minfo[i]);
                 row.appendChild(actCell);
 
                 tbl.appendChild(row);
@@ -149,7 +149,10 @@ block content
         function terminate(machine){
             //It has to be this way
             return function(){
-                console.log("terminating machine " + machine);
+                if (machine["user"]){
+                    console.log("terminating machine " + machine['name']);
+                    connection.send(JSON.stringify( {'request': 'terminate' , 'user': machine["user"] } ));
+                }
             }
         }
 

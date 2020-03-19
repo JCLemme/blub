@@ -54,6 +54,14 @@ wss.on('connection', async (ws, req) => {
             }
             break;
 
+            case 'terminate': {
+                console.log('User ' + req.session.passport.user['sAMAccountName'] + ' wants to terminate user ' + msg['user']);
+                worked = machines.terminate(msg['user']);
+                console.log(worked + " test!!");
+                sendMachines();
+            }
+            break;
+
             case 'reserve': {
                 cd = (msg['code']) ? "code " + msg['code'] : 'no code';
                 console.log('User ' + req.session.passport.user['sAMAccountName'] + ' wants to reserve machine ' + msg['machine'] + ' with ' + cd);
