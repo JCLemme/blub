@@ -103,7 +103,7 @@ wss.on('connection', async (ws, req) => {
                                 "username": machine['user'],
                                 "password": msg['pass'],
                                 "security": "any",
-                                //"ignore-cert": true,
+                                "ignore-cert": true,
                                 "enable-wallpaper": false,
                                 "width": 1024,
                                 "height": 768,
