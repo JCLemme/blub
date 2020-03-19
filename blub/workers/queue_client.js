@@ -310,7 +310,6 @@ wss.on('connection', async (ws, req) => {
                             }
                         }
                         
-                        console.log(newrdp);
                         
                         var token = encrypt(newrdp);
                         ws.send(JSON.stringify({'status': 'rdp-token', 'token': token}));

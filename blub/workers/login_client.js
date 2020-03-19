@@ -113,23 +113,6 @@ wss.on('connection', async (ws, req) => {
                         }
                     }
                     
-                    var newrdp_safe = {
-                        "connection": {
-                            "type": "rdp",
-                            "settings": {
-                                "hostname": machine['ip'],
-                                "username": machine['user'],
-                                //"password": sockets.credentials(machine['user']),
-                                "security": "any",
-                                "ignore-cert": true,
-                                "enable-wallpaper": true,
-                                "width": msg['width'],
-                                "height": msg['height'],
-                            }
-                        }
-                    }
-                    //console.log(nenewrdp_safe);
-                    
                     var token = encrypt(newrdp);
                     ws.send(JSON.stringify({'status': 'rdp-token', 'token': token}));
                 }
