@@ -113,7 +113,7 @@ block content
                 
                 case "invalid-class": {
                     document.getElementById('header').innerHTML = "You're not waiting for a machine.";
-                    document.getElementById('subheader').innerHTML = "The current wait time is about <b>20 minutes</b>.";
+                    document.getElementById('subheader').innerHTML = "Join the queue for estimated wait times.";
                     toggleHidden('join', 'close', 'code');
                     document.getElementById('err').innerHTML = "Invalid code. Make sure that the code is correct and you're not too early to join this class.";
                     hasClassCode = true;
@@ -122,7 +122,7 @@ block content
                 
                 case "full-class": {
                     document.getElementById('header').innerHTML = "You're not waiting for a machine.";
-                    document.getElementById('subheader').innerHTML = "The current wait time is about <b>20 minutes</b>.";
+                    document.getElementById('subheader').innerHTML = "Join the queue for estimated wait times.";
                     toggleHidden('join', 'close', 'code');
                     document.getElementById('err').innerHTML = "The class you are trying to join is already full.";
                     hasClassCode = true;

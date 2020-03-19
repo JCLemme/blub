@@ -1,19 +1,23 @@
+. .\Send-Request.ps1
+
 Try{  
     Do{
         $WS = New-Object System.Net.WebSockets.ClientWebSocket                                                
         $CT = New-Object System.Threading.CancellationToken                                                   
 
-        $Conn = $WS.ConnectAsync("beer.egr.uri.edu:8082", $CT)                                                  
+        $Conn = $WS.ConnectAsync("ws://beer.egr.uri.edu/ws", $CT)                                                  
         While (!$Conn.IsCompleted) { Start-Sleep -Milliseconds 100 }
 
-        Write-Verbose "Connected to WebSocket server!"
+        Write-Output "Connected to WebSocket server!"
 
         $Size = 1024
         $Array = [byte[]] @(,0) * $Size
 		$Recv = New-Object System.ArraySegment[byte] -ArgumentList @(,$Array)
 		
-		While ($WS.State -eq 'Open') {
+		Send-Request "session-passwd"
 
+		While ($WS.State -eq 'Open') {
+			
             $out = ""
 
             Do {
@@ -24,7 +28,7 @@ Try{
 
             } Until ($Conn.Result.Count -lt $Size)
 
-			Write-Verbose "`n$out"
+			Write-Output "`n$out"
 			
 			If ($out){
                 $out = ($out | convertfrom-json)
@@ -54,14 +58,14 @@ Try{
                     default { Write-Verbose "No action specified for $($out.type) event" }            
 				}
 			}
+			
         }   
     } Until (!$Conn)
 
 }Finally{
 
     If ($WS) { 
-        Write-Verbose "Closing WebSocket..."
+        Write-Output "Closing WebSocket..."
         $WS.Dispose()
     }
-
 }
