@@ -5,7 +5,7 @@ block content
     link(rel='stylesheet', href='/stylesheets/login.css')
 
     script.
-        const connection = new WebSocket('#{login_server}');
+        const connection = new WebSocket('#{client_server}');
          
         connection.onopen = () => {
         }
@@ -29,7 +29,7 @@ block content
         function login_handler() {
             if (!clicked){
                 clicked = true;
-                connection.send(JSON.stringify( { 'request': 'session-passwd', 'user': document.getElementById('usr').value, 'pass': document.getElementById('pwd').value } ) );
+                connection.send(JSON.stringify( { 'endpoint': 'login', 'request': 'session-passwd', 'user': document.getElementById('usr').value, 'pass': document.getElementById('pwd').value } ) );
             }
         }
         
