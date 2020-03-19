@@ -40,6 +40,7 @@ html
             var rtok;
             var client = new Guacamole.Client(new Guacamole.WebSocketTunnel('wss://#{guac_server}:443'));
             var mouse;
+            var keyboard;
             
             const connection = new WebSocket('#{uname_server}');
             
@@ -87,7 +88,7 @@ html
 
                 };
                 
-                var keyboard = new Guacamole.Keyboard(document);
+                keyboard = new Guacamole.Keyboard(document);
 
                 keyboard.onkeydown = function(keysym) {
                     client.sendKeyEvent(true, keysym);
