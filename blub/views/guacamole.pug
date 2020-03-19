@@ -50,7 +50,9 @@ block content
             } while(password == "")
             
             if(password != null) 
-                connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password 'width': window.innerWidth, 'height': window.innerHeight } ));
+                wd = document.documentElement.clientWidth;
+                ht = document.documentElement.clientHeight - 56;
+                connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password, 'width': wd, 'height': ht } ));
         }
         
         connection.onerror = (error) => {
@@ -78,7 +80,9 @@ block content
             mouse.onmouseup   = function(state) {
 
                 client.sendMouseState(state);
-                client.sendSize(window.innerWidth, window.innerHeight);
+                wd = document.documentElement.clientWidth;
+                ht = document.documentElement.clientHeight - 56;
+                client.sendSize(wd, ht);
 
             };
             client.connect('token=' + rtok);
@@ -88,11 +92,13 @@ block content
         window.addEventListener("resize", resize);
 
         function resize(){
-            console.log("resizing to " + window.innerWidth + " " + window.innerHeight);
+            wd = document.documentElement.clientWidth;
+            ht = document.documentElement.clientHeight - 56;
+            console.log("resizing to " + wd + " " + ht);
             console.log(client.getDisplay());
             console.log(client);
-            client.getDisplay().resize(client.getDisplay().getDefaultLayer(), window.innerWidth, window.innerHeight);
-            client.sendSize(window.innerWidth, window.innerHeight);
+            client.getDisplay().resize(client.getDisplay().getDefaultLayer(), wd, ht);
+            client.sendSize(wd, ht);
         }
 
     div(id='mainView')
