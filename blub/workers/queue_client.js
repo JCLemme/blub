@@ -401,9 +401,11 @@ wss.on('connection', async (ws, req) => {
         }
         
         else if(msg['endpoint'] == 'computer') {
+            console.log('testing A');
             switch(msg['request']) {
                 case 'watchdog': {
                     // The computer is valid
+                    console.log('testing B');
                     SessionWorker.watchdog_connection(msg['user'], ws);
                     SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog'}));
                     //ws.send(JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'fuck you'}));

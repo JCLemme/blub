@@ -103,7 +103,7 @@ wss.on('connection', async (ws, req) => {
                             "settings": {
                                 "hostname": machine['ip'],
                                 "username": machine['user'],
-                                "password": sockets.credentials(machine['user']),
+                                //"password": sockets.credentials(machine['user']),
                                 "security": "any",
                                 "ignore-cert": true,
                                 "enable-wallpaper": true,
