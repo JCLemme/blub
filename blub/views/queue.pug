@@ -197,7 +197,7 @@ block content
         }
 
         function rdp_handler() {
-            download(rdpfile, "connection.rdp", "text/plain");
+            download(rdpfile, "connection.rdp");
 
 
         }
@@ -275,6 +275,6 @@ block content
     button(id="options" class='textOnly' onclick='opt_handler()') Other connection options...
     br
     br
-    button(id='opt1' class="hidden" onclick='rdp_handler()') RDP file
     button(id='opt2' class="hidden" onclick='guac_handler()') Guacamole client
+    button(id='opt1' class="hidden" onclick='rdp_handler()') RDP file (advanced)
     //Myrtille client

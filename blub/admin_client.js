@@ -91,14 +91,14 @@ wss.on('connection', async (ws, req) => {
 
             case 'terminate-code': {
                 console.log('User ' + req.session.passport.user['sAMAccountName'] + ' wants to terminate all machines using code ' + msg['code']);
-                //worked = machines.reserve_machine(msg['machine'], msg['code']);
+                changed = machines.terminateGroup(true, msg['code']);
                 sendMachines();
             }
             break;
 
             case 'terminate-all': {
                 console.log('User ' + req.session.passport.user['sAMAccountName'] + ' wants to terminate all machines (something must be very wrong)');
-                //worked = machines.reserve_machine(msg['machine']);
+                changed = machines.terminateGroup(false);
                 sendMachines();
             }
             break;

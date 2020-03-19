@@ -156,10 +156,11 @@ block content
             }
         }
 
-        confirmation = false;
+        confirm = false;
 
         function check_handler(){
             document.getElementById("termAllCheck").innerHTML = (document.getElementById("termAllCheck").innerHTML == " ") ? "✔" : " ";
+            confirm = !confirm;
         }
 
         function termAll_handler(){
