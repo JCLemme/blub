@@ -37,7 +37,7 @@ block content
 
                 //Session Info
                 var use;
-                use = (minfo[i]['user'] != "") ? ('in use by ' + minfo[i]['user'] + ' until ' + new Date(minfo[i]['until']) + ' ') : 'not in use ';
+                use = (minfo[i]['user'] != "") ? ('in use by ' + minfo[i]['user'] + ' until ' + new Date(minfo[i]['until']) + ' ') + ((minfo[i]['on_terminate'] == "") ? ' - terminating' : ' - open'): 'not in use ';
                 var useCell = document.createElement("td");
                 useCell.style.width = "300px"; 
                 useCell.innerHTML = use;
@@ -76,7 +76,8 @@ block content
                 var actCell = document.createElement("td");
                 var box = document.createElement("div");
                 var termButton = document.createElement("button");
-                termButton.innerHTML = "Terminate";
+                termButton.innerHTML = (minfo[i]['user'] == "") ? 'No actions' : (minfo[i]['on_terminate'] == "") ? 'Kill' : 'Terminate';
+                if(minfo[i]['user'] == "") { termButton.disabled = true; }
                 termButton.classList.add("admin");
                 box.appendChild(termButton);
                 actCell.appendChild(box);
