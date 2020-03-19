@@ -88,7 +88,7 @@ html
 
                 };
                 
-                keyboard = new Guacamole.Keyboard(document);
+                keyboard = new Guacamole.Keyboard(document.getElementById("mainView"));
 
                 keyboard.onkeydown = function(keysym) {
                     client.sendKeyEvent(true, keysym);
