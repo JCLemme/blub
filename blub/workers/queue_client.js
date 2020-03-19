@@ -390,6 +390,16 @@ wss.on('connection', async (ws, req) => {
                 }
             }
         }
+        
+        else if(msg['endpoint'] == 'computer') {
+            switch(msg['request']) {
+                case 'init': {
+                    // The computer is valid
+                    console.log(msg);
+                    ws.send(JSON.stringify({'fuck': 'you'));
+                }
+            }
+        }
 
     })
 
