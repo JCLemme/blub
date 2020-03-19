@@ -102,7 +102,7 @@ wss.on('connection', async (ws, req) => {
                                 "hostname": machine['ip'],
                                 "username": "ECC\\" + machine['user'],
                                 "password": msg['pass'],
-                                "security": "tls",
+                                "security": "any",
                                 //"ignore-cert": true,
                                 "enable-wallpaper": false,
                                 "width": 1024,
