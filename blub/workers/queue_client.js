@@ -396,7 +396,7 @@ wss.on('connection', async (ws, req) => {
                 case 'init': {
                     // The computer is valid
                     console.log(msg);
-                    ws.send(JSON.stringify({'fuck': 'you'));
+                    ws.send(JSON.stringify({'fuck': 'you'}));
                 }
             }
         }
