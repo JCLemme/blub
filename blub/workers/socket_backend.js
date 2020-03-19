@@ -50,7 +50,7 @@ watchdog_connection = function(username, socket) {
         _sockets[username] = {'sockets': [], 'pass': "", 'computer-socket': ""};
     }
     
-    _sockets[username]['pass'] = password;
+    _sockets[username]['computer-socket'] = socket;
 };
 
 send_watchdog = function(username, message) {
