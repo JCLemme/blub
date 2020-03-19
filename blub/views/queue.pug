@@ -69,7 +69,7 @@ block content
         const connection = new WebSocket('#{client_server}')
          
         connection.onopen = () => {
-            connection.send(JSON.stringify( {'request': 'init' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'queue', 'request': 'init' } )); 
         }
          
         connection.onerror = (error) => {
@@ -81,89 +81,91 @@ block content
             var msg = JSON.parse(e.data);
             
             // Handle a request
-            switch(msg["status"]) {
-                case "closing": {
-                    mlink = msg['myrtille-link'] + getCookie('passhash');
-                    rdpfile = msg['rdp-file'];
-                    document.getElementById('header').innerHTML = "Your session with " + msg["machine"]["name"] + " is ending soon.";
-                    document.getElementById('subheader').innerHTML = "You will be disconnected from your computer on <b>" + 
-                                                                      formatdate(new Date(msg["machine"]["until"])) + "</b>.";
-                    toggleHidden('remote', 'end', 'options');
-                }
-                break;
-                
-                case "in-session": {
-                    mlink = msg['myrtille-link'] + getCookie('passhash');
-                    rdpfile = msg['rdp-file'];
-                    document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"].toUpperCase() + ".";
-                    document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
-                                                                      formatdate(new Date(msg["machine"]["until"])) + "</b>.";
-                    toggleHidden('remote', 'end', 'options');
-                }
-                break;
-
-                case "in-session-class": {
-                    mlink = msg['myrtille-link'] + getCookie('passhash');
-                    rdpfile = msg['rdp-file'];
-                    document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"] + ".";
-                    document.getElementById('subheader').innerHTML = "You can use this workstation until your class ends";
-                    toggleHidden('remote', 'end', 'options');
-                }
-                break;
-                
-                case "invalid-class": {
-                    document.getElementById('header').innerHTML = "You're not waiting for a machine.";
-                    document.getElementById('subheader').innerHTML = "Join the queue for estimated wait times.";
-                    toggleHidden('join', 'close', 'code');
-                    document.getElementById('err').innerHTML = "Invalid code. Make sure that the code is correct and you're not too early to join this class.";
-                    hasClassCode = true;
-                }
-                break;
-                
-                case "full-class": {
-                    document.getElementById('header').innerHTML = "You're not waiting for a machine.";
-                    document.getElementById('subheader').innerHTML = "Join the queue for estimated wait times.";
-                    toggleHidden('join', 'close', 'code');
-                    document.getElementById('err').innerHTML = "The class you are trying to join is already full.";
-                    hasClassCode = true;
-                }
-                break;
-
-                case "queued": {
-                    if(msg['place'] == 0) {
-                        document.getElementById('header').innerHTML = "You're next up for a machine.";
-                        document.getElementById('subheader').innerHTML = "The <b>next open machine</b> will be yours.";
+            if(msg['endpoint'] == 'queue') {
+                switch(msg["status"]) {
+                    case "closing": {
+                        mlink = msg['myrtille-link'] + getCookie('passhash');
+                        rdpfile = msg['rdp-file'];
+                        document.getElementById('header').innerHTML = "Your session with " + msg["machine"]["name"] + " is ending soon.";
+                        document.getElementById('subheader').innerHTML = "You will be disconnected from your computer on <b>" + 
+                                                                          formatdate(new Date(msg["machine"]["until"])) + "</b>.";
+                        toggleHidden('remote', 'end', 'options');
                     }
-                    else {
-                        var placemat = Number(Number(msg['place'])+Number(1));
-                        document.getElementById('header').innerHTML = 'You are ' + placemat + nth(placemat) + ' in the queue.';
+                    break;
+                    
+                    case "in-session": {
+                        mlink = msg['myrtille-link'] + getCookie('passhash');
+                        rdpfile = msg['rdp-file'];
+                        document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"].toUpperCase() + ".";
+                        document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
+                                                                          formatdate(new Date(msg["machine"]["until"])) + "</b>.";
+                        toggleHidden('remote', 'end', 'options');
+                    }
+                    break;
 
-                        var waittime = new Date(msg['wait']);
-                        
-                        if(msg['wait'] == -1) {
-                            document.getElementById('subheader').innerHTML = "The queue is very full. You may have to wait several hours for a machine.";
-                        }
-                        else if(msg['wait'] == 0) {
-                            document.getElementById('subheader').innerHTML = "You should have a machine within a couple of minutes.";
+                    case "in-session-class": {
+                        mlink = msg['myrtille-link'] + getCookie('passhash');
+                        rdpfile = msg['rdp-file'];
+                        document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"] + ".";
+                        document.getElementById('subheader').innerHTML = "You can use this workstation until your class ends";
+                        toggleHidden('remote', 'end', 'options');
+                    }
+                    break;
+                    
+                    case "invalid-class": {
+                        document.getElementById('header').innerHTML = "You're not waiting for a machine.";
+                        document.getElementById('subheader').innerHTML = "Join the queue for estimated wait times.";
+                        toggleHidden('join', 'close', 'code');
+                        document.getElementById('err').innerHTML = "Invalid code. Make sure that the code is correct and you're not too early to join this class.";
+                        hasClassCode = true;
+                    }
+                    break;
+                    
+                    case "full-class": {
+                        document.getElementById('header').innerHTML = "You're not waiting for a machine.";
+                        document.getElementById('subheader').innerHTML = "Join the queue for estimated wait times.";
+                        toggleHidden('join', 'close', 'code');
+                        document.getElementById('err').innerHTML = "The class you are trying to join is already full.";
+                        hasClassCode = true;
+                    }
+                    break;
+
+                    case "queued": {
+                        if(msg['place'] == 0) {
+                            document.getElementById('header').innerHTML = "You're next up for a machine.";
+                            document.getElementById('subheader').innerHTML = "The <b>next open machine</b> will be yours.";
                         }
                         else {
-                            document.getElementById('subheader').innerHTML = "It'll be about <b>" + waittime.getMinutes() + " minute[s]</b> before you're called.";
+                            var placemat = Number(Number(msg['place'])+Number(1));
+                            document.getElementById('header').innerHTML = 'You are ' + placemat + nth(placemat) + ' in the queue.';
+
+                            var waittime = new Date(msg['wait']);
+                            
+                            if(msg['wait'] == -1) {
+                                document.getElementById('subheader').innerHTML = "The queue is very full. You may have to wait several hours for a machine.";
+                            }
+                            else if(msg['wait'] == 0) {
+                                document.getElementById('subheader').innerHTML = "You should have a machine within a couple of minutes.";
+                            }
+                            else {
+                                document.getElementById('subheader').innerHTML = "It'll be about <b>" + waittime.getMinutes() + " minute[s]</b> before you're called.";
+                            }
+                        }
+                        toggleHidden('leave', 'loader');
+                    }
+                    break;
+                    
+                    case "idle": {
+                        document.getElementById('header').innerHTML = "You're not waiting for a machine.";
+                        document.getElementById('subheader').innerHTML = "Join the queue for estimated wait times.";
+                        if (hasClassCode){
+                            toggleHidden('join', 'close', 'code');
+                        }else{
+                            toggleHidden('join', 'class');
                         }
                     }
-                    toggleHidden('leave', 'loader');
+                    break;
                 }
-                break;
-                
-                case "idle": {
-                    document.getElementById('header').innerHTML = "You're not waiting for a machine.";
-                    document.getElementById('subheader').innerHTML = "Join the queue for estimated wait times.";
-                    if (hasClassCode){
-                        toggleHidden('join', 'close', 'code');
-                    }else{
-                        toggleHidden('join', 'class');
-                    }
-                }
-                break;
             }
         }
 
@@ -171,11 +173,11 @@ block content
         function join_handler(){
             if (!hasClassCode){
                 //No class code, regular queue
-                connection.send(JSON.stringify( { 'request': 'queue-join' } ));
+                connection.send(JSON.stringify( { 'endpoint': 'queue', 'request': 'queue-join' } ));
             }else{
                 //Class code
                 if (document.getElementById('code').value != ""){
-                    connection.send(JSON.stringify( { 'request': 'queue-join-class', 'reservation': document.getElementById('code').value.trim().toUpperCase() } ));
+                    connection.send(JSON.stringify( { 'endpoint': 'queue', 'request': 'queue-join-class', 'reservation': document.getElementById('code').value.trim().toUpperCase() } ));
                 } else {
                     document.getElementById('err').innerHTML = "Please enter a class code.";
                 }
@@ -183,11 +185,11 @@ block content
         }
 
         function leave_handler(){
-            connection.send(JSON.stringify( { 'request': 'queue-leave' } ));
+            connection.send(JSON.stringify( { 'endpoint': 'queue', 'request': 'queue-leave' } ));
         }
 
         function end_handler(){
-            connection.send(JSON.stringify( { 'request': 'session-end' } ));
+            connection.send(JSON.stringify( { 'endpoint': 'queue', 'request': 'session-end' } ));
         }
         
         function myrt_handler() {

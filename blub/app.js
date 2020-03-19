@@ -1,3 +1,5 @@
+require('module-alias/register')
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -6,16 +8,14 @@ var logger = require('morgan');
 var flash = require("connect-flash");
 var passport = require('passport')
 var session = require('express-session')
-var mongodb = require('mongodb')
-var machines = require('./machine_backend.js')
+
 var blubsetup = require('./blub_setup.js')
 var blubglobals = require('./blub_globals.js')
 const fs = require('fs');
 
-var adminclient = require('./admin_client.js');
-var loginclient = require('./login_client.js');
-var queueclient = require('./queue_client.js');
-var queueworker = require('./queue_backend.js');
+var queueclient = require('@workers/queue_client.js');
+var queueworker = require('@workers/queue_backend.js');
+var machines = require('@workers/machine_backend.js')
 
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');

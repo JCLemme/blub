@@ -17,10 +17,10 @@ html
     hr
 
   script.
-      const webConnection = new WebSocket('#{uname_server}');
+      const webConnection = new WebSocket('#{client_server}');
         
       webConnection.onopen = () => {
-          webConnection.send(JSON.stringify( {'request': 'user-info' } )); 
+          webConnection.send(JSON.stringify( {'endpoint': 'login', 'request': 'user-info' } )); 
       }
         
       webConnection.onerror = (error) => {
@@ -29,18 +29,20 @@ html
         
       webConnection.onmessage = (e) => {
         var msg = JSON.parse(e.data);
-        if (msg["data"] != "none"){
-          //logged in
-          console.log(msg["data"]);
-          document.getElementById('userLabel').innerHTML = "Logged in as " + msg["data"]["cn"];
-          document.getElementById('signout').classList.remove("hidden");
-          document.getElementById('signin').classList.add("hidden");
-        }else{
-          //logged out
-          console.log("Logged out");
-          document.getElementById('userLabel').innerHTML = "Not logged in";
-          document.getElementById('signout').classList.add("hidden");
-          document.getElementById('signin').classList.remove("hidden");
+        if(msg['endpoint'] == 'login') {
+            if (msg["data"] != "none"){
+              //logged in
+              console.log(msg["data"]);
+              document.getElementById('userLabel').innerHTML = "Logged in as " + msg["data"]["cn"];
+              document.getElementById('signout').classList.remove("hidden");
+              document.getElementById('signin').classList.add("hidden");
+            }else{
+              //logged out
+              console.log("Logged out");
+              document.getElementById('userLabel').innerHTML = "Not logged in";
+              document.getElementById('signout').classList.add("hidden");
+              document.getElementById('signin').classList.remove("hidden");
+            }
         }
       }
 

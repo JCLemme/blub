@@ -5,7 +5,7 @@ block content
         link(rel='stylesheet', href='/stylesheets/admin.css')
    
     script.
-        const connection = new WebSocket('#{admin_server}')
+        const connection = new WebSocket('#{client_server}')
          
         //StackOverflow is god
         function clearTable(table){
@@ -105,9 +105,9 @@ block content
         }
         
         connection.onopen = () => {
-            connection.send(JSON.stringify( {'request': 'init-admin' } ));
-            connection.send(JSON.stringify( {'request': 'queue' } )); 
-            connection.send(JSON.stringify( {'request': 'machines' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'init' } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'queue' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'machines' } )); 
         }
          
         connection.onerror = (error) => {
@@ -119,29 +119,31 @@ block content
             var msg = JSON.parse(e.data);
             
             // Handle a request
-            switch(msg['status']) {
-                case 'machine-info': {
-                    display_machines(msg['data']);
-                }
-                break;
+            if(msg['endpoint'] == 'admin') {
+                switch(msg['status']) {
+                    case 'machine-info': {
+                        display_machines(msg['data']);
+                    }
+                    break;
 
-                case 'queue-info': {
-                    display_queues(msg['data']);
+                    case 'queue-info': {
+                        display_queues(msg['data']);
+                    }
+                    break;                
                 }
-                break;                
             }
         }
         
         function button_handler() {
-            connection.send(JSON.stringify( {'request': 'queue' } )); 
-            connection.send(JSON.stringify( {'request': 'machines' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'queue' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'machines' } )); 
         }
         
         function changeCode(machine){
             //Oh god I'm so sorry
             return function(){
                 console.log("changing machine " + machine + " to use code " + document.getElementById(machine + '-codeField').value.toUpperCase());
-                connection.send(JSON.stringify( {'request': 'reserve' , 'machine': machine, 'code': document.getElementById(machine + '-codeField').value.toUpperCase() } )); 
+                connection.send(JSON.stringify( {'endpoint': 'admin', 'endpoint': 'admin', 'request': 'reserve' , 'machine': machine, 'code': document.getElementById(machine + '-codeField').value.toUpperCase() } )); 
                 document.getElementById(machine + '-codeField').value = '';
             }
         }
@@ -151,7 +153,7 @@ block content
             return function(){
                 if (machine["user"]){
                     console.log("terminating machine " + machine['name']);
-                    connection.send(JSON.stringify( {'request': 'terminate' , 'user': machine["user"] } ));
+                    connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'terminate' , 'user': machine["user"] } ));
                 }
             }
         }
@@ -166,7 +168,7 @@ block content
         function termAll_handler(){
             if (confirm){
                 //terminates ALL machines
-                connection.send(JSON.stringify( {'request': 'terminate-all' } ));
+                connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'terminate-all' } ));
                 //Reset confirmation
                 confirm = false;
                 document.getElementById("termAllCheck").innerHTML = " ";
@@ -175,22 +177,22 @@ block content
 
         function termCode_handler(){
             //terminates all machines with given code
-            connection.send(JSON.stringify( {'request': 'terminate-code' , 'code': document.getElementById('termCodeInput').value.toUpperCase() } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'terminate-code' , 'code': document.getElementById('termCodeInput').value.toUpperCase() } ));
         }
 
         function addCode_handler(){
             //Adds code to all machines
-            connection.send(JSON.stringify( {'request': 'change-code-all' , 'code': document.getElementById('addCodeInput').value.toUpperCase() } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-code-all' , 'code': document.getElementById('addCodeInput').value.toUpperCase() } ));
         }
 
         function removeCode_handler(){
             //Removes code from all machines
-            connection.send(JSON.stringify( {'request': 'remove-code' , 'code': document.getElementById('rmvCodeInput').value.toUpperCase() } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'remove-code' , 'code': document.getElementById('rmvCodeInput').value.toUpperCase() } ));
         }
 
         function removeAll_handler(){
             //Removes all codes from all machines
-            connection.send(JSON.stringify( {'request': 'change-code-all' } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-code-all' } ));
         }
 
     h1 Here's your Blub status report.

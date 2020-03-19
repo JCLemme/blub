@@ -4,50 +4,50 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/guacamole.css')
     body
-        script(src='./src/main/webapp/modules/ArrayBufferReader.js')
-        script(src='./src/main/webapp/modules/ArrayBufferWriter.js')
-        script(src='./src/main/webapp/modules/AudioContextFactory.js')
-        script(src='./src/main/webapp/modules/AudioPlayer.js')
-        script(src='./src/main/webapp/modules/AudioRecorder.js')
-        script(src='./src/main/webapp/modules/BlobReader.js')
-        script(src='./src/main/webapp/modules/BlobWriter.js')
-        script(src='./src/main/webapp/modules/Client.js')
-        script(src='./src/main/webapp/modules/DataURIReader.js')
-        script(src='./src/main/webapp/modules/Display.js')
-        script(src='./src/main/webapp/modules/InputSink.js')
-        script(src='./src/main/webapp/modules/InputStream.js')
-        script(src='./src/main/webapp/modules/IntegerPool.js')
-        script(src='./src/main/webapp/modules/JSONReader.js')
-        script(src='./src/main/webapp/modules/Keyboard.js')
-        script(src='./src/main/webapp/modules/Layer.js')
-        script(src='./src/main/webapp/modules/Mouse.js')
-        script(src='./src/main/webapp/modules/Namespace.js')
-        script(src='./src/main/webapp/modules/Object.js')
-        script(src='./src/main/webapp/modules/OnScreenKeyboard.js')
-        script(src='./src/main/webapp/modules/OutputStream.js')
-        script(src='./src/main/webapp/modules/Parser.js')
-        script(src='./src/main/webapp/modules/RawAudioFormat.js')
-        script(src='./src/main/webapp/modules/SessionRecording.js')
-        script(src='./src/main/webapp/modules/Status.js')
-        script(src='./src/main/webapp/modules/StringReader.js')
-        script(src='./src/main/webapp/modules/StringWriter.js')
-        script(src='./src/main/webapp/modules/Tunnel.js')
-        script(src='./src/main/webapp/modules/Version.js')
-        script(src='./src/main/webapp/modules/VideoPlayer.js')
+        script(src='./scripts/guacamole/ArrayBufferReader.js')
+        script(src='./scripts/guacamole/ArrayBufferWriter.js')
+        script(src='./scripts/guacamole/AudioContextFactory.js')
+        script(src='./scripts/guacamole/AudioPlayer.js')
+        script(src='./scripts/guacamole/AudioRecorder.js')
+        script(src='./scripts/guacamole/BlobReader.js')
+        script(src='./scripts/guacamole/BlobWriter.js')
+        script(src='./scripts/guacamole/Client.js')
+        script(src='./scripts/guacamole/DataURIReader.js')
+        script(src='./scripts/guacamole/Display.js')
+        script(src='./scripts/guacamole/InputSink.js')
+        script(src='./scripts/guacamole/InputStream.js')
+        script(src='./scripts/guacamole/IntegerPool.js')
+        script(src='./scripts/guacamole/JSONReader.js')
+        script(src='./scripts/guacamole/Keyboard.js')
+        script(src='./scripts/guacamole/Layer.js')
+        script(src='./scripts/guacamole/Mouse.js')
+        script(src='./scripts/guacamole/Namespace.js')
+        script(src='./scripts/guacamole/Object.js')
+        script(src='./scripts/guacamole/OnScreenKeyboard.js')
+        script(src='./scripts/guacamole/OutputStream.js')
+        script(src='./scripts/guacamole/Parser.js')
+        script(src='./scripts/guacamole/RawAudioFormat.js')
+        script(src='./scripts/guacamole/SessionRecording.js')
+        script(src='./scripts/guacamole/Status.js')
+        script(src='./scripts/guacamole/StringReader.js')
+        script(src='./scripts/guacamole/StringWriter.js')
+        script(src='./scripts/guacamole/Tunnel.js')
+        script(src='./scripts/guacamole/Version.js')
+        script(src='./scripts/guacamole/VideoPlayer.js')
 
         
         script.
             var rtok;
-            var client = new Guacamole.Client(new Guacamole.WebSocketTunnel('wss://#{guac_server}:443'));
+            var client = new Guacamole.Client(new Guacamole.WebSocketTunnel('wss:/#{guac_server}:443'));
             var mouse;
             var keyboard;
             
-            const connection = new WebSocket('#{uname_server}');
+            const connection = new WebSocket('#{client_server}');
             
             connection.onopen = () => {
                 wd = document.documentElement.clientWidth;
                 ht = document.documentElement.clientHeight;
-                connection.send(JSON.stringify( { 'request': 'guac-token', 'width': wd, 'height': ht } ));
+                connection.send(JSON.stringify( { 'endpoint': 'login', 'request': 'guac-token', 'width': wd, 'height': ht } ));
             }
             
             connection.onerror = (error) => {
@@ -63,7 +63,7 @@ html
                     console.log(rtok);
                     geddit();
                 }else{
-                    //null token
+                    // null token;
                 }
             }
 
