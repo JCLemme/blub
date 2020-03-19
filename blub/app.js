@@ -63,14 +63,14 @@ blubglobals.data['time-kill'] = 2;
 var load_last = (process.argv.length >= 3 && process.argv[2] == '--no-reload') ? false : true;
 
 fs.stat(blubsetup.queue_default + '.last', function(err, stats) {
-    if(load_last) {
+    if(stats != undefined && load_last) {
         queueworker.load(blubsetup.queue_default + '.last');
         console.log('Loaded queue from last run.');
     }
 });
 
 fs.stat(blubsetup.machines_default + '.last', function(err, stats) {
-    if(load_last) {
+    if(stats != undefined && load_last) {
         machines.load(blubsetup.machines_default + '.last');
         console.log('Loaded machines from last run.');
     }
