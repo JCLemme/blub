@@ -100,7 +100,7 @@ wss.on('connection', async (ws, req) => {
                             "type": "rdp",
                             "settings": {
                                 "hostname": machine['ip'],
-                                "username": "ECC\\" + machine['user'],
+                                "username": machine['user'],
                                 "password": msg['pass'],
                                 "security": "any",
                                 //"ignore-cert": true,
