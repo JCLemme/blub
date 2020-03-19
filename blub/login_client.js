@@ -105,8 +105,8 @@ wss.on('connection', async (ws, req) => {
                                 "security": "any",
                                 "ignore-cert": true,
                                 "enable-wallpaper": false,
-                                "width": 1024,
-                                "height": 768,
+                                //"width": 1024,
+                                //"height": 768,
                             }
                         }
                     }

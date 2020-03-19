@@ -50,7 +50,7 @@ block content
             } while(password == "")
             
             if(password != null) 
-                connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password } ));
+                connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password 'width': window.innerWidth, 'height': window.innerHeight } ));
         }
         
         connection.onerror = (error) => {
@@ -71,25 +71,29 @@ block content
         }
 
         function geddit() {
-            document.getElementById('boop').appendChild(client.getDisplay().getElement());
-            mouse = new Guacamole.Mouse(document.getElementById("boop"));
+            document.getElementById('mainView').appendChild(client.getDisplay().getElement());
+            mouse = new Guacamole.Mouse(document.getElementById("mainView"));
             mouse.onmousedown =
             mouse.onmousemove =
             mouse.onmouseup   = function(state) {
 
                 client.sendMouseState(state);
+                client.sendSize(window.innerWidth, window.innerHeight);
 
             };
             client.connect('token=' + rtok);
         }
         
 
-        //window.addEventListener("resize", resize);
+        window.addEventListener("resize", resize);
 
         function resize(){
-            console.log("size!");
+            console.log("resizing to " + window.innerWidth + " " + window.innerHeight);
+            console.log(client.getDisplay());
+            console.log(client);
+            client.getDisplay().resize(client.getDisplay().getDefaultLayer(), window.innerWidth, window.innerHeight);
+            client.sendSize(window.innerWidth, window.innerHeight);
         }
 
-    h1= title
-    p(id='boop') Welcome to #{title}
-    //button(onclick='geddit()') booper
+    div(id='mainView')
+
