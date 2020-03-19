@@ -7,7 +7,7 @@ var _sockets = {};
 send = function(username, message) {
     if(username in _sockets) {
     
-        for(var i=_sockets[username].length-1;i>=0;i--) {
+        for(var i=_sockets[username]['sockets'].length-1;i>=0;i--) {
             if(_sockets[username]['sockets'][i] instanceof websocket) {
                 if(_sockets[username]['sockets'][i].readyState == 1) {
                     _sockets[username]['sockets'][i].send(message);
