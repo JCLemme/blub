@@ -26,32 +26,32 @@ Try{
 
 			Write-Verbose "`n$out"
 			
-			If ($RTM){
-                $RTM = ($RTM | convertfrom-json)
+			If ($out){
+                $out = ($out | convertfrom-json)
 
-                Switch ($RTM){
+                Switch ($out){
                     {($_.type -eq 'message') -and (!$_.reply_to)} { 
 
-                        If ( ($_.text -Match "<@$($RTMSession.self.id)>") -or $_.channel.StartsWith("D") ){
+                        If ( ($_.text -Match "<@$($outSession.self.id)>") -or $_.channel.StartsWith("D") ){
                             #A message was sent to the bot
 
                             # *** Responses go here, for example..***
                             $words = ($_.text.ToLower() -split " ")
 
                             Switch ($words){
-                                {@("hey","hello","hi") -contains $_} { Send-SlackMsg -Text 'Hello!' -Channel $RTM.Channel }
-                                {@("bye","cya") -contains $_} { Send-SlackMsg -Text 'Goodbye!' -Channel $RTM.Channel }
+                                {@("hey","hello","hi") -contains $_} { Send-SlackMsg -Text 'Hello!' -Channel $out.Channel }
+                                {@("bye","cya") -contains $_} { Send-SlackMsg -Text 'Goodbye!' -Channel $out.Channel }
 
                                 default { Write-Verbose "I have no response for $_" }
                             }
 
                         }Else{
-                            Write-Verbose "Message ignored as it wasn't sent to @$($RTMSession.self.name) or in a DM channel"
+                            Write-Verbose "Message ignored as it wasn't sent to @$($outSession.self.name) or in a DM channel"
                         }
                     }
-                    {$_.type -eq 'reconnect_url'} { $RTMSession.URL = $RTM.url }
+                    {$_.type -eq 'reconnect_url'} { $outSession.URL = $out.url }
 
-                    default { Write-Verbose "No action specified for $($RTM.type) event" }            
+                    default { Write-Verbose "No action specified for $($out.type) event" }            
 				}
 			}
         }   
