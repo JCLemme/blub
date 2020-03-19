@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var blubsetup = require('./blub_setup.js')
+var blubsetup = require('../blub_setup.js')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
