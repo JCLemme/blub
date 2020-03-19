@@ -202,10 +202,6 @@ block content
 
         }
 
-        function guac_handler() {
-            
-        }
-
         function class_handler(){
             document.getElementById('class').classList.add("hidden");
             document.getElementById('code').classList.remove("hidden");
@@ -255,8 +251,9 @@ block content
         | The current wait time is about 
         b(id='time-remaining') 20 minutes.
     br
-    button(id='remote' onclick='myrt_handler()') 
-        b() Open your remote session
+    a(id='remote' href="/guacamole" target="_blank")
+        button(onclick='guac_handler()') 
+            b() Open your remote session
     input(id='code' name='code' autocomplete="off" oninput="codeEntered()" placeholder='Enter class code')
     button(id='leave' onclick='leave_handler()') Leave the queue
     button(id='join' onclick='join_handler()') Join the queue
@@ -275,6 +272,5 @@ block content
     button(id="options" class='textOnly' onclick='opt_handler()') Other connection options...
     br
     br
-    button(id='opt2' class="hidden" onclick='guac_handler()') Guacamole client
+    button(id='opt2' class="hidden" onclick='myrt_handler()') Myrtille client
     button(id='opt1' class="hidden" onclick='rdp_handler()') RDP file (advanced)
-    //Myrtille client
