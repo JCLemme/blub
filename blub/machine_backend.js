@@ -122,6 +122,19 @@ var terminate = function(username) {
     return false;
 };
 
+function terminateGroup(useCode, code = "") {
+    found = 0;
+    _machines.forEach(element => {
+        if (element['user']) {
+            if (!useCode || element['reservation'] == code){
+                terminate(element['user']);
+                found++;
+            }
+        }
+    });
+    return found;
+}
+
 var reservation = function(reservation) {
     var found = 0;
     var full = 0;
@@ -200,3 +213,4 @@ module.exports.reserve_machine = reserve_machine;
 module.exports.reservation = reservation;
 module.exports.time_at = time_at;
 module.exports.terminate = terminate;
+module.exports.terminateGroup = terminateGroup;
