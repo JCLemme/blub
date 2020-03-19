@@ -28,6 +28,7 @@ var open = function(username, reservation, onTerminate, onKill) {
             _machines[i]["on_terminate"] = onTerminate;
             _machines[i]["on_kill"] = onKill;
             
+            machines.save(blubsetup.machines_default = '.last');
             return _machines[i];
         }
     }
@@ -38,6 +39,7 @@ var open = function(username, reservation, onTerminate, onKill) {
 var check = function(username) {
     for(var i=0;i<_machines.length;i++) {
         if(_machines[i]["user"] == username) {
+            machines.save(blubsetup.machines_default = '.last');
             return _machines[i];
         }
     }
@@ -53,6 +55,7 @@ var close = function(username) {
             _machines[i]["on_terminate"] = "";
             _machines[i]["on_kill"] = "";
             
+            machines.save(blubsetup.machines_default = '.last');
             return true;
         }
     }
@@ -90,6 +93,35 @@ var cull = function(reservation) {
     }
 }
 
+var terminate = function(username) {
+    // Mark them for DEATH
+    for(var i=_machines.length-1;i>=0;i--) {
+        
+        // First - see if they're active and if their time is up and if they aren't reserved
+        if(_machines[i]["user"] == username) {
+        
+            // Then run the required battery of tests
+            if(_machines[i]["on_terminate"] != "") {
+                var expiration = new Date();
+                expiration.setMinutes(expiration.getMinutes() + blubglobals.data['time-kill']);
+                
+                _machines[i]["until"] = expiration;
+                _machines[i]["on_terminate"](_machines[i]);
+                _machines[i]["on_terminate"] = "";
+            }
+            else {
+                // F-F-F-FATALITY
+                _machines[i]["on_kill"](_machines[i]);
+                close(_machines[i]["user"]);
+            }
+            
+            return true;
+        }
+    }
+    
+    return false;
+};
+
 var reservation = function(reservation) {
     var found = 0;
     var full = 0;
@@ -119,6 +151,8 @@ var reserve_machine = function(machine, reservation) {
     } else {
         return false;
     }
+    
+    machines.save(blubsetup.machines_default = '.last');
 };
 
 var reserve = function(reservation, original, all = false, amount = -1) {
@@ -133,7 +167,8 @@ var reserve = function(reservation, original, all = false, amount = -1) {
                 return found;
         }
     }
-    
+
+    machines.save(blubsetup.machines_default = '.last');
     return found;
 }
 

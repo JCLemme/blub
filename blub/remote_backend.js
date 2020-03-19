@@ -30,7 +30,7 @@ var rdp_file = function(machine) {
     
     rdpfile += 'domain:s:ECC\n';
     rdpfile += 'full address:s:' + machine['ip'] + '\n';
-    rdpfile += 'public mode:i:1');
+    rdpfile += 'public mode:i:1\n';
     rdpfile += 'username:s:' + machine['user'] + '\n';
     
     return rdpfile;

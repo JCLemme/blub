@@ -27,7 +27,8 @@ function queueRunner() {
             console.log("    Looks like " + status + " got a machine")
         break;
     }
-    queueworker.save('./queue.json.last');
+    
+    queueworker.save(blubsetup.queue_default + '.last');
 }
 
 
@@ -51,7 +52,7 @@ function cullRunner() {
         break;
     }*/
     
-    machines.save('./machines.json.last');
+    machines.save(blubsetup.machines_default = '.last');
 }
 
 

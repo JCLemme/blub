@@ -10,6 +10,7 @@ var mongodb = require('mongodb')
 var machines = require('./machine_backend.js')
 var blubsetup = require('./blub_setup.js')
 var blubglobals = require('./blub_globals.js')
+const fs = require('fs');
 
 var adminclient = require('./admin_client.js');
 var loginclient = require('./login_client.js');
@@ -57,7 +58,28 @@ app.use(express.static('guacamole-common-js'))
 blubglobals.data['time-term'] = 2;
 blubglobals.data['time-kill'] = 2;
 
-machines.load(blubsetup.machines_default);
+
+// Load last run files 
+var load_last = (process.argv.length >= 3 && process.argv[2] == '--no-reload') ? false : true;
+
+fs.stat(blubsetup.queue_default + '.last', function(err, stats) {
+    if(load_last) {
+        queueworker.load(blubsetup.queue_default + '.last');
+        console.log('Loaded queue from last run.');
+    }
+});
+
+fs.stat(blubsetup.machines_default + '.last', function(err, stats) {
+    if(load_last) {
+        machines.load(blubsetup.machines_default + '.last');
+        console.log('Loaded machines from last run.');
+    }
+    else {
+        machines.load(blubsetup.machines_default);
+        console.log('Loaded default set of machines.');
+    }
+});
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
