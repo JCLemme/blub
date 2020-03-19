@@ -396,7 +396,8 @@ wss.on('connection', async (ws, req) => {
                 case 'init': {
                     // The computer is valid
                     console.log(msg);
-                    ws.send(JSON.stringify({'action': 'notify-user', 'message': 'fuck you'}));
+                    ws.send(JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'fuck you'}));
+                    ws.send(JSON.stringify({'endpoint': 'computer', 'action': 'kill-session', 'timer': 15}));
                 }
             }
         }
