@@ -45,15 +45,9 @@ html
             const connection = new WebSocket('#{uname_server}');
             
             connection.onopen = () => {
-                var password = "";
-                do {
-                    password = window.prompt("Please enter your ECC password...", "");
-                } while(password == "")
-                
-                if(password != null) 
-                    wd = document.documentElement.clientWidth;
-                    ht = document.documentElement.clientHeight;
-                    connection.send(JSON.stringify( { 'request': 'guac-token', 'pass': password, 'width': wd, 'height': ht } ));
+                wd = document.documentElement.clientWidth;
+                ht = document.documentElement.clientHeight;
+                connection.send(JSON.stringify( { 'request': 'guac-token', 'width': wd, 'height': ht } ));
             }
             
             connection.onerror = (error) => {
@@ -103,7 +97,7 @@ html
             }
             
 
-            window.addEventListener("resize", resize);
+            //window.addEventListener("resize", resize);
 
             function resize(){
                 wd = document.documentElement.clientWidth;
@@ -114,5 +108,9 @@ html
                 //client.getDisplay().resize(client.getDisplay().getDefaultLayer(), wd, ht);
                 client.sendSize(wd, ht);
             }
+
+            window.addEventListener("beforeunload", function(event) {
+                client.disconnect();
+            });
 
         div(id='mainView')
