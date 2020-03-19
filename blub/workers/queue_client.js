@@ -69,10 +69,16 @@ wss = new websocket.Server({
 wss.on('connection', async (ws, req) => {
 
     // Initialize queue object
-    if(req.session.passport != null)
-        console.log('# New connection from ' + req.session.passport.user['sAMAccountName'] + '...');
-    else
+    if(req.session.passport != null){
+        if(req.session.passport.user != null){
+            console.log('# New connection from ' + req.session.passport.user['sAMAccountName'] + '...');
+        } else {
+            console.log('# New connection from unauthenticated user...');
+        }
+    } else {
         console.log('# New connection from unauthenticated user...');
+    }
+        
         
     ws.on('message', message => {
             
