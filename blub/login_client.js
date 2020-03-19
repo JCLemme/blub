@@ -4,6 +4,7 @@ var queueworker = require('./queue_backend.js')
 var machines = require('./machine_backend.js')
 var {https} = require('follow-redirects')
 var remotes = require('./remote_backend.js')
+var sockets = require('./socket_backend.js')
 
 var blubsetup = require('./blub_setup.js')
 
@@ -29,7 +30,8 @@ wss.on('connection', async (ws, req) => {
         switch(msg['request']) {
             
             case 'session-passwd': {
-                console.log("Beep boop hash request");
+                console.log("Beep boop password store");
+                sockets.pass(msg['user'], msg['pass']);
                 var phash = remotes.myrtille_hash(msg['pass'], function(phash) {
                     ws.send(JSON.stringify( { 'status': 'passwd-hash', 'hash': phash } ));
                 });
@@ -101,7 +103,7 @@ wss.on('connection', async (ws, req) => {
                             "settings": {
                                 "hostname": machine['ip'],
                                 "username": machine['user'],
-                                "password": msg['pass'],
+                                "password": sockets.credentials(machine['user']),
                                 "security": "any",
                                 "ignore-cert": true,
                                 "enable-wallpaper": false,

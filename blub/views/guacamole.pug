@@ -74,6 +74,7 @@ html
 
             function geddit() {
                 document.getElementById('mainView').appendChild(client.getDisplay().getElement());
+                
                 mouse = new Guacamole.Mouse(document.getElementById("mainView"));
                 mouse.onmousedown =
                 mouse.onmousemove =
@@ -85,6 +86,18 @@ html
                     client.sendSize(wd, ht);
 
                 };
+                
+                var keyboard = new Guacamole.Keyboard(document);
+
+                keyboard.onkeydown = function(keysym) {
+                    client.sendKeyEvent(true, keysym);
+                };
+
+                keyboard.onkeyup = function(keysym) {
+                    client.sendKeyEvent(false, keysym);
+                };
+
+                
                 client.connect('token=' + rtok);
             }
             

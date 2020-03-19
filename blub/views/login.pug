@@ -25,7 +25,7 @@ block content
         }
         
         function login_handler() {
-            connection.send(JSON.stringify( { 'request': 'session-passwd', 'pass': document.getElementById('pwd').value } ) );
+            connection.send(JSON.stringify( { 'request': 'session-passwd', 'user': document.getElementById('usr').value, 'pass': document.getElementById('pwd').value } ) );
         }
         
         function help_handler() {
@@ -43,7 +43,7 @@ block content
                 td
                     label(for='username') Username:
                 td
-                    input(name='username' placeholder='Username')
+                    input(id='usr' name='username' placeholder='Username')
             tr 
                 td
                     label(for='password') Password:
