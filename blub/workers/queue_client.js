@@ -412,7 +412,7 @@ wss.on('connection', async (ws, req) => {
                         SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog-fail', 'error': 'no-session'}));
                     }
                     else {
-                        if(machine['name'].toUpper() != msg['host'].toUpper())
+                        if(machine['name'].toUpperCase() != msg['host'].toUpperCase())
                             SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog-fail', 'error': 'invalid-host'}));
                         else
                             SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog-success'}));
