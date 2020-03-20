@@ -56,8 +56,8 @@ watchdog_connection = function(username, socket) {
 send_watchdog = function(username, message) {
     if(username in _sockets) {
         if(_sockets[username]['computer-socket'] instanceof websocket) {
-            if(_sockets[username]['computer-socket'][i].readyState == 1) {
-                _sockets[username]['computer-socket'][i].send(message);
+            if(_sockets[username]['computer-socket'].readyState == 1) {
+                _sockets[username]['computer-socket'].send(message);
             }
             else {
                 // Do nothin
