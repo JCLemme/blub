@@ -104,11 +104,17 @@ block content
             
             document.getElementById('queueinfo').innerHTML = qstr;
         }
+
+        function display_times(tinfo){
+            document.getElementById('sess').innerHTML = qstr['term'];
+            document.getElementById('sess').innerHTML = qstr['kill'];
+        }
         
         connection.onopen = () => {
             connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'init' } ));
             connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'queue' } )); 
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'machines' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'machines' } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
         }
          
         connection.onerror = (error) => {
@@ -130,14 +136,20 @@ block content
                     case 'queue-info': {
                         display_queues(msg['data']);
                     }
-                    break;                
+                    break;  
+
+                    case 'times-info': {
+                        display_times(msg['data']);
+                    }
+                    break;               
                 }
             }
         }
         
         function button_handler() {
             connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'queue' } )); 
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'machines' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'machines' } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } )); 
         }
         
         function changeCode(machine){
@@ -199,11 +211,13 @@ block content
         function sess_handler(){
             //Removes all codes from all machines
             connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-length', 'num': document.getElementById('sessInput').value } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
         }
 
         function grace_handler(){
             //Removes all codes from all machines
             connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-grace', 'num': document.getElementById('graceInput').value } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
         }
 
     h1 Here's your Blub status report.
