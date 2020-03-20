@@ -16,6 +16,10 @@ a.lined{
   text-decoration: underline;
 }
 
+a.unlined:hover{
+  text-decoration: none;
+}
+
 .headBar{
   display: flex;
   height:0;
