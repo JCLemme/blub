@@ -16,6 +16,10 @@ a.lined{
   text-decoration: underline;
 }
 
+.unlined{
+  text-decoration: none;
+}
+
 .unlined:hover{
   text-decoration: none;
 }

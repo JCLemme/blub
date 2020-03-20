@@ -105,9 +105,9 @@ block content
             document.getElementById('queueinfo').innerHTML = qstr;
         }
 
-        function display_times(tinfo){
-            document.getElementById('sess').innerHTML = "Session length: <b>" + tinfo['term'] + "</b>";
-            document.getElementById('sess').innerHTML = "Session grace period: <b>" + tinfo['kill'] + "</b>";
+        function display_times(term, kill){
+            document.getElementById('sess').innerHTML = "Session length: <b>" + term + "</b>";
+            document.getElementById('sess').innerHTML = "Session grace period: <b>" + kill + "</b>";
         }
         
         connection.onopen = () => {
@@ -139,7 +139,7 @@ block content
                     break;  
 
                     case 'times-info': {
-                        display_times(msg['data']);
+                        display_times(msg['term'], msg['kill']);
                     }
                     break;               
                 }
