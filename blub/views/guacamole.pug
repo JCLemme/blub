@@ -95,6 +95,7 @@ html
                 client.onstatechange = function(state) {
                     if(state == 5) {
                         window.alert("The session has ended.");
+                        close();
                     }
                 };
                 
