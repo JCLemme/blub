@@ -228,13 +228,13 @@ block content
     button(id='action' onclick='button_handler()') Refresh page
     h3 These are the admin controls.
     div(style="display:flex;")
-        div()
+        div(style="border-bottom:2px solid black;")
             p(id="sess") Session length: 120 minutes
             button(class="cPanel" id='sessButton' onclick='sess_handler()') Change session length:
             input(class="cPanel" id='sessInput' autocomplete="off" name='code' placeholder='Enter number' type='number')
             br
             br
-        div(style="border-left:2px solid black; margin-left:30px; padding-left:30px;")
+        div(style="border-bottom:2px solid black; margin-left:30px; padding-left:30px;")
             p(id="grace") Session grace period: 10 minutes
             button(class="cPanel" id='graceButton' onclick='grace_handler()') Change grace period:
             input(class="cPanel" id='graceInput' autocomplete="off" name='code' placeholder='Enter number' type='number')
