@@ -7,6 +7,7 @@ var RemoteConnectionWorker = require('@workers/remote_backend')
 var SessionWorker = require('@workers/socket_backend')
 
 var BlubSetup = require('@root/blub_setup')
+var BlubGlobals = require('@root/blub_globals.js')
 
 // Queue worker
 
@@ -352,7 +353,7 @@ wss.on('connection', async (ws, req) => {
                 case 'times': {
                     console.log('User ' + username + ' requested session timer information');
                     var queueinfo = QueueWorker.debuginfo();
-                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'times-info', 'term': blubglobals.data['time-term'], 'kill': blubglobals.data['time-kill']} ));
+                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'times-info', 'term': BlubGlobals.data['time-term'], 'kill': BlubGlobals.data['time-kill']} ));
                 }
                 break;
                 
@@ -407,13 +408,13 @@ wss.on('connection', async (ws, req) => {
                 
                 case 'change-length': {
                     console.log('Changing session length to ' + msg['num'] + ' minutes');
-                    blubglobals.data['time-term'] = Number(msg['num']);
+                    BlubGlobals.data['time-term'] = Number(msg['num']);
                 }
                 break;
               
                 case 'change-grace': {
                     console.log('Changing logout time to ' + msg['num'] + ' minutes');
-                    blubglobals.data['time-kill'] = Number(msg['num']);
+                    BlubGlobals.data['time-kill'] = Number(msg['num']);
                 }
                 break;
                 
