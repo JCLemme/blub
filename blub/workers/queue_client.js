@@ -349,6 +349,13 @@ wss.on('connection', async (ws, req) => {
                 }
                 break;
 
+                case 'times': {
+                    console.log('User ' + username + ' requested session timer information');
+                    var queueinfo = QueueWorker.debuginfo();
+                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'times-info', 'term': blubglobals.data['time-term'], 'kill': blubglobals.data['time-kill']} ));
+                }
+                break;
+                
                 case 'terminate': {
                     console.log('User ' + username + ' wants to terminate user ' + msg['user']);
                     worked = MachineWorker.terminate(msg['user']);
@@ -395,6 +402,18 @@ wss.on('connection', async (ws, req) => {
                     console.log('User ' + username + ' wants to terminate all machines (something must be very wrong)');
                     changed = MachineWorker.terminateGroup(false);
                     sendMachines();
+                }
+                break;
+                
+                case 'change-length': {
+                    console.log('Changing session length to ' + msg['num'] + ' minutes');
+                    blubglobals.data['time-term'] = Number(msg['num']);
+                }
+                break;
+              
+                case 'change-grace': {
+                    console.log('Changing logout time to ' + msg['num'] + ' minutes');
+                    blubglobals.data['time-kill'] = Number(msg['num']);
                 }
                 break;
                 
