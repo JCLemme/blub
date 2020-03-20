@@ -196,9 +196,32 @@ block content
             connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-code-all' } ));
         }
 
+        function sess_handler(){
+            //Removes all codes from all machines
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-length', 'num': document.getElementById('sessInput').value } ));
+        }
+
+        function grace_handler(){
+            //Removes all codes from all machines
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-grace', 'num': document.getElementById('graceInput').value } ));
+        }
+
     h1 Here's your Blub status report.
     button(id='action' onclick='button_handler()') Refresh page
     h3 These are the admin controls.
+    div(style="display:flex;")
+        div()
+            p(id="sess") Session length: 120 minutes
+            button(class="cPanel" id='sessButton' onclick='sess_handler()') Change session length:
+            input(class="cPanel" id='sessInput' autocomplete="off" name='code' placeholder='Enter number' type='number')
+            br
+            br
+    div(style="border-left:2px solid black; margin-left:30px; padding-left:30px;")
+        p(id="sess") Session grace period: 10 minutes
+        button(class="cPanel" id='graceButton' onclick='grace_handler()') Change grace period:
+            input(class="cPanel" id='graceInput' autocomplete="off" name='code' placeholder='Enter number' type='number')
+            br
+            br
     div(style="display:flex;")
         div()
             button(class="cPanel" id='addCodeButton' onclick='addCode_handler()') Add code to all machines:
