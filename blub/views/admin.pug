@@ -106,8 +106,8 @@ block content
         }
 
         function display_times(term, kill){
-            document.getElementById('sess').innerHTML = "Session length: <b>" + term + "</b>";
-            document.getElementById('sess').innerHTML = "Session grace period: <b>" + kill + "</b>";
+            document.getElementById('sess').innerHTML = "Session length: <b>" + term + " minutes.</b>";
+            document.getElementById('grace').innerHTML = "Session grace period: <b>" + kill + " minutes.</b>";
         }
         
         connection.onopen = () => {
