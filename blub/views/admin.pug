@@ -106,8 +106,8 @@ block content
         }
 
         function display_times(tinfo){
-            document.getElementById('sess').innerHTML = qstr['term'];
-            document.getElementById('sess').innerHTML = qstr['kill'];
+            document.getElementById('sess').innerHTML = "Session length: <b>" + tinfo['term'] + "</b>";
+            document.getElementById('sess').innerHTML = "Session grace period: <b>" + tinfo['kill'] + "</b>";
         }
         
         connection.onopen = () => {
@@ -209,15 +209,19 @@ block content
         }
 
         function sess_handler(){
-            //Removes all codes from all machines
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-length', 'num': document.getElementById('sessInput').value } ));
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
+            //Changes session length
+            if (document.getElementById('sessInput').value != null){
+                connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-length', 'num': document.getElementById('sessInput').value } ));
+                connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
+            }
         }
 
         function grace_handler(){
-            //Removes all codes from all machines
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-grace', 'num': document.getElementById('graceInput').value } ));
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
+            //Changes grace period length
+            if (document.getElementById('graceInput').value != null){
+                connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-grace', 'num': document.getElementById('graceInput').value } ));
+                connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
+            }
         }
 
     h1 Here's your Blub status report.
