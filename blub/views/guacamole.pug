@@ -92,6 +92,11 @@ html
                     client.sendKeyEvent(0, keysym);
                 };
 
+                client.onstatechange = function(state) {
+                    if(state == 5) {
+                        window.alert("The session has ended.");
+                    }
+                };
                 
                 client.connect('token=' + rtok);
             }
