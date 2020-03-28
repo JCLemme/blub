@@ -34,6 +34,7 @@
   "_moduleAliases": {
     "@root": ".",
     "@workers": "workers/",
+    "@talkers": "talkers/",
     "@routes": "routes/",
     "@views": "views/",
     "@public": "public/"

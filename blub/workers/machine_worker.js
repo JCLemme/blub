@@ -1,6 +1,6 @@
 const fs = require('fs');
-var blubsetup = require('@root/blub_setup.js')
-var blubglobals = require('@root/blub_globals.js')
+var BlubSetup = require('@root/blub_setup.js')
+var BlubGlobals = require('@root/blub_globals.js')
 
 var _machines = [];
 
@@ -21,14 +21,14 @@ var open = function(username, reservation, onTerminate, onKill) {
             // We found a free machine. Expire in two hours plz
             var expiration = new Date();
             //expiration.setHours(expiration.getHours() + 2);
-            expiration.setMinutes(expiration.getMinutes() + blubglobals.data['time-term']);
+            expiration.setMinutes(expiration.getMinutes() + BlubGlobals.data['time-term']);
             
             _machines[i]["user"] = username;
             _machines[i]["until"] = expiration;
             _machines[i]["on_terminate"] = onTerminate;
             _machines[i]["on_kill"] = onKill;
             
-            save(blubsetup.machines_default = '.last');
+            save(BlubSetup.machines_default = '.last');
             return _machines[i];
         }
     }
@@ -39,7 +39,7 @@ var open = function(username, reservation, onTerminate, onKill) {
 var check = function(username) {
     for(var i=0;i<_machines.length;i++) {
         if(_machines[i]["user"] == username) {
-            save(blubsetup.machines_default = '.last');
+            save(BlubSetup.machines_default = '.last');
             return _machines[i];
         }
     }
@@ -55,7 +55,7 @@ var close = function(username) {
             _machines[i]["on_terminate"] = "";
             _machines[i]["on_kill"] = "";
             
-            save(blubsetup.machines_default = '.last');
+            save(BlubSetup.machines_default = '.last');
             return true;
         }
     }
@@ -78,7 +78,7 @@ var cull = function(reservation) {
             // Then run the required battery of tests
             if(_machines[i]["on_terminate"] != "") {
                 var expiration = new Date();
-                expiration.setMinutes(expiration.getMinutes() + blubglobals.data['time-kill']);
+                expiration.setMinutes(expiration.getMinutes() + BlubGlobals.data['time-kill']);
                 
                 _machines[i]["until"] = expiration;
                 _machines[i]["on_terminate"](_machines[i]);
@@ -103,7 +103,7 @@ var terminate = function(username) {
             // Then run the required battery of tests
             if(_machines[i]["on_terminate"] != "") {
                 var expiration = new Date();
-                expiration.setMinutes(expiration.getMinutes() + blubglobals.data['time-kill']);
+                expiration.setMinutes(expiration.getMinutes() + BlubGlobals.data['time-kill']);
                 
                 _machines[i]["until"] = expiration;
                 _machines[i]["on_terminate"](_machines[i]);
@@ -165,7 +165,7 @@ var reserve_machine = function(machine, reservation) {
         return false;
     }
     
-    save(blubsetup.machines_default = '.last');
+    save(BlubSetup.machines_default = '.last');
 };
 
 var reserve = function(reservation, original, all = false, amount = -1) {
@@ -181,7 +181,7 @@ var reserve = function(reservation, original, all = false, amount = -1) {
         }
     }
 
-    save(blubsetup.machines_default = '.last');
+    save(BlubSetup.machines_default = '.last');
     return found;
 }
 

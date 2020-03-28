@@ -13,16 +13,20 @@ var blubsetup = require('./blub_setup.js')
 var blubglobals = require('./blub_globals.js')
 const fs = require('fs');
 
-var queueclient = require('@workers/queue_client.js');
-var queueworker = require('@workers/queue_backend.js');
-var machines = require('@workers/machine_backend.js')
+var queueclient = require('@talkers/queue_talker.js');
+var loginclient = require('@talkers/login_talker.js');
+var adminclient = require('@talkers/admin_talker.js');
+var clientclient = require('@talkers/client_talker.js');
 
-var indexRouter = require('./routes/index');
-var loginRouter = require('./routes/login');
-var queueRouter = require('./routes/queue');
-var usersRouter = require('./routes/users');
-var adminRouter = require('./routes/admin');
-var guacRouter = require('./routes/guacamole');
+var queueworker = require('@workers/queue_worker.js');
+var machines = require('@workers/machine_worker.js')
+
+var indexRouter = require('@routes/index');
+var loginRouter = require('@routes/login');
+var queueRouter = require('@routes/queue');
+var usersRouter = require('@routes/users');
+var adminRouter = require('@routes/admin');
+var guacRouter = require('@routes/guacamole');
 
 var app = express();
 
@@ -37,9 +41,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//app.use(express.session({ cookie: { maxAge: 60000 }}));
-//app.use(flash());
-
 megasession = session({ secret: blubsetup.cookie_secret });
 app.use(megasession);
 
@@ -53,7 +54,7 @@ app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/guacamole', guacRouter);
 app.use(express.static('guacamole-common-js'))
-
+ 
 // Defaults
 blubglobals.data['time-term'] = 2;
 blubglobals.data['time-kill'] = 2;

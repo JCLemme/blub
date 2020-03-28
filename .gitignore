@@ -115,8 +115,8 @@ dist
 .pnp.*
 
 # Blub stuff
-
 blub_setup.js
 blub_secrets.js
 machines.json
 *.last
+.vscode/

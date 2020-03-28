@@ -42,7 +42,7 @@ html
             var mouse;
             var keyboard;
             
-            const connection = new WebSocket('#{client_server}');
+            const connection = new WebSocket('#{protocol}#{server}#{endpoint}')
             
             connection.onopen = () => {
                 wd = document.documentElement.clientWidth;

@@ -1,6 +1,6 @@
 const fs = require('fs');
 var websocket = require('ws')
-var blubsetup = require('@root/blub_setup.js')
+var BlubSetup = require('@root/blub_setup.js')
 
 var _sockets = {};
 

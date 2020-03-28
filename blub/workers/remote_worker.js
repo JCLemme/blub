@@ -1,10 +1,10 @@
 var {https} = require('follow-redirects')
-var blubsetup = require('@root/blub_setup.js')
+var BlubSetup = require('@root/blub_setup.js')
 
 var myrtille_hash = async function(password, callback) {
     var hash = "";
     
-    var request = await https.get(blubsetup.myrtille_server + "/myrtille/GetHash.aspx?password=" + encodeURIComponent(password), {rejectUnauthorized: false}, res => {
+    var request = await https.get(BlubSetup.myrtille_server + "/myrtille/GetHash.aspx?password=" + encodeURIComponent(password), {rejectUnauthorized: false}, res => {
         res.setEncoding("utf8");
         
         let phash = "";
@@ -21,7 +21,7 @@ var myrtille_hash = async function(password, callback) {
 };
 
 var myrtille_link = function(machine, hash) {
-    return blubsetup.myrtille_server + "/Myrtille/?__EVENTTARGET=&__EVENTARGUMENT=&connect=Connect%21&server=" + machine['ip'] + "&domain=ECC&user=" + machine['user'] + "&passwordHash=" + hash;
+    return BlubSetup.myrtille_server + "/Myrtille/?__EVENTTARGET=&__EVENTARGUMENT=&connect=Connect%21&server=" + machine['ip'] + "&domain=ECC&user=" + machine['user'] + "&passwordHash=" + hash;
 };
 
 var rdp_file = function(machine) {

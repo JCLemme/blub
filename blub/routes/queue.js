@@ -6,7 +6,7 @@ var blubsetup = require('../blub_setup.js');
 /* GET home page. */
 router.get('/', function(req, res, next) {
     if (req.user) {
-        res.render('queue', { title: 'Blub queue', client_server: "wss://" + blubsetup.host + ':' + blubsetup.client_port_external   });
+        res.render('queue', { title: 'Blub queue', protocol: ((blubsetup.use_tls) ? 'wss://' : 'ws://'), server: blubsetup.host, endpoint: blubsetup.queue_endpoint, mini_endpoint: blubsetup.login_endpoint });
     }
     else {
         res.redirect('/login');

@@ -1,10 +1,10 @@
 var websocket = require('ws')
 var https = require('https')
 
-var QueueWorker = require('@workers/queue_backend')
-var MachineWorker = require('@workers/machine_backend')
-var RemoteConnectionWorker = require('@workers/remote_backend')
-var SessionWorker = require('@workers/socket_backend')
+var QueueWorker = require('@workers/queue_worker')
+var MachineWorker = require('@workers/machine_worker')
+var RemoteConnectionWorker = require('@workers/remote_worker')
+var SessionWorker = require('@workers/session_worker')
 
 var BlubSetup = require('@root/blub_setup')
 var BlubGlobals = require('@root/blub_globals.js')
@@ -58,7 +58,7 @@ setTimeout(updateRunner, BlubSetup.runner_delay*1000);
 // Websocket receiver for clients
 
 wss = new websocket.Server({
-    port: BlubSetup.client_port,
+    port: BlubSetup.queue_port,
     
     verifyClient: (info, done) => {
         megasession(info.req, {}, () => {
@@ -237,216 +237,6 @@ wss.on('connection', async (ws, req) => {
                 break;
             }
         }
-        
-        else if(msg['endpoint'] == 'login') {
-            switch(msg['request']) {
-                case 'session-passwd': {
-                    console.log("Beep boop password store");
-                    SessionWorker.pass(msg['user'], msg['pass']);
-                    var phash = RemoteConnectionWorker.myrtille_hash(msg['pass'], function(phash) {
-                        ws.send(JSON.stringify( { 'endpoint': 'login', 'status': 'passwd-hash', 'hash': phash } ));
-                    });
-                }
-                break;
-                
-                // User data functions
-                
-                case 'user-info': {
-                    if (req.session.passport != null){
-                        if (req.session.passport.user != null){
-                            console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested all their info');
-                            ws.send(JSON.stringify( { 'endpoint': 'login', 'response': 'info',  'data': req.session.passport.user} ));
-                        }else{
-                            console.log("User-info request was made but no user is logged in, sending logged-out message");
-                            ws.send(JSON.stringify( { 'endpoint': 'login', 'response': 'info',  'data': 'none'} ));
-                        }
-                    }else{
-                        console.log("User-info request was made but no user is logged in, sending logged-out message");
-                        ws.send(JSON.stringify( { 'endpoint': 'login', 'response': 'info',  'data': 'none'} ));
-                    }
-                }
-                break;
-
-                case 'guac-token': {
-                
-                    const crypto = require('crypto');
-                     
-                    const clientOptions = {
-                        cypher: 'AES-256-CBC',
-                        key: BlubSetup.guac_key,
-                    }
-                     
-                    const encrypt = (value) => {
-                        const iv = crypto.randomBytes(16);
-                        const cipher = crypto.createCipheriv(clientOptions.cypher, clientOptions.key, iv);
-                     
-                        let crypted = cipher.update(JSON.stringify(value), 'utf8', 'base64');
-                        crypted += cipher.final('base64');
-                     
-                        const data = {
-                            iv: iv.toString('base64'),
-                            value: crypted
-                        };
-                     
-                        return new Buffer(JSON.stringify(data)).toString('base64');
-
-                    };
-                    
-                    
-                    // Runnin shit bouiz
-                    
-                    var machine = MachineWorker.check(req.session.passport.user['sAMAccountName']);
-                    
-                    if(machine == null) {
-                        ws.send(JSON.stringify({'status': 'error', 'error': 'no-session'}));
-                    }
-                    else{
-                        var newrdp = {
-                            "connection": {
-                                "type": "rdp",
-                                "settings": {
-                                    "hostname": machine['ip'],
-                                    "username": machine['user'],
-                                    "password": SessionWorker.credentials(machine['user']),
-                                    "security": "any",
-                                    "ignore-cert": true,
-                                    "enable-wallpaper": true,
-                                    "width": msg['width'],
-                                    "height": msg['height'],
-                                }
-                            }
-                        }
-                        
-                        
-                        var token = encrypt(newrdp);
-                        ws.send(JSON.stringify({'status': 'rdp-token', 'token': token}));
-                    }
-                }
-                break;
-            }
-        }
-        
-        else if(msg['endpoint'] == 'admin') {
-            var username = req.session.passport.user['sAMAccountName'] ;
-            console.log('! Admin message from ' + username + ': ' + `${message}`);
-            
-            switch(msg['request']) {
-                case 'init': {
-                    // Refresh the login token
-                    SessionWorker.register(username, ws);
-                }
-                break;
-                
-                case 'machines': {
-                    console.log('User ' + username + ' requested admin machine information');
-                    sendMachines();
-                }
-                break;
-                
-                case 'queue': {
-                    console.log('User ' + username + ' requested admin queue information');
-                    var queueinfo = QueueWorker.debuginfo();
-                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'queue-info', 'data': queueinfo } ));
-                }
-                break;
-
-                case 'times': {
-                    console.log('User ' + username + ' requested session timer information');
-                    var queueinfo = QueueWorker.debuginfo();
-                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'times-info', 'term': BlubGlobals.data['time-term'], 'kill': BlubGlobals.data['time-kill']} ));
-                }
-                break;
-                
-                case 'terminate': {
-                    console.log('User ' + username + ' wants to terminate user ' + msg['user']);
-                    worked = MachineWorker.terminate(msg['user']);
-                    console.log(worked + " test!!");
-                    sendMachines();
-                }
-                break;
-
-                case 'reserve': {
-                    cd = (msg['code']) ? "code " + msg['code'] : 'no code';
-                    console.log('User ' + username + ' wants to reserve machine ' + msg['machine'] + ' with ' + cd);
-                    worked = MachineWorker.reserve_machine(msg['machine'], msg['code']);
-                    sendMachines();
-                }
-                break;
-
-                case 'change-code-all': {
-                    cd = (msg['code']) ? "reserve all machines with code " + msg['code'] : 'remove all codes from all machines';
-                    console.log('User ' + username + ' wants to ' + cd);
-                    if (msg['code']){
-                        changed = MachineWorker.reserve(msg['code'], "", true);
-                    } else {
-                        changed = MachineWorker.reserve("", "", true);
-                    }
-                    sendMachines();
-                }
-                break;
-
-                case 'remove-code': {
-                    console.log('User ' + username + ' wants to unreserve all machines using code ' + msg['code']);
-                    changed = MachineWorker.reserve("", msg['code']);
-                    sendMachines();
-                }
-                break;
-
-                case 'terminate-code': {
-                    console.log('User ' + username + ' wants to terminate all machines using code ' + msg['code']);
-                    changed = MachineWorker.terminateGroup(true, msg['code']);
-                    sendMachines();
-                }
-                break;
-
-                case 'terminate-all': {
-                    console.log('User ' + username + ' wants to terminate all machines (something must be very wrong)');
-                    changed = MachineWorker.terminateGroup(false);
-                    sendMachines();
-                }
-                break;
-                
-                case 'change-length': {
-                    console.log('Changing session length to ' + msg['num'] + ' minutes');
-                    BlubGlobals.data['time-term'] = Number(msg['num']);
-                }
-                break;
-              
-                case 'change-grace': {
-                    console.log('Changing logout time to ' + msg['num'] + ' minutes');
-                    BlubGlobals.data['time-kill'] = Number(msg['num']);
-                }
-                break;
-                
-                function sendMachines(){
-                    var machineinfo = MachineWorker.debuginfo();
-                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'machine-info', 'data': machineinfo } ));
-                }
-            }
-        }
-        
-        else if(msg['endpoint'] == 'computer') {
-            switch(msg['request']) {
-                case 'watchdog': {
-                    SessionWorker.watchdog_connection(msg['user'], ws);
-                    
-                    console.log('Checking connection state for user ' + msg['user'] + ' on machine ' + msg['host']);
-                    var machine = MachineWorker.check(msg['user']);
-                    
-                    if(machine == null) {
-                        console.log('They are gettin banned');
-                        SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog-fail', 'error': 'no-session'}));
-                    }
-                    else {
-                        if(machine['name'].toUpperCase() != msg['host'].toUpperCase())
-                            SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog-fail', 'error': 'invalid-host'}));
-                        else
-                            SessionWorker.send_watchdog(msg['user'], JSON.stringify({'endpoint': 'computer', 'action': 'watchdog-success'}));
-                    }
-                }
-            }
-        }
-
     })
 
 })

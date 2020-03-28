@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
     if (req.user) {
         if(req.user['memberOf'] != undefined) {
             if (req.user['memberOf'].includes(blubsetup.ldap_admins)) {
-                res.render('admin', { title: 'Blub admin', client_server: "wss://" + blubsetup.host + ':' + blubsetup.client_port_external });
+                res.render('admin', { title: 'Blub admin', protocol: ((blubsetup.use_tls) ? 'wss://' : 'ws://'), server: blubsetup.host, endpoint: blubsetup.admin_endpoint, mini_endpoint: blubsetup.login_endpoint });
             }
             else {
                 next(createError(403));

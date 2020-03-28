@@ -1,7 +1,8 @@
 const fs = require('fs');
-var machines = require('@workers/machine_backend.js')
-var blubsetup = require('@root/blub_setup.js')
-var blubglobals = require('@root/blub_globals.js')
+
+var MachineWorker = require('@workers/machine_worker.js')
+var BlubSetup = require('@root/blub_setup.js')
+var BlubGlobals = require('@root/blub_globals.js')
 
 var _entries = [];
 
@@ -58,7 +59,7 @@ var remove = function(username) {
 };
 
 var nextup = function() {
-    // If there are no machines in the queue, do nothing. 
+    // If there are no MachineWorker in the queue, do nothing. 
     if(_entries.length < 1) {
         return "queue-empty";
     }

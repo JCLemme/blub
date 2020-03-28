@@ -25,7 +25,7 @@ html
     hr
 
   script.
-      const webConnection = new WebSocket('#{client_server}');
+      const webConnection = new WebSocket('#{protocol}#{server}#{mini_endpoint}')
         
       webConnection.onopen = () => {
           webConnection.send(JSON.stringify( {'endpoint': 'login', 'request': 'user-info' } )); 
