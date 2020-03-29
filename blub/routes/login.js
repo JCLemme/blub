@@ -3,6 +3,11 @@ var flash = require("connect-flash");
 var router = express.Router();
 var fs = require('fs');
 
+var QueueWorker = require('@workers/queue_worker')
+var MachineWorker = require('@workers/machine_worker')
+var RemoteConnectionWorker = require('@workers/remote_worker')
+var SessionWorker = require('@workers/session_worker')
+
 var blubsetup = require('../blub_setup.js');
 
 require('ssl-root-cas').addFile('./certs/ldap.pem');
@@ -46,8 +51,20 @@ router.get('/', function(req, res, next) {
     
 });
 
-router.post('/', passport.authenticate('ldapauth',{ successRedirect: '/queue', failureRedirect: '/login', failureFlash: true }), function(req, res) {
-    res.json(req.user)
+// TODO: re-enable flash messages...
+router.post('/', function(req, res, next) {
+    passport.authenticate('ldapauth', {failureFlash: true}, function(err, user, info) {
+        if (err) { return next(err); }
+        
+        if (!user) { return res.redirect('/login'); }
+        
+        req.login(user, function(err) {
+            if (err) { return next(err); }
+            console.log(req.body.username + ' ' + req.body.password);
+            SessionWorker.pass(req.body.username, req.body.password);
+            return res.redirect('/queue');
+        });
+    })(req, res, next);
 });
 
 module.exports = router;

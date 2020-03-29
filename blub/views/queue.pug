@@ -9,9 +9,6 @@ block content
     script.
 
         var hasClassCode;
-
-        var mlink = ""
-        var rdpfile;
         
         const nth = function(d) {
             if (d > 3 && d < 21) return 'th';
@@ -82,6 +79,16 @@ block content
             
             // Handle a request
             switch(msg["status"]) {
+                case 'launch-myrtille': {
+                    window.open(msg['link']);
+                }
+                break;
+                
+                case 'launch-rdp': {
+                    download(msg['file'], "connection.rdp");
+                }
+                break;
+                
                 case "closing": {
                     mlink = msg['myrtille-link'] + getCookie('passhash');
                     rdpfile = msg['rdp-file'];
@@ -155,7 +162,6 @@ block content
                 break;
                 
                 case "idle": {
-                    console.log('hehe');
                     document.getElementById('header').innerHTML = "You're not waiting for a machine.";
                     document.getElementById('subheader').innerHTML = "Join the queue for estimated wait times.";
                     if (hasClassCode){
@@ -193,15 +199,11 @@ block content
         }
         
         function myrt_handler() {
-            // Launch Myrtille
-            if(mlink != "")
-                window.open(mlink);
+            connection.send(JSON.stringify( { 'request': 'run-myrtille' } ));
         }
 
         function rdp_handler() {
-            download(rdpfile, "connection.rdp");
-
-
+            connection.send(JSON.stringify( { 'request': 'run-rdp' } ));
         }
 
         function class_handler(){

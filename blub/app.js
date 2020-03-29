@@ -59,7 +59,6 @@ app.use(express.static('guacamole-common-js'))
 blubglobals.data['time-term'] = 2;
 blubglobals.data['time-kill'] = 2;
 
-
 // Load last run files 
 var load_last = (process.argv.length >= 3 && process.argv[2] == '--no-reload') ? false : true;
 

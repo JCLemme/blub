@@ -19,8 +19,7 @@ block content
             var msg = JSON.parse(e.data);
             
             if(msg['hash'] != "") {
-                document.cookie = 'passhash=' + msg['hash'];// + ";domain=.uri.edu;path=/";
-                document.getElementById("logform").submit();
+                // We don't need to send the password with a websocket anymore
             }
         }
         
@@ -31,7 +30,7 @@ block content
                 clicked = true;
                 document.getElementById('logbutton').innerHTML = "Logging in...";
                 document.getElementById('logbutton').disabled = true;
-                connection.send(JSON.stringify( { 'endpoint': 'login', 'request': 'session-passwd', 'user': document.getElementById('usr').value, 'pass': document.getElementById('pwd').value } ) );
+                document.getElementById("logform").submit();
             }
         }
         
@@ -65,6 +64,7 @@ block content
     br
     br
     br
+    p: a(href='https://password.egr.uri.edu') I don't remember my password...
     button(class='textOnly' style='font-size:20px; padding:0;' onclick='help_handler()') Need help logging in?
     p(id='helplogin1' class='hidden') Send an email to 
         a(href="mailto:eccmanager@egr.uri.edu" class="lined") eccmanager@egr.uri.edu

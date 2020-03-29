@@ -47,9 +47,7 @@ wss.on('connection', async (ws, req) => {
                 case 'session-passwd': {
                     console.log("Beep boop password store");
                     SessionWorker.pass(msg['user'], msg['pass']);
-                    var phash = RemoteConnectionWorker.myrtille_hash(msg['pass'], function(phash) {
-                        ws.send(JSON.stringify( { 'endpoint': 'login', 'status': 'passwd-hash', 'hash': phash } ));
-                    });
+                    ws.send(JSON.stringify( { 'response': 'ready' } ));
                 }
                 break;
                 

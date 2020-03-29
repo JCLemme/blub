@@ -54,7 +54,6 @@ function updateRunner() {
 
 setTimeout(updateRunner, BlubSetup.runner_delay*1000);
 
-
 // Websocket receiver for clients
 
 wss = new websocket.Server({
@@ -88,154 +87,172 @@ wss.on('connection', async (ws, req) => {
         
         // V dangerous
         //console.log(msg);
+    
+        var username = req.session.passport.user['sAMAccountName'] ;
+        console.log('! Queue message from ' + username + ': ' + `${message}`);
         
-        if(msg['endpoint'] == 'queue') {
-            var username = req.session.passport.user['sAMAccountName'] ;
-            console.log('! Queue message from ' + username + ': ' + `${message}`);
-            
-            switch(msg['request']) {
-                case 'init': {
-                    // Refresh their websocket
-                    SessionWorker.register(username, ws);
+        
+        
+        // Callbacks for queue and machine calls. I don't know if there's a better place
+        // to put them but for now here is fine
+
+        var callback_session_term = function(machine) {
+            // This handler tells the client that their time is up.
+            console.log('  User ' + username + ' has ten minutes to get their shit together.');
+            SessionWorker.send_watchdog(username, JSON.stringify({ 'action': 'notify-user', 'message': 'Your session is expiring soon. Please save all work and leave the remote session.'}));
+            SessionWorker.send(username, JSON.stringify( { 'status': 'closing', 'machine': machine } ));
+        }
+
+        var callback_session_kill = function(machine) {
+            // This handler tells the client to forcibly kill the connection.
+            console.log('  User ' + username + '\'s session just ended.');
+            SessionWorker.send_watchdog(username, JSON.stringify({ 'action': 'notify-user', 'message': 'Your session is over. You will be logged out in thirty seconds.'}));
+            SessionWorker.send_watchdog(username, JSON.stringify({ 'action': 'kill-session', 'timer': 30}));
+            SessionWorker.send(username, JSON.stringify( { 'status': 'idle' } ));
+        }
+
+
+
+        switch(msg['request']) {
+            case 'init': {
+                // Refresh their websocket
+                SessionWorker.register(username, ws);
+                
+                // See if the user is currently queued, and if so send them some queue
+                var place = QueueWorker.check(username);
+                
+                if(place != null) {
+                    ws.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
+                }
+                else {
+                
+                    // See if the user has a machine attached to them
+                    var machine = MachineWorker.check(username);
                     
-                    // See if the user is currently queued, and if so send them some queue
-                    var place = QueueWorker.check(username);
-                    
-                    if(place != null) {
-                        ws.send(JSON.stringify( { 'endpoint': 'queue', 'status': 'queued', 'place': place } ));
+                    if(machine != null) {
+                        // Split based on class or no class
+                        if(machine['on_terminate'] != "") {
+                            if(machine['reservation'] != "") {
+                                ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'reservation': machine['reservation'] } ));
+                            }
+                            else {
+                                ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine } ));
+                            }
+                        }
+                        else if(machine['on_kill'] != "") {
+                            ws.send(JSON.stringify( { 'status': 'closing', 'machine': machine } ));
+                        }
+                        else if(machine['on_kill'] == "") {
+                            ws.send(JSON.stringify( { 'status': 'idle' } ));
+                        }
                     }
                     else {
                     
-                        // See if the user has a machine attached to them
-                        var machine = MachineWorker.check(username);
-                        
-                        if(machine != null) {
-                            // Split based on class or no class
-                            if(machine['on_terminate'] != "") {
-                                if(machine['reservation'] != "") {
-                                    ws.send(JSON.stringify( { 'endpoint': 'queue', 'status': 'in-session-class', 'machine': machine, 'myrtille-link': RemoteConnectionWorker.myrtille_link(machine, ""), 'rdp-file': RemoteConnectionWorker.rdp_file(machine), 'reservation': machine['reservation'] } ));
-                                }
-                                else {
-                                    ws.send(JSON.stringify( { 'endpoint': 'queue', 'status': 'in-session', 'machine': machine, 'myrtille-link': RemoteConnectionWorker.myrtille_link(machine, ""), 'rdp-file': RemoteConnectionWorker.rdp_file(machine) } ));
-                                }
-                            }
-                            else if(machine['on_kill'] != "") {
-                                ws.send(JSON.stringify( { 'endpoint': 'queue', 'status': 'closing', 'machine': machine, 'myrtille-link': RemoteConnectionWorker.myrtille_link(machine, ""), 'rdp-file': RemoteConnectionWorker.rdp_file(machine) } ));
-                            }
-                            else if(machine['on_kill'] == "") {
-                                ws.send(JSON.stringify( { 'endpoint': 'queue', 'status': 'idle' } ));
-                            }
-                        }
-                        else {
-                        
-                            // User must not be doing anything I guess.
-                            ws.send(JSON.stringify( { 'endpoint': 'queue', 'status': 'idle' } ));
-                        }
+                        // User must not be doing anything I guess.
+                        ws.send(JSON.stringify( { 'status': 'idle' } ));
                     }
                 }
-                break;
-                
-                // Queue functions
+            }
+            break;
+            
+            // Queue functions
 
-                case 'queue-join': {
-                    console.log('  User ' + username + ' requested queue join');
+            case 'queue-join': {
+                console.log('  User ' + username + ' requested queue join');
+                
+                QueueWorker.append(username, 
+                
+                function(place) {
+                    var wait = MachineWorker.time_at(place);
+                    SessionWorker.send(username, JSON.stringify( { 'status': 'queued', 'place': place, 'wait': wait } ));
+                },
+                
+                function(machine) {
+                    // Otherwise let's find them a machine
+                    var machine = MachineWorker.open(username, "", callback_session_term, callback_session_kill);
                     
-                    QueueWorker.append(username, 
+                    // Exit if there are no free machines. 
+                    if(machine == null) {
+                        return false;
+                    }
+                    else {
+                        // Get a machine and send details to client
+                        SessionWorker.send(username, JSON.stringify( { 'status': 'in-session', 'machine': machine } ));
+                        return true;
+                    }
+                });
+            }
+            break;
+            
+            case 'queue-join-class': {
+                console.log('  User ' + username + ' requested to join a class "' + msg['reservation'] + '"');
+                
+                // Funny enough, there isn't a queue involved. Just look for a machine.
+                var available = MachineWorker.reservation(msg['reservation']);
+                
+                if(available == 'class-full') {
+                    SessionWorker.send(username, JSON.stringify( { 'status': 'full-class' } ));
+                }
+                else if(available == 'invalid-class') {
+                    SessionWorker.send(username, JSON.stringify( { 'status': 'invalid-class' } ));
+                }
+                else {
+                    console.log('  That class above has ' + available + ' spots left.');
                     
-                    function(place) {
-                        var wait = MachineWorker.time_at(place);
-                        SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'queued', 'place': place, 'wait': wait } ));
-                    },
+                    var machine = MachineWorker.open(username, msg['reservation'], callback_session_term, callback_session_kill);
                     
-                    function(machine) {
-                        // Otherwise let's find them a machine
-                        var machine = MachineWorker.open(username, "", 
-                        function(machine) {
-                            // This handler tells the client that their time is up.
-                            console.log('  User ' + username + ' has ten minutes to get their shit together.');
-                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'Your session is expiring soon. Please save all work and leave the remote session.'}));
-                            SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'closing', 'machine': machine, 'myrtille-link': RemoteConnectionWorker.myrtille_link(machine, ""), 'rdp-file': RemoteConnectionWorker.rdp_file(machine) } ));
-                        },
-                        
-                        function(machine) {
-                            // This handler tells the client to forcibly kill the connection.
-                            console.log('  User ' + username + '\'s session just ended.');
-                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'Your session is over. You will be logged out in thirty seconds.'}));
-                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'kill-session', 'timer': 30}));
-                            SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'idle' } ));
-                        });
-                        
-                        // Exit if there are no free machines. 
-                        if(machine == null) {
-                            return false;
-                        }
-                        else {
-                            // Get a machine and send details to client
-                            SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'in-session', 'machine': machine, 'myrtille-link': RemoteConnectionWorker.myrtille_link(machine, ""), 'rdp-file': RemoteConnectionWorker.rdp_file(machine) } ));
-                            return true;
-                        }
+                    if(machine == null) {
+                        SessionWorker.send(username, JSON.stringify( { 'status': 'invalid-class' } ));
+                    }
+                    else {
+                        SessionWorker.send(username, JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'reservation': msg['reservation'] } ));
+                    }
+                }
+            }
+            break;
+            
+            case 'queue-leave': {
+                console.log('User ' + username + ' requested queue leave');
+                QueueWorker.remove(username);
+                SessionWorker.send(username, JSON.stringify( { 'status': 'idle' } ));
+            }
+            break;
+                     
+            // Session functions
+            
+            case 'run-myrtille': {
+                var machine = MachineWorker.check(username);
+                
+                if(machine != null) {
+                    var phash = RemoteConnectionWorker.myrtille_hash(SessionWorker.credentials(username), function(phash) {
+                        SessionWorker.send(username, JSON.stringify( { 'status': 'launch-myrtille', 'link': RemoteConnectionWorker.myrtille_link(machine, phash), } ));
                     });
                 }
-                break;
-                
-                case 'queue-join-class': {
-                    console.log('  User ' + username + ' requested to join a class "' + msg['reservation'] + '"');
-                    
-                    // Funny enough, there isn't a queue involved. Just look for a machine.
-                    var available = MachineWorker.reservation(msg['reservation']);
-                    
-                    if(available == 'class-full') {
-                        SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'full-class' } ));
-                    }
-                    else if(available == 'invalid-class') {
-                        SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'invalid-class' } ));
-                    }
-                    else {
-                        console.log('  That class above has ' + available + ' spots left.');
-                        
-                        var machine = MachineWorker.open(username, msg['reservation'], 
-                        function(machine) {
-                            // This handler tells the client that their time is up.
-                            console.log('  User ' + username + ' has ten minutes to get their shit together.');
-                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'Your session is expiring soon. Please save all work and leave the remote session.'}));
-                            SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'closing', 'machine': machine, 'myrtille-link': RemoteConnectionWorker.myrtille_link(machine, ""), 'rdp-file': RemoteConnectionWorker.rdp_file(machine) } ));
-                        },
-                        
-                        function(machine) {
-                            // This handler tells the client to forcibly kill the connection.
-                            console.log('  User ' + username + '\'s session just ended.');
-                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'notify-user', 'message': 'Your session is over. You will be logged out in thirty seconds.'}));
-                            SessionWorker.send_watchdog(username, JSON.stringify({'endpoint': 'computer', 'action': 'kill-session', 'timer': 30}));
-                            SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'idle' } ));
-                        });
-                        
-                        if(machine == null) {
-                            SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'invalid-class' } ));
-                        }
-                        else {
-                            SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'in-session-class', 'machine': machine, 'reservation': msg['reservation'], 'myrtille-link': RemoteConnectionWorker.myrtille_link(machine, ""), 'rdp-file': RemoteConnectionWorker.rdp_file(machine)  } ));
-                        }
-                    }
+                else {
+                    SessionWorker.send(username, JSON.stringify( { 'status': 'error', 'reason': 'no-machine'  } ));
                 }
-                break;
-                
-                case 'queue-leave': {
-                    console.log('User ' + username + ' requested queue leave');
-                    QueueWorker.remove(username);
-                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'idle' } ));
-                }
-                break;
-                         
-                // Session functions
-                
-                case 'session-end': {
-                    console.log('User ' + username + ' requested session end');
-                    MachineWorker.terminate(username);
-                    MachineWorker.terminate(username);
-                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'queue', 'status': 'idle' } ));
-                }
-                break;
             }
+            break;
+            
+            case 'run-rdp': {
+                var machine = MachineWorker.check(username);
+                
+                if(machine != null) {
+                    SessionWorker.send(username, JSON.stringify( { 'status': 'launch-rdp', 'file': RemoteConnectionWorker.rdp_file(machine) } ));
+                }
+                else {
+                    SessionWorker.send(username, JSON.stringify( { 'status': 'error', 'reason': 'no-machine'  } ));
+                }
+            }
+            break;
+            
+            case 'session-end': {
+                console.log('User ' + username + ' requested session end');
+                MachineWorker.terminate(username);
+                MachineWorker.terminate(username);
+                SessionWorker.send(username, JSON.stringify( { 'status': 'idle' } ));
+            }
+            break;
         }
     })
 
