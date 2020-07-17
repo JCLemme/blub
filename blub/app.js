@@ -6,11 +6,11 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var flash = require("connect-flash");
-var passport = require('passport')
-var session = require('express-session')
+var passport = require('passport');
+var session = require('express-session');
 
-var blubsetup = require('./blub_setup.js')
-var blubglobals = require('./blub_globals.js')
+var blubsetup = require('./blub_setup.js');
+var blubglobals = require('./blub_globals.js');
 const fs = require('fs');
 
 var queueclient = require('@talkers/queue_talker.js');
@@ -19,7 +19,7 @@ var adminclient = require('@talkers/admin_talker.js');
 var clientclient = require('@talkers/client_talker.js');
 
 var queueworker = require('@workers/queue_worker.js');
-var machines = require('@workers/machine_worker.js')
+var machines = require('@workers/machine_worker.js');
 
 var indexRouter = require('@routes/index');
 var loginRouter = require('@routes/login');
@@ -53,7 +53,7 @@ app.use('/queue', queueRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 app.use('/guacamole', guacRouter);
-app.use(express.static('guacamole-common-js'))
+app.use(express.static('guacamole-common-js'));
  
 // Defaults
 blubglobals.data['time-term'] = 2;
