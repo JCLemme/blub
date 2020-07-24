@@ -1,216 +1,144 @@
 const fs = require('fs');
+const MongoClient = require('mongodb').MongoClient;
+
 var BlubSetup = require('@root/blub_setup.js')
 var BlubGlobals = require('@root/blub_globals.js')
 
-var _machines = [];
 
-var load = function(filename) {
-    var rawdata = fs.readFileSync(filename);
-    _machines = JSON.parse(rawdata);
-    console.log("    Loaded " + _machines.length + " machines.");
+/*
+  _
+ /. \ /|
+(_   X |
+ \_V/ \|    blub
+
+ */
+ 
+
+function template(host, name) {
+    var machine_template = {
+        'host': host,                   // FQDN (or ip address i suppose). Acts as their unique identifier.
+        'name': name,                   // Pretty display name for the machine. Probably should match the hostname.
+        
+        'state': 'idle',                // Machine current state. idle, assigned
+        'reservation': '',              // Class/reservation code the machine is tied to.
+        
+        'reserved-until': null,         // Datetime when the machine will no longer be reserved.
+    };
+    
+    return machine_template;
 };
 
-var save = function(filename) { 
-    fs.writeFileSync(filename, JSON.stringify(_machines));
-    console.log("    Saved " + _machines.length + " machines.");
-};
-
-var open = function(username, reservation, onTerminate, onKill) {
-    for(var i=0;i<_machines.length;i++) {
-        if(_machines[i]["user"] == "" && _machines[i]["reservation"] == reservation) {
-            // We found a free machine. Expire in two hours plz
-            var expiration = new Date();
-            //expiration.setHours(expiration.getHours() + 2);
-            expiration.setMinutes(expiration.getMinutes() + BlubGlobals.data['time-term']);
-            
-            _machines[i]["user"] = username;
-            _machines[i]["until"] = expiration;
-            _machines[i]["on_terminate"] = onTerminate;
-            _machines[i]["on_kill"] = onKill;
-            
-            save(BlubSetup.machines_default = '.last');
-            return _machines[i];
-        }
-    }
+async function add_machine(host, name) {
     
-    return null;
-}
-
-var check = function(username) {
-    for(var i=0;i<_machines.length;i++) {
-        if(_machines[i]["user"] == username) {
-            save(BlubSetup.machines_default = '.last');
-            return _machines[i];
-        }
-    }
+    // Adds a machine to the database
+    var new_machine = template(host, name);
     
-    return null;
-}
-
-var close = function(username) {
-    for(var i=0;i<_machines.length;i++) {
-        if(_machines[i]["user"] == username) {
-            _machines[i]["user"] = "";
-            _machines[i]["until"] = "";
-            _machines[i]["on_terminate"] = "";
-            _machines[i]["on_kill"] = "";
-            
-            save(BlubSetup.machines_default = '.last');
-            return true;
-        }
-    }
-    
-    return false;
-}
-
-var debuginfo = function() {
-    return _machines;
-};
-
-var cull = function(reservation) {
-
-    // Mark them for DEATH
-    for(var i=_machines.length-1;i>=0;i--) {
-        
-        // First - see if they're active and if their time is up and if they aren't reserved
-        if(_machines[i]["user"] != "" && Date.now() > Number(_machines[i]["until"]) && _machines[i]['reservation'] == reservation) {
-        
-            // Then run the required battery of tests
-            if(_machines[i]["on_terminate"] != "") {
-                var expiration = new Date();
-                expiration.setMinutes(expiration.getMinutes() + BlubGlobals.data['time-kill']);
-                
-                _machines[i]["until"] = expiration;
-                _machines[i]["on_terminate"](_machines[i]);
-                _machines[i]["on_terminate"] = "";
-            }
-            else {
-                // F-F-F-FATALITY
-                _machines[i]["on_kill"](_machines[i]);
-                close(_machines[i]["user"]);
-            }
-        }
-    }
-}
-
-var terminate = function(username) {
-    // Mark them for DEATH
-    for(var i=_machines.length-1;i>=0;i--) {
-        
-        // First - see if they're active and if their time is up and if they aren't reserved
-        if(_machines[i]["user"] == username) {
-        
-            // Then run the required battery of tests
-            if(_machines[i]["on_terminate"] != "") {
-                var expiration = new Date();
-                expiration.setMinutes(expiration.getMinutes() + BlubGlobals.data['time-kill']);
-                
-                _machines[i]["until"] = expiration;
-                _machines[i]["on_terminate"](_machines[i]);
-                _machines[i]["on_terminate"] = "";
-            }
-            else {
-                // F-F-F-FATALITY
-                _machines[i]["on_kill"](_machines[i]);
-                close(_machines[i]["user"]);
-            }
-            
-            return true;
-        }
-    }
-    
-    return false;
-};
-
-function terminateGroup(useCode, code = "") {
-    found = 0;
-    _machines.forEach(element => {
-        if (element['user']) {
-            if (!useCode || element['reservation'] == code){
-                terminate(element['user']);
-                found++;
-            }
-        }
-    });
-    return found;
-}
-
-var reservation = function(reservation) {
-    var found = 0;
-    var full = 0;
-    
-    for(var i=0;i<_machines.length;i++) {
-        if(_machines[i]["reservation"] == reservation) {
-            found++;
-            
-            if(_machines[i]["user"] != "") {
-                full++;
-            }
-        }
-    }
-    
-    if(found == 0)
-        return 'invalid-class';
-    else if(found == full) 
-        return 'class-full';
-    else
-        return found-full;
-}
-
-var reserve_machine = function(machine, reservation) {
-    if (_machines[machine]){
-        _machines[machine]["reservation"] = reservation;
-        return true;
-    } else {
+    if(!BlubGlobals.database) {
         return false;
     }
     
-    save(BlubSetup.machines_default = '.last');
+    var machines = BlubGlobals.database.collection('blub-machines');
+    await machines.insertOne(new_machine);
 };
 
-var reserve = function(reservation, original, all = false, amount = -1) {
-    var found = 0;
+async function remove_machine(host) {
     
-    for(var i=0;i<_machines.length;i++) {
-        if(_machines[i]["reservation"] == original || all) {
-            found++;
-            _machines[i]["reservation"] = reservation;
-            
-            if(found == amount) 
-                return found;
-        }
+    // Removes a machine from the database
+    if(!BlubGlobals.database) {
+        return false;
     }
-
-    save(BlubSetup.machines_default = '.last');
-    return found;
-}
-
-var time_at = function(place) {
-    // Sort the array
-    var filtered = _machines.slice().filter(function(a) { return a['until'] != "" });
-    filtered.sort(function(a, b) { return a['until'] - b['until'] });
     
-    if(_machines.length == filtered.length) {
-        if(place >= filtered.length) 
-            return -1;
-        else 
-            return filtered[place]['until'] - Date.now();
+    var machines = BlubGlobals.database.collection('blub-machines');
+    await machines.removeOne({'host': host});
+};
+
+async function get_machine(host) {
+    
+    // Gets a machine by hostname
+    if(!BlubGlobals.database) {
+        return false;
+    }
+    
+    var machines = BlubGlobals.database.collection('blub-machines');
+    var found = await machines.find({'host': host});
+    
+    if(found.length > 0)
+        return found[0];
+    else
+        return false;
+};
+
+async function get_machines() {
+
+    // Gets all machines. Not strictly necessary with get_machines_by_query but a good shortcut.
+    if(!BlubGlobals.database) {
+        return false;
+    }
+    
+    var machines = BlubGlobals.database.collection('blub-machines');
+    return await machines.find({});
+};
+
+async function get_machines_by_query(query) {
+    
+    // Gets machines by database query. A little unfocused but good for weird requests.
+    if(!BlubGlobals.database) {
+        return false;
+    }
+    
+    var machines = BlubGlobals.database.collection('blub-machines');
+    return await machines.find(query);
+};
+
+async function set_machine(machine) {
+
+    // Sets data for a machine. Takes a whole machine object, uses host from that object as the index.
+    if(!BlubGlobals.database) {
+        return false;
+    }
+    
+    var machines = BlubGlobals.database.collection('blub-machines');
+    await machines.updateOne(machine['host'], machine);
+    return true;
+};
+
+async function assign_machine(reservation) {
+    
+    // Look for a free machine, optionally with reservation code
+    if(!BlubGlobals.database) {
+        return false;
+    }
+    
+    var machines = BlubGlobals.database.collection('blub-machines');
+    var free_machines = await machines.find({'state': 'idle', 'reservation': reservation});
+    
+    // Give it out
+    if(free_machines.length == 0) {
+        return false;
     }
     else {
-        return 0;
+        await machines.updateOne(free_machines[0], {$set: {'state': 'assigned'}});
+        return free_machines[0]['host'];
     }
 }
 
-module.exports.load = load;
-module.exports.save = save;
-module.exports.open = open;
-module.exports.check = check;
-module.exports.close = close;
-module.exports.debuginfo = debuginfo;
-module.exports.cull = cull;
-module.exports.reserve = reserve;
-module.exports.reserve_machine = reserve_machine;
-module.exports.reservation = reservation;
-module.exports.time_at = time_at;
-module.exports.terminate = terminate;
-module.exports.terminateGroup = terminateGroup;
+async function release_machine(host) {
+
+    // Frees a machine. Returns false if that machine wasn't actually assigned.
+    if(!BlubGlobals.database) {
+        return false;
+    }
+    
+    var machines = BlubGlobals.database.collection('blub-machines');
+    var release_machine = await machines.findOne({'host': host});
+    
+    // Give it out
+    if(release_machine == null || release_machine['state'] != 'assigned') {
+        return false;
+    }
+    else {
+        await machines.updateOne(release_machine, {$set: {'state': 'idle'}});
+        return true;
+    }
+};
+

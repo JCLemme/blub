@@ -18,8 +18,8 @@ var loginclient = require('@talkers/login_talker.js');
 var adminclient = require('@talkers/admin_talker.js');
 var clientclient = require('@talkers/client_talker.js');
 
-var queueworker = require('@workers/queue_worker.js');
-var machines = require('@workers/machine_worker.js')
+var machines = require('@workers/machine_worker.js');
+var userz = require('@workers/user_worker.js');
 
 var indexRouter = require('@routes/index');
 var loginRouter = require('@routes/login');
@@ -58,6 +58,20 @@ app.use(express.static('guacamole-common-js'))
 // Defaults
 blubglobals.data['time-term'] = 2;
 blubglobals.data['time-kill'] = 2;
+
+// This is where mongo testing lives
+(async() => {
+
+    // Connect to database
+    const client = await MongoClient.connect(BlubSetup.mongo_host, { useUnifiedTopology: true, useNewUrlParser: true }).catch(err => { console.log(err); });
+    BlubGlobals.database = client.db('blub');
+    
+    console.log(await userz.queue_join('jlemme', ''));
+    console.log(await userz.user_search('jlemme'));
+
+})()
+//while(true) {}
+// End of mongotest
 
 // Load last run files 
 var load_last = (process.argv.length >= 3 && process.argv[2] == '--no-reload') ? false : true;
