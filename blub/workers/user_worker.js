@@ -4,13 +4,15 @@ const MongoClient = require('mongodb').MongoClient;
 var BlubSetup = require('@root/blub_setup.js');
 var BlubGlobals = require('@root/blub_globals.js');
 
-/* The goal of blub 2.0 is that the "queue" stops existing.
- * The queue isn't a line that people can jump in/out of
- * It's a concept defined by machine availability 
- * A user that "joins the queue" is actually just saying that they have wanted a machine since xyz time
- * Like a letter to santa
- * A separate process occasionally searches through the list and picks people who have been waiting to get machines
+
+/*
+ *    _
+ *   /. \ /|    blub
+ *  (_   X |    
+ *   \_V/ \|    copyright 2020- john lemme and co
+ * 
  */
+ 
  
 function template(username) {
     var user_template = {

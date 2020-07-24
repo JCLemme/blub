@@ -6,11 +6,11 @@ var BlubGlobals = require('@root/blub_globals.js')
 
 
 /*
-  _
- /. \ /|
-(_   X |
- \_V/ \|    blub
-
+ *    _
+ *   /. \ /|    blub
+ *  (_   X |    
+ *   \_V/ \|    copyright 2020- john lemme and co
+ * 
  */
  
 
