@@ -33,6 +33,7 @@ var BlubSetup = require('@root/blub_setup.js')
  * to enter their password twice in one session.
  */
  
+ 
 var _sockets = {};
 
 send = function(username, message) {

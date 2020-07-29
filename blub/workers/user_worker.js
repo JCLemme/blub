@@ -30,11 +30,20 @@ function template(username) {
     return user_template;
 };
 
+async function user_add(username, reservation) {
+
+    var user_template = template(username);
+    
+    if (!BlubGlobals.database) { return false; }
+    
+    var usercol = BlubGlobals.database.collection('blub-users');
+    await usercol.insertOne(user_template);
+    return user_template;
+};
+
 async function user_search(username) {
 
-    if (!BlubGlobals.database) {
-        return false;
-    }
+    if (!BlubGlobals.database) { return false; }
     
     var usercol = BlubGlobals.database.collection('blub-users');
     var record = await usercol.findOne({'user': username});
@@ -44,22 +53,18 @@ async function user_search(username) {
     return record;
 };
 
-async function queue_join(username, reservation) {
+async function queue_join(user) {
 
     // Make a user template
-    var user_template = template(username);
-    user_template['in-queue-since'] = (new Date()).toJSON();
+    user['in-queue-since'] = (new Date()).toJSON();
     
-    if (!BlubGlobals.database) {
-        return false;
-    }
-    
+    if (!BlubGlobals.database) { return false; }
     var usercol = BlubGlobals.database.collection('blub-users');
-    var records = await usercol.find({'user': username});
     
+    var records = await usercol.find({'user': username});
     if(records.length > 0) { return false; }
     
-    await usercol.insertOne(user_template);
+    await usercol.updateOne(user, user);
     
     return true;
 };
@@ -67,9 +72,7 @@ async function queue_join(username, reservation) {
 async function queue_top() {
 
     // Look for it in the database
-    if (!BlubGlobals.database) {
-        return false;
-    }
+    if (!BlubGlobals.database) { return false; }
     
     var usercol = BlubGlobals.database.collection('blub-users');
     var record = await usercol.findOne( {'in-queue-since': {$not: null} }, { sort: {'in-queue-since': 1} } );
