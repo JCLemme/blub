@@ -50,10 +50,12 @@ wss.on('connection', async (ws, req) => {
         
         switch(msg['request']) {
             case 'watchdog': {
+            
+                // Replace the user's watchdog socket with this one, since it's clearly the one they want to use
                 SessionWorker.watchdog_connection(msg['user'], ws);
                 
-                console.log('Checking connection state for user ' + msg['user'] + ' on machine ' + msg['host']);
-                var machine = MachineWorker.check(msg['user']);
+                logs.info('Checking connection state for user ' + msg['user'] + ' on machine ' + msg['host']);
+                var machine = UserWorker.check(msg['user']);
                 
                 if(machine == null) {
                     console.log('They are gettin banned');
@@ -71,30 +73,6 @@ wss.on('connection', async (ws, req) => {
     })
 
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
