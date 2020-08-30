@@ -96,6 +96,7 @@ wss.on('connection', async (ws, req) => {
                         }
                         else {
                             ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine } ));
+                        }
                     }
                 }
                 
