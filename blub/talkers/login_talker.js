@@ -1,7 +1,7 @@
 var websocket = require('ws')
 var https = require('https')
 
-var QueueWorker = require('@workers/queue_worker')
+var UserWorker = require('@workers/user_worker')
 var MachineWorker = require('@workers/machine_worker')
 var RemoteConnectionWorker = require('@workers/remote_worker')
 var SessionWorker = require('@workers/session_worker')

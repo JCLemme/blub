@@ -30,6 +30,10 @@ function template(username) {
     return user_template;
 };
 
+
+// Adds a user to the database given their username and an optional reservation code. 
+// Returns a userobject for that user, or false on failure.
+
 async function user_add(username, reservation) {
 
     var user_template = template(username);
@@ -40,6 +44,10 @@ async function user_add(username, reservation) {
     await usercol.insertOne(user_template);
     return user_template;
 };
+
+
+// Looks for a user in the database given their username.
+// Returns the first userobject associated with that username, or false on failure.
 
 async function user_search(username) {
 
@@ -53,6 +61,10 @@ async function user_search(username) {
     return record;
 };
 
+
+// Marks a user as waiting for a machine, given that user's userobject.
+// Returns true on success or false on failure.
+
 async function queue_join(user) {
 
     // Make a user template
@@ -61,13 +73,16 @@ async function queue_join(user) {
     if (!BlubGlobals.database) { return false; }
     var usercol = BlubGlobals.database.collection('blub-users');
     
-    var records = await usercol.find({'user': username});
+    var records = await usercol.find({'user': user['username']});
     if(records.length > 0) { return false; }
     
     await usercol.updateOne(user, user);
     
     return true;
 };
+
+
+// Returns the userobject of the user who has been waiting for a machine the longest.
 
 async function queue_top() {
 
@@ -82,7 +97,8 @@ async function queue_top() {
     return record;
 };
 
-module.exports.connect = connect;
+
+module.exports.user_add = user_add;
 module.exports.user_search = user_search;
 module.exports.queue_join = queue_join;
 module.exports.queue_top = queue_top;

@@ -1,7 +1,8 @@
 var websocket = require('ws')
 var https = require('https')
+var logs = require('pino')().child({'source': 'queue-talker'})
 
-var QueueWorker = require('@workers/queue_worker')
+var UserWorker = require('@workers/user_worker')
 var MachineWorker = require('@workers/machine_worker')
 var RemoteConnectionWorker = require('@workers/remote_worker')
 var SessionWorker = require('@workers/session_worker')
@@ -9,54 +10,15 @@ var SessionWorker = require('@workers/session_worker')
 var BlubSetup = require('@root/blub_setup')
 var BlubGlobals = require('@root/blub_globals.js')
 
-// Queue worker
+/*
+ *    _
+ *   /. \ /|    blub
+ *  (_   X |    
+ *   \_V/ \|    copyright 2020- john lemme and co
+ * 
+ */
 
-function queueRunner() {
-    console.log("  Another beautiful day in the neighborhood");
-    var status = QueueWorker.nextup();
-    
-    switch(status) {
-        case 'no-machines':
-            console.log("    No machines are available to give out")
-        break;
-        
-        case 'queue-empty':
-            console.log("    No one's waiting for a machine")
-        break;
-        
-        default:
-            console.log("    Looks like " + status + " got a machine")
-        break;
-    }
-    
-    QueueWorker.save(BlubSetup.queue_default + '.last');
-}
-
-function cullRunner() {
-    console.log("  Time to cull the users");
-    var status = MachineWorker.cull("");
-    
-    MachineWorker.save(BlubSetup.machines_default + '.last');
-}
-
-
-function updateRunner() {
-    console.log('\nUpdating at ' + Date.now());
-    cullRunner();
-    
-    for(var q=0;q<BlubSetup.max_queue_per_turn;q++) {
-        queueRunner();
-    }
-    
-    console.log(' ');
-    setTimeout(updateRunner, BlubSetup.runner_delay*1000);
-}
-
-setTimeout(updateRunner, BlubSetup.runner_delay*1000);
-
-// Websocket receiver for clients
-
-wss = new websocket.Server({
+wss = new websocket.Server({   
     port: BlubSetup.queue_port,
     
     verifyClient: (info, done) => {
@@ -68,31 +30,25 @@ wss = new websocket.Server({
 
 wss.on('connection', async (ws, req) => {
 
-    // Initialize queue object
+    // Authenticate the connection
     if(req.session.passport != null){
         if(req.session.passport.user != null){
-            console.log('# New connection from ' + req.session.passport.user['sAMAccountName'] + '...');
+            logs.info('New connection from ' + req.session.passport.user['sAMAccountName'] + '...');
         } else {
-            console.log('# New connection from unauthenticated user...');
+            logs.info('New connection from unauthenticated user...');
         }
     } else {
-        console.log('# New connection from unauthenticated user...');
+        logs.info('New connection from unauthenticated user...');
     }
-        
         
     ws.on('message', message => {
             
-        // Parse the message out
+        // Convert the message from JSON
         var msg = JSON.parse(message);
-        
-        // V dangerous
-        //console.log(msg);
     
+        // Get username from Passport
         var username = req.session.passport.user['sAMAccountName'] ;
-        console.log('! Queue message from ' + username + ': ' + `${message}`);
-        
-        
-        
+
         // Callbacks for queue and machine calls. I don't know if there's a better place
         // to put them but for now here is fine
 
@@ -112,14 +68,36 @@ wss.on('connection', async (ws, req) => {
         }
 
 
-
+        // WHY DO YOU CALL UPON ME
         switch(msg['request']) {
+        
+            // Initalize the connection and synchronize states between blub and the client's browser
             case 'init': {
-                // Refresh their websocket
+            
+                // Refresh the websocket they're using
                 SessionWorker.register(username, ws);
                 
-                // See if the user is currently queued, and if so send them some queue
-                var place = QueueWorker.check(username);
+                // Grab their userobject
+                var user = UserWorker.user_search(username);
+                
+                if(user == false) {
+                
+                    // Users are added to Blub at login, so we should not get here
+                    ws.send(JSON.stringify( { 'status': 'error', 'error': 'user-not-in-database' } ));
+                }
+                else {
+                    
+                    // Does the user have a machine?
+                    if(user['machine'] != null) {
+                        
+                        // Is the user in a classroom?
+                        if(user['reservation'] != "") {
+                            ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'reservation': user['reservation'] } ));
+                        }
+                        else {
+                            ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine } ));
+                    }
+                }
                 
                 if(place != null) {
                     ws.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
@@ -160,27 +138,6 @@ wss.on('connection', async (ws, req) => {
             case 'queue-join': {
                 console.log('  User ' + username + ' requested queue join');
                 
-                QueueWorker.append(username, 
-                
-                function(place) {
-                    var wait = MachineWorker.time_at(place);
-                    SessionWorker.send(username, JSON.stringify( { 'status': 'queued', 'place': place, 'wait': wait } ));
-                },
-                
-                function(machine) {
-                    // Otherwise let's find them a machine
-                    var machine = MachineWorker.open(username, "", callback_session_term, callback_session_kill);
-                    
-                    // Exit if there are no free machines. 
-                    if(machine == null) {
-                        return false;
-                    }
-                    else {
-                        // Get a machine and send details to client
-                        SessionWorker.send(username, JSON.stringify( { 'status': 'in-session', 'machine': machine } ));
-                        return true;
-                    }
-                });
             }
             break;
             

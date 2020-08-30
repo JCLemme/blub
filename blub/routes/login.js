@@ -3,7 +3,7 @@ var flash = require("connect-flash");
 var router = express.Router();
 var fs = require('fs');
 
-var QueueWorker = require('@workers/queue_worker')
+var UserWorker = require('@workers/user_worker')
 var MachineWorker = require('@workers/machine_worker')
 var RemoteConnectionWorker = require('@workers/remote_worker')
 var SessionWorker = require('@workers/session_worker')

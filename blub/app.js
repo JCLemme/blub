@@ -9,14 +9,13 @@ var flash = require("connect-flash");
 var passport = require('passport')
 var session = require('express-session')
 
-var blubsetup = require('./blub_setup.js')
-var blubglobals = require('./blub_globals.js')
+var BlubSetup = require('./blub_setup.js')
+var BlubGlobals = require('./blub_globals.js')
 const fs = require('fs');
 
 var queueclient = require('@talkers/queue_talker.js');
 var loginclient = require('@talkers/login_talker.js');
 var adminclient = require('@talkers/admin_talker.js');
-var clientclient = require('@talkers/client_talker.js');
 
 var machines = require('@workers/machine_worker.js');
 var userz = require('@workers/user_worker.js');
@@ -41,7 +40,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-megasession = session({ secret: blubsetup.cookie_secret });
+megasession = session({ secret: BlubSetup.cookie_secret });
 app.use(megasession);
 
 app.use(passport.initialize());
@@ -55,9 +54,7 @@ app.use('/admin', adminRouter);
 app.use('/guacamole', guacRouter);
 app.use(express.static('guacamole-common-js'))
  
-// Defaults
-blubglobals.data['time-term'] = 2;
-blubglobals.data['time-kill'] = 2;
+const MongoClient = require('mongodb').MongoClient;
 
 // This is where mongo testing lives
 (async() => {
@@ -73,27 +70,6 @@ blubglobals.data['time-kill'] = 2;
 //while(true) {}
 // End of mongotest
 
-// Load last run files 
-var load_last = (process.argv.length >= 3 && process.argv[2] == '--no-reload') ? false : true;
-
-fs.stat(blubsetup.queue_default + '.last', function(err, stats) {
-    if(stats != undefined && load_last) {
-        queueworker.load(blubsetup.queue_default + '.last');
-        console.log('Loaded queue from last run.');
-    }
-});
-
-fs.stat(blubsetup.machines_default + '.last', function(err, stats) {
-    if(stats != undefined && load_last) {
-        machines.load(blubsetup.machines_default + '.last');
-        console.log('Loaded machines from last run.');
-    }
-    else {
-        machines.load(blubsetup.machines_default);
-        console.log('Loaded default set of machines.');
-    }
-});
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -108,7 +84,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error', { client_server: "wss://" + blubsetup.host + ':' + blubsetup.client_port_external } );
+  res.render('error', { client_server: "wss://" + BlubSetup.host + ':' + BlubSetup.client_port_external } );
 });
 
 module.exports = app;
