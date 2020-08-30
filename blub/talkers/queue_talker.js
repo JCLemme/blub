@@ -100,7 +100,7 @@ wss.on('connection', async (ws, req) => {
                     }
                 }
                 
-                if(place != null) {
+                /*if(place != null) {
                     ws.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
                 }
                 else {
@@ -130,7 +130,7 @@ wss.on('connection', async (ws, req) => {
                         // User must not be doing anything I guess.
                         ws.send(JSON.stringify( { 'status': 'idle' } ));
                     }
-                }
+                }*/
             }
             break;
             
