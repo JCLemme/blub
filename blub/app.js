@@ -84,7 +84,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error', { client_server: "wss://" + BlubSetup.host + ':' + BlubSetup.client_port_external } );
+  res.render('error', { protocol: ((BlubSetup.use_tls) ? 'wss://' : 'ws://'), server: BlubSetup.host, endpoint: BlubSetup.queue_endpoint, mini_endpoint: BlubSetup.login_endpoint  } );
 });
 
 module.exports = app;
