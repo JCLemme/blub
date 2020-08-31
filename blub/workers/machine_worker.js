@@ -131,7 +131,7 @@ async function reserve_machine(uuid, reservation) {
     var claimed_machine = await machines.findOne({'uuid': uuid});
     
     // Give it out
-    if(!claimed_machine) {
+    if(!claimed_machine) 
         return false;
     else 
         await machines.updateOne(claimed_machine, {$set: {'reservation': reservation}});
