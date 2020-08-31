@@ -1,0 +1,283 @@
+extends layout
+
+block content
+    head
+        link(rel='stylesheet', href='/stylesheets/admin.css')
+   
+    script.
+        const connection = new WebSocket('#{protocol}#{server}#{endpoint}')
+         
+        //StackOverflow is god
+        function clearTable(table){
+            var rows = table.rows;
+            var i = rows.length;
+            while (--i) {
+                rows[i].parentNode.removeChild(rows[i]);
+            }
+        }
+
+        function display_machines(minfo){
+            tbl = document.getElementById('machineTable');
+            clearTable(tbl);
+            
+            //TODO: This should really be a template instead of manually creating all these objs
+            for(var i=0;i<minfo.length;i++){
+                var row = document.createElement("tr");
+
+                //Machine Name
+                var machineCell = document.createElement("td");
+                machineCell.innerHTML = "<b>" + minfo[i]['name'].toUpperCase() + "</b>";
+                machineCell.id = (i + '-name');
+                row.appendChild(machineCell);
+
+                //IP Address
+                var ipCell = document.createElement("td");
+                ipCell.innerHTML = (minfo[i]['ip']);
+                row.appendChild(ipCell);
+
+                //Session Info
+                var use;
+                use = (minfo[i]['user'] != "") ? ('in use by ' + minfo[i]['user'] + ' until ' + new Date(minfo[i]['until']) + ' ') + ((minfo[i]['on_terminate'] == "") ? ' - terminating' : ' - open'): 'not in use ';
+                var useCell = document.createElement("td");
+                useCell.style.width = "300px"; 
+                useCell.innerHTML = use;
+                useCell.id = (i + '-use');
+                row.appendChild(useCell);
+
+                //Reservation Info
+                res = "<i>(none)</i>"
+                if(minfo[i]['reservation'] != "") {
+                    res = minfo[i]['reservation'];
+                }
+                var resCell = document.createElement("td");
+                resCell.innerHTML = res;
+                resCell.id = (i + '-res');
+                row.appendChild(resCell);
+
+                //Change Code
+                var changeCell = document.createElement("td");
+                var box = document.createElement("div");
+                var changeField = document.createElement("input");
+                var changeButton = document.createElement("button");
+                changeButton.innerHTML = "Change";
+                changeField.placeholder = "Enter new code";
+                changeField.classList.add("admin");
+                changeButton.classList.add("admin");
+                box.appendChild(changeField);
+                box.appendChild(changeButton);
+                changeCell.appendChild(box);
+                changeField.id = (i + '-codeField');
+                changeButton.id = (i + '-codeChange');
+                changeButton.onclick = changeCode(i);
+                row.appendChild(changeCell);
+                
+
+                //Actions
+                var actCell = document.createElement("td");
+                var box = document.createElement("div");
+                var termButton = document.createElement("button");
+                termButton.innerHTML = (minfo[i]['user'] == "") ? 'No actions' : (minfo[i]['on_terminate'] == "") ? 'Kill' : 'Terminate';
+                if(minfo[i]['user'] == "") { termButton.disabled = true; }
+                termButton.classList.add("admin");
+                box.appendChild(termButton);
+                actCell.appendChild(box);
+                termButton.id = (i + '-terminate');
+                termButton.onclick = terminate(minfo[i]);
+                row.appendChild(actCell);
+
+                tbl.appendChild(row);
+            }
+        }
+        
+        function display_queues(qinfo) {
+            var qstr = "";
+           
+            if(qinfo.length == 0) {
+                qstr = '<p><i>Queue is empty...</i></p>';
+            }
+            
+            for(var i=0;i<qinfo.length;i++) {
+                qstr += '<p><b>' + Number(1+i) + ':</b> ';
+                console.log(qinfo[i]);
+                qstr += qinfo[i]['user'] + ' (since ' + new Date(qinfo[i]['date']) + ')</p>';
+            }
+            
+            document.getElementById('queueinfo').innerHTML = qstr;
+        }
+
+        function display_times(tinfo){
+            document.getElementById('sess').innerHTML = qstr['term'];
+            document.getElementById('sess').innerHTML = qstr['kill'];
+        }
+        
+        connection.onopen = () => {
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'init' } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'queue' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'machines' } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
+        }
+         
+        connection.onerror = (error) => {
+            console.log(`WebSocket error: ${error}`)
+        }
+         
+        connection.onmessage = (e) => {
+            console.log(e.data)
+            var msg = JSON.parse(e.data);
+            
+            // Handle a request
+            if(msg['endpoint'] == 'admin') {
+                switch(msg['status']) {
+                    case 'machine-info': {
+                        display_machines(msg['data']);
+                    }
+                    break;
+
+                    case 'queue-info': {
+                        display_queues(msg['data']);
+                    }
+                    break;  
+
+                    case 'times-info': {
+                        display_times(msg['data']);
+                    }
+                    break;               
+                }
+            }
+        }
+        
+        function button_handler() {
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'queue' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'machines' } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } )); 
+        }
+        
+        function changeCode(machine){
+            //Oh god I'm so sorry
+            return function(){
+                console.log("changing machine " + machine + " to use code " + document.getElementById(machine + '-codeField').value.toUpperCase());
+                connection.send(JSON.stringify( {'endpoint': 'admin', 'endpoint': 'admin', 'request': 'reserve' , 'machine': machine, 'code': document.getElementById(machine + '-codeField').value.toUpperCase() } )); 
+                document.getElementById(machine + '-codeField').value = '';
+            }
+        }
+
+        function terminate(machine){
+            //It has to be this way
+            return function(){
+                if (machine["user"]){
+                    console.log("terminating machine " + machine['name']);
+                    connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'terminate' , 'user': machine["user"] } ));
+                }
+            }
+        }
+
+        confirm = false;
+
+        function check_handler(){
+            document.getElementById("termAllCheck").innerHTML = (document.getElementById("termAllCheck").innerHTML == " ") ? "✔" : " ";
+            confirm = !confirm;
+        }
+
+        function termAll_handler(){
+            if (confirm){
+                //terminates ALL machines
+                connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'terminate-all' } ));
+                //Reset confirmation
+                confirm = false;
+                document.getElementById("termAllCheck").innerHTML = " ";
+            }
+        }
+
+        function termCode_handler(){
+            //terminates all machines with given code
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'terminate-code' , 'code': document.getElementById('termCodeInput').value.toUpperCase() } ));
+        }
+
+        function addCode_handler(){
+            //Adds code to all machines
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-code-all' , 'code': document.getElementById('addCodeInput').value.toUpperCase() } ));
+        }
+
+        function removeCode_handler(){
+            //Removes code from all machines
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'remove-code' , 'code': document.getElementById('rmvCodeInput').value.toUpperCase() } ));
+        }
+
+        function removeAll_handler(){
+            //Removes all codes from all machines
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-code-all' } ));
+        }
+
+        function sess_handler(){
+            //Removes all codes from all machines
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-length', 'num': document.getElementById('sessInput').value } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
+        }
+
+        function grace_handler(){
+            //Removes all codes from all machines
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'change-grace', 'num': document.getElementById('graceInput').value } ));
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
+        }
+
+    h1 Here's your Blub status report.
+    button(id='action' onclick='button_handler()') Refresh page
+    h3 These are the admin controls.
+    div(style="display:flex;")
+        div()
+            p(id="sess") Session length: 120 minutes
+            button(class="cPanel" id='sessButton' onclick='sess_handler()') Change session length:
+            input(class="cPanel" id='sessInput' autocomplete="off" name='code' placeholder='Enter number' type='number')
+            br
+            br
+        div(style="border-left:2px solid black; margin-left:30px; padding-left:30px;")
+            p(id="sess") Session grace period: 10 minutes
+            button(class="cPanel" id='graceButton' onclick='grace_handler()') Change grace period:
+            input(class="cPanel" id='graceInput' autocomplete="off" name='code' placeholder='Enter number' type='number')
+            br
+            br
+    div(style="display:flex;")
+        div()
+            button(class="cPanel" id='addCodeButton' onclick='addCode_handler()') Add code to all machines:
+            input(class="cPanel" id='addCodeInput' autocomplete="off" name='code' placeholder='Enter code' type='text')
+            br
+            br
+            button(class="cPanel" id='rmvCodeButton' onclick='removeCode_handler()') Remove code from all machines:
+            input(class="cPanel" id='rmvCodeInput' autocomplete="off" name='code' placeholder='Enter code' type='text')
+            br
+            br
+            button(class="cPanel" id='termCodeButton' onclick='termCode_handler()') Terminate sessions with code:
+            input(class="cPanel" id='termCodeInput' autocomplete="off" name='code' placeholder='Enter code' type='text')
+            br
+            br
+        div(style="border-left:2px solid black; margin-left:30px; padding-left:30px;")
+            button(class="cPanel" id='rmvAllCodeButton' onclick='removeAll_handler()') Remove ALL codes
+            br
+            br
+            button(class="cPanel" id='termAllButton' onclick='termAll_handler()') Terminate ALL sessions
+            br
+            br
+            p(class="chk") I am absolutely sure I want to do this
+            button(class="cPanel chk" id='termAllCheck' onclick='check_handler()') 
+            
+    
+    div(style="display:flex;")
+        div()
+            h3 Here are the machines in the pool.
+            table(id="machineTable")
+                tr
+                    th Machine
+                    th IP Address
+                    th Current Session
+                    th Reservation Code
+                    th Change Code
+                    th Actions
+                tr
+                    td test!
+                    td test!
+                    td test!
+                    td test!
+        div(style="border-left:2px solid black; margin-left:15px; padding-left:15px; width:20%;")
+            h3 Here is the current queue.
+            div(id='queueinfo')
+        

@@ -16,6 +16,7 @@ const fs = require('fs');
 var queueclient = require('@talkers/queue_talker.js');
 var loginclient = require('@talkers/login_talker.js');
 var adminclient = require('@talkers/admin_talker.js');
+var moderatorclient = require('@talkers/moderator_talker.js');
 
 var machines = require('@workers/machine_worker.js');
 var userz = require('@workers/user_worker.js');
@@ -25,6 +26,7 @@ var loginRouter = require('@routes/login');
 var queueRouter = require('@routes/queue');
 var usersRouter = require('@routes/users');
 var adminRouter = require('@routes/admin');
+var moderatorRouter = require('@routes/moderator');
 var guacRouter = require('@routes/guacamole');
 
 var app = express();
@@ -51,6 +53,7 @@ app.use('/login', loginRouter);
 app.use('/queue', queueRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
+app.use('/moderator', moderatorRouter);
 app.use('/guacamole', guacRouter);
 app.use(express.static('guacamole-common-js'))
  

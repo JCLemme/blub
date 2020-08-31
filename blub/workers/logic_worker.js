@@ -18,20 +18,27 @@ var BlubGlobals = require('@root/blub_globals.js');
 
 async function find_user_a_machine(user) {
     
-    // Attempts to give a user a machine. Sets their queue timer if there are no free machines.
-    var given_machine = await MachineWorker.assign_machine(user['reservation']);
-    
-    if(given_machine == false) {
+        // Attempts to give a user a machine. Sets their queue timer if there are no free machines.
+        if(user['in-queue-since'] == null) {
+        var given_machine = await MachineWorker.assign_machine(user['reservation']);
         
-        // Put the user in the queue
-        UserWorker.queue_join(user);
-        return 'queued';
+        if(given_machine == false) {
+            
+            // Put the user in the queue
+            UserWorker.queue_join(user);
+            return 'queued';
+        }
+        else {
+            
+            // Assign their machine
+            UserWorker.give_machine(user, given_machine);
+            return 'assigned';
+        }
     }
     else {
-        
-        // Assign their machine
-        UserWorker.give_machine(user, given_machine);
-        return 'assigned';
+    
+        // No double dipping
+        return 'queued';
     }
 };
 

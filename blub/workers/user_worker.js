@@ -41,8 +41,9 @@ async function user_add(username, reservation) {
     
     if (!BlubGlobals.database) { return false; }
     
+    var usercol = BlubGlobals.database.collection('blub-users');
     var record = await usercol.findOne({'user': username});
-    if(record) { return false; }
+    if(record) { console.log("OW MY BONES"); return false; }
     
     var usercol = BlubGlobals.database.collection('blub-users');
     await usercol.insertOne(user_template);

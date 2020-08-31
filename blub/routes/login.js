@@ -65,7 +65,7 @@ router.post('/', function(req, res, next) {
             console.log(req.body.username + ' ' + req.body.password);
             
             // Add user to database with empty info
-            UserWorker.user_add(req.body.username);
+            UserWorker.user_add(req.body.username, "");
             
             // Cache password and redirect
             SessionWorker.pass(req.body.username, req.body.password);
