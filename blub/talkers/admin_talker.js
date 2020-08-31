@@ -46,6 +46,8 @@ wss.on('connection', async (ws, req) => {
             var username = req.session.passport.user['sAMAccountName'] ;
             console.log('! Admin message from ' + username + ': ' + `${message}`);
             
+            var user = await UserWorker.user_search(username);
+            
             switch(msg['request']) {
                 case 'init': {
                     // Refresh the login token
@@ -61,82 +63,82 @@ wss.on('connection', async (ws, req) => {
                 
                 case 'queue': {
                     console.log('User ' + username + ' requested admin queue information');
-                    var queueinfo = QueueWorker.debuginfo();
-                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'queue-info', 'data': queueinfo } ));
+                    //var queueinfo = QueueWorker.debuginfo();
+                    //SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'queue-info', 'data': queueinfo } ));
                 }
                 break;
 
                 case 'times': {
                     console.log('User ' + username + ' requested session timer information');
-                    var queueinfo = QueueWorker.debuginfo();
-                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'times-info', 'term': BlubGlobals.data['time-term'], 'kill': BlubGlobals.data['time-kill']} ));
+                    //var queueinfo = QueueWorker.debuginfo();
+                    //SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'times-info', 'term': BlubGlobals.data['time-term'], 'kill': BlubGlobals.data['time-kill']} ));
                 }
                 break;
                 
                 case 'terminate': {
                     console.log('User ' + username + ' wants to terminate user ' + msg['user']);
-                    worked = MachineWorker.terminate(msg['user']);
-                    console.log(worked + " test!!");
-                    sendMachines();
+                    //worked = MachineWorker.release_machine(user[]);
+                    //console.log(worked + " test!!");
+                    //sendMachines();
                 }
                 break;
 
                 case 'reserve': {
                     cd = (msg['code']) ? "code " + msg['code'] : 'no code';
                     console.log('User ' + username + ' wants to reserve machine ' + msg['machine'] + ' with ' + cd);
-                    worked = MachineWorker.reserve_machine(msg['machine'], msg['code']);
-                    sendMachines();
+                    //worked = MachineWorker.reserve_machine(msg['machine'], msg['code']);
+                    //sendMachines();
                 }
                 break;
 
                 case 'change-code-all': {
                     cd = (msg['code']) ? "reserve all machines with code " + msg['code'] : 'remove all codes from all machines';
                     console.log('User ' + username + ' wants to ' + cd);
-                    if (msg['code']){
-                        changed = MachineWorker.reserve(msg['code'], "", true);
-                    } else {
-                        changed = MachineWorker.reserve("", "", true);
-                    }
-                    sendMachines();
+                    //if (msg['code']){
+                    //    changed = MachineWorker.reserve(msg['code'], "", true);
+                    //} else {
+                    //    changed = MachineWorker.reserve("", "", true);
+                    //}
+                    //sendMachines();
                 }
                 break;
 
                 case 'remove-code': {
                     console.log('User ' + username + ' wants to unreserve all machines using code ' + msg['code']);
-                    changed = MachineWorker.reserve("", msg['code']);
-                    sendMachines();
+                    //changed = MachineWorker.reserve("", msg['code']);
+                    //sendMachines();
                 }
                 break;
 
                 case 'terminate-code': {
                     console.log('User ' + username + ' wants to terminate all machines using code ' + msg['code']);
-                    changed = MachineWorker.terminateGroup(true, msg['code']);
-                    sendMachines();
+                    //changed = MachineWorker.terminateGroup(true, msg['code']);
+                    //sendMachines();
                 }
                 break;
 
                 case 'terminate-all': {
                     console.log('User ' + username + ' wants to terminate all machines (something must be very wrong)');
-                    changed = MachineWorker.terminateGroup(false);
-                    sendMachines();
+                    //changed = MachineWorker.terminateGroup(false);
+                    //sendMachines();
                 }
                 break;
                 
                 case 'change-length': {
                     console.log('Changing session length to ' + msg['num'] + ' minutes');
-                    BlubGlobals.data['time-term'] = Number(msg['num']);
+                    //BlubGlobals.data['time-term'] = Number(msg['num']);
                 }
                 break;
               
                 case 'change-grace': {
                     console.log('Changing logout time to ' + msg['num'] + ' minutes');
-                    BlubGlobals.data['time-kill'] = Number(msg['num']);
+                    //BlubGlobals.data['time-kill'] = Number(msg['num']);
                 }
                 break;
                 
                 function sendMachines(){
-                    var machineinfo = MachineWorker.debuginfo();
-                    SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'machine-info', 'data': machineinfo } ));
+                    //var machineinfo = MachineWorker.debuginfo();
+                    //SessionWorker.send(username, JSON.stringify( { 'endpoint': 'admin', 'status': 'machine-info', 'data': machineinfo } ));
                 }
             }
         }

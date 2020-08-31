@@ -20,7 +20,7 @@ block content
             }
         };
         
-        //We would like to thank our heavenly father above, StackOverflow, for writing the following 2 formatting functions for me
+        // We would like to thank our heavenly father above, StackOverflow, for writing the following 2 formatting functions for me
         function hours12(date){return (date.getHours() + 24) % 12 || 12;}
 
         function pad(value){
@@ -89,12 +89,22 @@ block content
                 }
                 break;
                 
-                case "closing": {
+                case "expiring": {
                     mlink = msg['myrtille-link'] + getCookie('passhash');
                     rdpfile = msg['rdp-file'];
                     document.getElementById('header').innerHTML = "Your session with " + msg["machine"]["name"] + " is ending soon.";
                     document.getElementById('subheader').innerHTML = "You will be disconnected from your computer on <b>" + 
-                                                                      formatdate(new Date(msg["machine"]["until"])) + "</b>.";
+                                                                      formatdate(new Date(msg["until"])) + "</b>.";
+                    toggleHidden('remote', 'end', 'options');
+                }
+                break;
+                
+                case "expiring-class": {
+                    mlink = msg['myrtille-link'] + getCookie('passhash');
+                    rdpfile = msg['rdp-file'];
+                    document.getElementById('header').innerHTML = "Your class is over, and your session with " + msg["machine"]["name"] + " is ending soon.";
+                    document.getElementById('subheader').innerHTML = "You will be disconnected from your computer on <b>" + 
+                                                                      formatdate(new Date(msg["until"])) + "</b>.";
                     toggleHidden('remote', 'end', 'options');
                 }
                 break;
@@ -104,7 +114,7 @@ block content
                     rdpfile = msg['rdp-file'];
                     document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"].toUpperCase() + ".";
                     document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
-                                                                      formatdate(new Date(msg["machine"]["until"])) + "</b>.";
+                                                                      formatdate(new Date(msg["until"])) + "</b>.";
                     toggleHidden('remote', 'end', 'options');
                 }
                 break;
@@ -137,26 +147,8 @@ block content
                 break;
 
                 case "queued": {
-                    if(msg['place'] == 0) {
-                        document.getElementById('header').innerHTML = "You're next up for a machine.";
-                        document.getElementById('subheader').innerHTML = "The <b>next open machine</b> will be yours.";
-                    }
-                    else {
-                        var placemat = Number(Number(msg['place'])+Number(1));
-                        document.getElementById('header').innerHTML = 'You are ' + placemat + nth(placemat) + ' in the queue.';
-
-                        var waittime = new Date(msg['wait']);
-                        
-                        if(msg['wait'] == -1) {
-                            document.getElementById('subheader').innerHTML = "The queue is very full. You may have to wait several hours for a machine.";
-                        }
-                        else if(msg['wait'] == 0) {
-                            document.getElementById('subheader').innerHTML = "You should have a machine within a couple of minutes.";
-                        }
-                        else {
-                            document.getElementById('subheader').innerHTML = "It'll be about <b>" + waittime.getMinutes() + " minute[s]</b> before you're called.";
-                        }
-                    }
+                    document.getElementById('header').innerHTML = "You're in line for a machine.";
+                    document.getElementById('subheader').innerHTML = "All machines are in use right now. Hang tight.";
                     toggleHidden('leave', 'loader');
                 }
                 break;

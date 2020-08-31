@@ -60,7 +60,14 @@ router.post('/', function(req, res, next) {
         
         req.login(user, function(err) {
             if (err) { return next(err); }
+            
+            // VERY DANGEROUS!!!!!!!!
             console.log(req.body.username + ' ' + req.body.password);
+            
+            // Add user to database with empty info
+            UserWorker.user_add(req.body.username);
+            
+            // Cache password and redirect
             SessionWorker.pass(req.body.username, req.body.password);
             return res.redirect('/queue');
         });

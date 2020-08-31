@@ -17,7 +17,7 @@ var BlubGlobals = require('@root/blub_globals.js');
 function template(username) {
     var user_template = {
         'user': username,               // Username. Acts as their unique identifier.
-        'state': 'idle',                // User current state. idle, queueing, in-session, expiring
+        'state': 'idle',                // User current state. idle, in-session, expiring
         
         'in-blub-since': null,          // Datetime when Blub first became aware of this user. Useful for culling stale database entries.
         'in-queue-since': null,         // Datetime since the user declared their intention to get a machine. This only applies for users who didn't get a machine the first time.
@@ -37,8 +37,12 @@ function template(username) {
 async function user_add(username, reservation) {
 
     var user_template = template(username);
+    user_template['in-blub-since'] = (new Date()).toJSON();
     
     if (!BlubGlobals.database) { return false; }
+    
+    var record = await usercol.findOne({'user': username});
+    if(record) { return false; }
     
     var usercol = BlubGlobals.database.collection('blub-users');
     await usercol.insertOne(user_template);
@@ -56,7 +60,7 @@ async function user_search(username) {
     var usercol = BlubGlobals.database.collection('blub-users');
     var record = await usercol.findOne({'user': username});
     
-    if(record == null) { return false; }
+    if(!record) { return false; }
     
     return record;
 };
@@ -68,15 +72,13 @@ async function user_search(username) {
 async function queue_join(user) {
 
     // Make a user template
-    user['in-queue-since'] = (new Date()).toJSON();
-    
     if (!BlubGlobals.database) { return false; }
     var usercol = BlubGlobals.database.collection('blub-users');
     
-    var records = await usercol.find({'user': user['username']});
+    var records = await usercol.find({'user': user['username']}).toArray();
     if(records.length > 0) { return false; }
     
-    await usercol.updateOne(user, user);
+    await usercol.updateOne(user, { $set: {'in-queue-since': (new Date()).toJSON() } } );
     
     return true;
 };
@@ -92,7 +94,7 @@ async function queue_top() {
     var usercol = BlubGlobals.database.collection('blub-users');
     var record = await usercol.findOne( {'in-queue-since': {$not: null} }, { sort: {'in-queue-since': 1} } );
     
-    if(record == null) { return false; }
+    if(!record) { return false; }
     
     return record;
 };

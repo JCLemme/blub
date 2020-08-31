@@ -6,6 +6,7 @@ var UserWorker = require('@workers/user_worker')
 var MachineWorker = require('@workers/machine_worker')
 var RemoteConnectionWorker = require('@workers/remote_worker')
 var SessionWorker = require('@workers/session_worker')
+var LogicWorker = require('@workers/logic_worker')
 
 var BlubSetup = require('@root/blub_setup')
 var BlubGlobals = require('@root/blub_globals.js')
@@ -41,7 +42,7 @@ wss.on('connection', async (ws, req) => {
         logs.info('New connection from unauthenticated user...');
     }
         
-    ws.on('message', message => {
+    ws.on('message', async message => {
             
         // Convert the message from JSON
         var msg = JSON.parse(message);
@@ -66,7 +67,55 @@ wss.on('connection', async (ws, req) => {
             SessionWorker.send_watchdog(username, JSON.stringify({ 'action': 'kill-session', 'timer': 30}));
             SessionWorker.send(username, JSON.stringify( { 'status': 'idle' } ));
         }
-
+        
+        // I'm breaking this out into a function so I don't have to rewrite all these JSON objects in every subcase
+        var refresh_user_page = async function(){
+        
+            // Grab their userobject
+            var user = await UserWorker.user_search(username);
+            console.log(user);
+            if(user == false) {
+            
+                // Users are added to Blub at login, so we should never get here
+                ws.send(JSON.stringify( { 'status': 'error', 'error': 'user-not-in-database' } ));
+            }
+            else {
+                
+                // Does the user have a machine?
+                if(user['machine'] != null) {
+                    
+                    // Is the user in a classroom?
+                    if(user['reservation'] != "") {
+                    
+                        if(user['state'] == 'expiring')
+                            ws.send(JSON.stringify( { 'status': 'expiring-class', 'machine': user['machine']['name'], 'until': user['in-session-until'], 'reservation': user['reservation'] } ));
+                        else
+                            ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': user['machine']['name'], 'until': user['in-session-until'], 'reservation': user['reservation'] } ));
+                    }
+                    else {
+                        
+                        if(user['state'] == 'expiring')
+                            ws.send(JSON.stringify( { 'status': 'expiring', 'machine': user['machine']['name'], 'until': user['in-session-until'] } ));
+                        else
+                            ws.send(JSON.stringify( { 'status': 'in-session', 'machine': user['machine']['name'], 'until': user['in-session-until'] } ));
+                    }
+                }
+                else {
+                    
+                    // Is the user waiting for a machine?
+                    if(user['in-session-until'] != null) {
+                    
+                        // Let them know 
+                        ws.send(JSON.stringify( { 'status': 'queued', 'since': user['in-queue-since'] } ));
+                    }
+                    else {
+                        
+                        // Just chillin w my blubbles
+                        ws.send(JSON.stringify( { 'status': 'idle' } ));
+                    }
+                }
+            }
+        }
 
         // WHY DO YOU CALL UPON ME
         switch(msg['request']) {
@@ -77,75 +126,32 @@ wss.on('connection', async (ws, req) => {
                 // Refresh the websocket they're using
                 SessionWorker.register(username, ws);
                 
-                // Grab their userobject
-                var user = UserWorker.user_search(username);
-                
-                if(user == false) {
-                
-                    // Users are added to Blub at login, so we should not get here
-                    ws.send(JSON.stringify( { 'status': 'error', 'error': 'user-not-in-database' } ));
-                }
-                else {
-                    
-                    // Does the user have a machine?
-                    if(user['machine'] != null) {
-                        
-                        // Is the user in a classroom?
-                        if(user['reservation'] != "") {
-                            ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'reservation': user['reservation'] } ));
-                        }
-                        else {
-                            ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine } ));
-                        }
-                    }
-                }
-                
-                /*if(place != null) {
-                    ws.send(JSON.stringify( { 'status': 'queued', 'place': place } ));
-                }
-                else {
-                
-                    // See if the user has a machine attached to them
-                    var machine = MachineWorker.check(username);
-                    
-                    if(machine != null) {
-                        // Split based on class or no class
-                        if(machine['on_terminate'] != "") {
-                            if(machine['reservation'] != "") {
-                                ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'reservation': machine['reservation'] } ));
-                            }
-                            else {
-                                ws.send(JSON.stringify( { 'status': 'in-session', 'machine': machine } ));
-                            }
-                        }
-                        else if(machine['on_kill'] != "") {
-                            ws.send(JSON.stringify( { 'status': 'closing', 'machine': machine } ));
-                        }
-                        else if(machine['on_kill'] == "") {
-                            ws.send(JSON.stringify( { 'status': 'idle' } ));
-                        }
-                    }
-                    else {
-                    
-                        // User must not be doing anything I guess.
-                        ws.send(JSON.stringify( { 'status': 'idle' } ));
-                    }
-                }*/
+                await refresh_user_page();
             }
             break;
             
             // Queue functions
 
             case 'queue-join': {
-                console.log('  User ' + username + ' requested queue join');
+                logs.info('User ' + username + ' wants a machine');
+                var user = await UserWorker.user_search(username);
+                var result = await LogicWorker.find_user_a_machine(user);
                 
+                if(result == 'assigned')
+                    logs.info('Assigned ' + username + ' a machine');
+                else if(result == 'queued') 
+                    logs.info('Queued ' + username + ' for a machine');
+                else
+                    logs.info('Error while assigning machine to ' + username);
+                
+                await refresh_user_page();
             }
             break;
             
             case 'queue-join-class': {
                 console.log('  User ' + username + ' requested to join a class "' + msg['reservation'] + '"');
                 
-                // Funny enough, there isn't a queue involved. Just look for a machine.
+                /*// Funny enough, there isn't a queue involved. Just look for a machine.
                 var available = MachineWorker.reservation(msg['reservation']);
                 
                 if(available == 'class-full') {
@@ -165,13 +171,14 @@ wss.on('connection', async (ws, req) => {
                     else {
                         SessionWorker.send(username, JSON.stringify( { 'status': 'in-session-class', 'machine': machine, 'reservation': msg['reservation'] } ));
                     }
-                }
+                }*/
             }
             break;
             
             case 'queue-leave': {
                 console.log('User ' + username + ' requested queue leave');
-                QueueWorker.remove(username);
+                var user = UserWorker.user_search(username);
+                UserWorker.
                 SessionWorker.send(username, JSON.stringify( { 'status': 'idle' } ));
             }
             break;

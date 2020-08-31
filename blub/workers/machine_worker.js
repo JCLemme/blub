@@ -14,9 +14,10 @@ var BlubGlobals = require('@root/blub_globals.js')
  */
  
 
-function template(host, name) {
+function template(uuid, host, name) {
     var machine_template = {
-        'host': host,                   // FQDN (or ip address i suppose). Acts as their unique identifier.
+        'uuid': uuid,                   // Internal ID for the connection. Distinct from the hostname because some machines can support multiple remote sessions.
+        'host': host,                   // FQDN (or ip address i suppose). 
         'name': name,                   // Pretty display name for the machine. Probably should match the hostname.
         
         'state': 'idle',                // Machine current state. idle, assigned
@@ -28,10 +29,10 @@ function template(host, name) {
     return machine_template;
 };
 
-async function add_machine(host, name) {
+async function add_machine(uuid, host, name) {
     
     // Adds a machine to the database
-    var new_machine = template(host, name);
+    var new_machine = template(uuid, host, name);
     
     if(!BlubGlobals.database) {
         return false;
@@ -49,7 +50,7 @@ async function remove_machine(host) {
     }
     
     var machines = BlubGlobals.database.collection('blub-machines');
-    await machines.removeOne({'host': host});
+    await machines.removeOne({'uuid': uuid});
 };
 
 async function get_machine(host) {
@@ -60,7 +61,7 @@ async function get_machine(host) {
     }
     
     var machines = BlubGlobals.database.collection('blub-machines');
-    var found = await machines.find({'host': host});
+    var found = await machines.find({'uuid': uuid});
     
     if(found.length > 0)
         return found[0];
@@ -87,7 +88,7 @@ async function get_machines_by_query(query) {
     }
     
     var machines = BlubGlobals.database.collection('blub-machines');
-    return await machines.find(query);
+    return await machines.find(query).toArray();
 };
 
 async function set_machine(machine) {
@@ -98,7 +99,7 @@ async function set_machine(machine) {
     }
     
     var machines = BlubGlobals.database.collection('blub-machines');
-    await machines.updateOne(machine['host'], machine);
+    await machines.updateOne(machine, machine);
     return true;
 };
 
@@ -110,7 +111,9 @@ async function assign_machine(reservation) {
     }
     
     var machines = BlubGlobals.database.collection('blub-machines');
-    var free_machines = await machines.find({'state': 'idle', 'reservation': reservation});
+    var free_machines = await machines.find({'state': 'idle', 'reservation': reservation}).toArray();
+    
+    console.log(free_machines);
     
     // Give it out
     if(free_machines.length == 0) {
@@ -118,11 +121,23 @@ async function assign_machine(reservation) {
     }
     else {
         await machines.updateOne(free_machines[0], {$set: {'state': 'assigned'}});
-        return free_machines[0]['host'];
+        return free_machines[0]['uuid'];
     }
 }
 
-async function release_machine(host) {
+async function reserve_machine(uuid, reservation) {
+
+    var machines = BlubGlobals.database.collection('blub-machines');
+    var claimed_machine = await machines.findOne({'uuid': uuid});
+    
+    // Give it out
+    if(!claimed_machine) {
+        return false;
+    else 
+        await machines.updateOne(claimed_machine, {$set: {'reservation': reservation}});
+}
+
+async function release_machine(uuid) {
 
     // Frees a machine. Returns false if that machine wasn't actually assigned.
     if(!BlubGlobals.database) {
@@ -130,10 +145,10 @@ async function release_machine(host) {
     }
     
     var machines = BlubGlobals.database.collection('blub-machines');
-    var release_machine = await machines.findOne({'host': host});
+    var release_machine = await machines.findOne({'uuid': uuid});
     
     // Give it out
-    if(release_machine == null || release_machine['state'] != 'assigned') {
+    if(!release_machine || release_machine['state'] != 'assigned') {
         return false;
     }
     else {
@@ -141,4 +156,14 @@ async function release_machine(host) {
         return true;
     }
 };
+
+module.exports.add_machine = add_machine;
+module.exports.remove_machine = remove_machine;
+module.exports.get_machine = get_machine;
+module.exports.get_machines = get_machines;
+module.exports.get_machines_by_query = get_machines_by_query;
+module.exports.set_machine = set_machine;
+module.exports.assign_machine = assign_machine;
+module.exports.release_machine = release_machine;
+
 
