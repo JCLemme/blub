@@ -35,7 +35,7 @@ wss.on('connection', async (ws, req) => {
     }
         
         
-    ws.on('message', message => {
+    ws.on('message', async message => {
             
         // Parse the message out
         var msg = JSON.parse(message);
