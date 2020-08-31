@@ -55,6 +55,31 @@ wss.on('connection', async (ws, req) => {
                 }
                 break;
                 
+                case 'upload-machines': {
+                    // Add machines from JSON object
+                    var machines = msg['machines'];
+                    
+                    if(msg['overwrite']) {
+                        BlubGlobals.database.collection('blub-machines').drop();
+                        console.log('Dropped machines.');
+                    }
+                    
+                    for(machine of machines) {
+                        console.log(machine);
+                        var machine_present = await MachineWorker.get_machine(machine['uuid']);
+                        console.log(machine_present);
+                        
+                        if(machine_present == false) {
+                            await MachineWorker.add_machine(machine['uuid'], machine['host'], machine['name']);
+                            console.log('Added machine to database: ' + machine['uuid']);
+                        }
+                        else {
+                            console.log('Machine already in database: ' + machine['uuid']);
+                        }
+                    }
+                }
+                break;
+                
                 case 'machines': {
                     console.log('User ' + username + ' requested admin machine information');
                     sendMachines();

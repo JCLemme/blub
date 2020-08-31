@@ -86,24 +86,28 @@ wss.on('connection', async (ws, req) => {
                     
                     // Is the user in a classroom?
                     if(user['reservation'] != "") {
-                    
+                        
+                        var user_machine = await MachineWorker.get_machine(user['machine']);
+                                                
                         if(user['state'] == 'expiring')
-                            ws.send(JSON.stringify( { 'status': 'expiring-class', 'machine': user['machine']['name'], 'until': user['in-session-until'], 'reservation': user['reservation'] } ));
+                            ws.send(JSON.stringify( { 'status': 'expiring-class', 'machine': user_machine['name'], 'until': user['in-session-until'], 'reservation': user['reservation'] } ));
                         else
-                            ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': user['machine']['name'], 'until': user['in-session-until'], 'reservation': user['reservation'] } ));
+                            ws.send(JSON.stringify( { 'status': 'in-session-class', 'machine': user_machine['name'], 'until': user['in-session-until'], 'reservation': user['reservation'] } ));
                     }
                     else {
+                    
+                        var user_machine = await MachineWorker.get_machine(user['machine']);
                         
                         if(user['state'] == 'expiring')
-                            ws.send(JSON.stringify( { 'status': 'expiring', 'machine': user['machine']['name'], 'until': user['in-session-until'] } ));
+                            ws.send(JSON.stringify( { 'status': 'expiring', 'machine': user_machine['name'], 'until': user['in-session-until'] } ));
                         else
-                            ws.send(JSON.stringify( { 'status': 'in-session', 'machine': user['machine']['name'], 'until': user['in-session-until'] } ));
+                            ws.send(JSON.stringify( { 'status': 'in-session', 'machine': user_machine['name'], 'until': user['in-session-until'] } ));
                     }
                 }
                 else {
-                    
+
                     // Is the user waiting for a machine?
-                    if(user['in-session-until'] != null) {
+                    if(user['in-queue-since'] != null) {
                     
                         // Let them know 
                         ws.send(JSON.stringify( { 'status': 'queued', 'since': user['in-queue-since'] } ));
@@ -151,6 +155,20 @@ wss.on('connection', async (ws, req) => {
             case 'queue-join-class': {
                 console.log('  User ' + username + ' requested to join a class "' + msg['reservation'] + '"');
                 
+                logs.info('User ' + username + ' wants a machine');
+                var user = await UserWorker.user_search(username);
+                var result = await LogicWorker.find_user_a_machine(user);
+                
+                
+                if(result == 'assigned')
+                    logs.info('Assigned ' + username + ' a machine');
+                else if(result == 'queued') 
+                    logs.info('Queued ' + username + ' for a machine');
+                else
+                    logs.info('Error while assigning machine to ' + username);
+                
+                await refresh_user_page();
+                
                 /*// Funny enough, there isn't a queue involved. Just look for a machine.
                 var available = MachineWorker.reservation(msg['reservation']);
                 
@@ -178,7 +196,7 @@ wss.on('connection', async (ws, req) => {
             case 'queue-leave': {
                 console.log('User ' + username + ' requested queue leave');
                 var user = UserWorker.user_search(username);
-                UserWorker.
+                UserWorker.queue_leave(user);
                 SessionWorker.send(username, JSON.stringify( { 'status': 'idle' } ));
             }
             break;

@@ -152,6 +152,10 @@ block content
             connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } )); 
         }
         
+        function machine_upload() {
+            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'upload-machines', 'machines': JSON.parse(document.getElementById('machineData').value), 'overwrite': false } )); 
+        }
+        
         function changeCode(machine){
             //Oh god I'm so sorry
             return function(){
@@ -280,4 +284,12 @@ block content
         div(style="border-left:2px solid black; margin-left:15px; padding-left:15px; width:20%;")
             h3 Here is the current queue.
             div(id='queueinfo')
-        
+    
+    h3 Big dangerous machine editor
+    input(class="machines" id='machineData' autocomplete="off" name='machinedata' placeholder='Enter machine JSON array' type='text')
+    p(class="chk") Drop machines first...
+    button(class="cPanel" id='machineUpload' onclick='machine_upload()') Upload machines
+    
+    
+    
+    

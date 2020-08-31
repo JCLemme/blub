@@ -59,20 +59,15 @@ app.use(express.static('guacamole-common-js'))
  
 const MongoClient = require('mongodb').MongoClient;
 
-// This is where mongo testing lives
+// Blub setup lives here
 (async() => {
 
     // Connect to database
     const client = await MongoClient.connect(BlubSetup.mongo_host, { useUnifiedTopology: true, useNewUrlParser: true }).catch(err => { console.log(err); });
     BlubGlobals.database = client.db('blub');
-    
-    console.log(await userz.queue_join('jlemme', ''));
-    console.log(await userz.user_search('jlemme'));
+    BlubGlobals.session_time = 20;
 
 })()
-//while(true) {}
-// End of mongotest
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

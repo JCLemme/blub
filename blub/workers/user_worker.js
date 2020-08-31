@@ -85,6 +85,24 @@ async function queue_join(user) {
 };
 
 
+// Marks a user as waiting for a machine, given that user's userobject.
+// Returns true on success or false on failure.
+
+async function queue_leave(user) {
+
+    // Make a user template
+    if (!BlubGlobals.database) { return false; }
+    var usercol = BlubGlobals.database.collection('blub-users');
+    
+    var records = await usercol.find({'user': user['username']}).toArray();
+    if(records.length > 0) { return false; }
+    
+    await usercol.updateOne(user, { $set: {'in-queue-since': null } } );
+    
+    return true;
+};
+
+
 // Returns the userobject of the user who has been waiting for a machine the longest.
 
 async function queue_top() {
@@ -101,8 +119,46 @@ async function queue_top() {
 };
 
 
+// Gives a user a machine.
+// Returns false on error.
+
+async function assign_machine(user, machine) {
+    
+    // Make a user template
+    if (!BlubGlobals.database) { return false; }
+    var usercol = BlubGlobals.database.collection('blub-users');
+    
+    var expiration = new Date();
+    expiration.setMinutes(expiration.getMinutes() + BlubGlobals.session_time);
+    
+    await usercol.updateOne(user, { $set: {'state': 'in-session', 'machine': machine, 'in-session-until': expiration.toJSON() } } );
+
+    return true;
+}
+
+
+// Removes a machine from a user.
+// Returns false on error.
+
+async function release_machine(user) {
+    
+    // Make a user template
+    if (!BlubGlobals.database) { return false; }
+    var usercol = BlubGlobals.database.collection('blub-users');
+    
+    var records = await usercol.find({'user': user['username']}).toArray();
+    if(records.length == 0) { return false; }
+    
+    await usercol.updateOne(user, { $set: {'machine': null } } );
+
+    return true;
+}
+
+
 module.exports.user_add = user_add;
 module.exports.user_search = user_search;
 module.exports.queue_join = queue_join;
+module.exports.queue_leave = queue_leave;
 module.exports.queue_top = queue_top;
-
+module.exports.assign_machine = assign_machine;
+module.exports.release_machine = release_machine;
