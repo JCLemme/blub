@@ -38,11 +38,12 @@ async function add_machine(uuid, host, name) {
         return false;
     }
     
+    console.log(new_machine);
     var machines = BlubGlobals.database.collection('blub-machines');
     await machines.insertOne(new_machine);
 };
 
-async function remove_machine(host) {
+async function remove_machine(uuid) {
     
     // Removes a machine from the database
     if(!BlubGlobals.database) {
@@ -53,7 +54,7 @@ async function remove_machine(host) {
     await machines.removeOne({'uuid': uuid});
 };
 
-async function get_machine(host) {
+async function get_machine(uuid) {
     
     // Gets a machine by hostname
     if(!BlubGlobals.database) {
@@ -61,7 +62,7 @@ async function get_machine(host) {
     }
     
     var machines = BlubGlobals.database.collection('blub-machines');
-    var found = await machines.find({'uuid': uuid});
+    var found = await machines.find({'uuid': uuid}).toArray();
     
     if(found.length > 0)
         return found[0];
@@ -77,7 +78,7 @@ async function get_machines() {
     }
     
     var machines = BlubGlobals.database.collection('blub-machines');
-    return await machines.find({});
+    return await machines.find({}).toArray();
 };
 
 async function get_machines_by_query(query) {

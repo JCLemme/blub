@@ -92,7 +92,7 @@ block content
                 case "expiring": {
                     mlink = msg['myrtille-link'] + getCookie('passhash');
                     rdpfile = msg['rdp-file'];
-                    document.getElementById('header').innerHTML = "Your session with " + msg["machine"]["name"] + " is ending soon.";
+                    document.getElementById('header').innerHTML = "Your session with " + msg["machine"] + " is ending soon.";
                     document.getElementById('subheader').innerHTML = "You will be disconnected from your computer on <b>" + 
                                                                       formatdate(new Date(msg["until"])) + "</b>.";
                     toggleHidden('remote', 'end', 'options');
@@ -102,7 +102,7 @@ block content
                 case "expiring-class": {
                     mlink = msg['myrtille-link'] + getCookie('passhash');
                     rdpfile = msg['rdp-file'];
-                    document.getElementById('header').innerHTML = "Your class is over, and your session with " + msg["machine"]["name"] + " is ending soon.";
+                    document.getElementById('header').innerHTML = "Your class is over, and your session with " + msg["machine"] + " is ending soon.";
                     document.getElementById('subheader').innerHTML = "You will be disconnected from your computer on <b>" + 
                                                                       formatdate(new Date(msg["until"])) + "</b>.";
                     toggleHidden('remote', 'end', 'options');
@@ -112,7 +112,7 @@ block content
                 case "in-session": {
                     mlink = msg['myrtille-link'] + getCookie('passhash');
                     rdpfile = msg['rdp-file'];
-                    document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"].toUpperCase() + ".";
+                    document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"].toUpperCase() + ".";
                     document.getElementById('subheader').innerHTML = "You can use this workstation until your session expires on <b>" + 
                                                                       formatdate(new Date(msg["until"])) + "</b>.";
                     toggleHidden('remote', 'end', 'options');
@@ -122,7 +122,7 @@ block content
                 case "in-session-class": {
                     mlink = msg['myrtille-link'] + getCookie('passhash');
                     rdpfile = msg['rdp-file'];
-                    document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"]["name"] + ".";
+                    document.getElementById('header').innerHTML = "You're connected to a machine: " + msg["machine"] + ".";
                     document.getElementById('subheader').innerHTML = "You can use this workstation until your class ends";
                     toggleHidden('remote', 'end', 'options');
                 }
