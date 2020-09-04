@@ -1,0 +1,91 @@
+table{
+	/*
+	  width:95%;
+	  margin-left: 2.5%;
+	  margin-right: 2.5%;
+	text-align: center;
+	*/
+	  border: 2px solid black;
+	  border-collapse: collapse;
+  }
+  
+  tr:nth-child(odd) {background-color: #f2f2f2;}
+  
+  #classTable tr:hover{
+	  background-color: #e2e2e2;
+  }
+  
+  th{
+	background-color: #d3d3d3;
+  }
+  
+  th, td{
+	padding:12px 15px 12px 5px;
+	font-size: 17px;
+  }
+  
+  button.admin{
+	margin-left:20px;
+	width:110px;
+	font-size: 17px;
+  }
+  
+  input.admin{
+	width:160px;
+	font-size: 16px;
+  }
+
+  button.cPanel{
+	width:400px;
+  }
+
+  input.cPanel{
+	width:300px;
+  }
+
+  input[type=time],input[type=number],input[type=date]{
+	width:150px;
+  }
+
+
+  button.chk{
+	float:left;
+	margin-right:20px;
+	width:50px;
+	height:50px;
+  }
+
+  p.chk{
+	display:inline-block;
+	margin-top:16px;
+ }
+
+ .classBox{
+	border:2px solid black;
+	border-radius:10px;
+	box-shadow: 0px 5px 7px -5px;
+	margin-top:10px;
+	overflow:hidden;
+	width:900px;
+ }
+
+ .classBox div{
+	margin-top:-30px;
+	padding-top:20px;
+	background: #0d864a;
+	width:100%;
+ }
+
+ .classBox h2{
+	color: white;
+	padding-bottom:15px;
+	padding-left:0px;
+ }
+
+ .classBox *{
+	padding-left:15px;
+ }
+
+ #classTable{
+	 width:1200px;
+ }

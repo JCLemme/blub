@@ -2,7 +2,7 @@ extends layout
 
 block content
     head
-        link(rel='stylesheet', href='/stylesheets/admin.css')
+        link(rel='stylesheet', href='/stylesheets/moderator.css')
    
     script.
         const connection = new WebSocket('#{protocol}#{server}#{endpoint}')
@@ -20,7 +20,7 @@ block content
             tbl = document.getElementById('machineTable');
             clearTable(tbl);
             
-            //TODO: This should really be a template instead of manually creating all these objs
+            //TODO: This should still be a template, not manual objs
             for(var i=0;i<minfo.length;i++){
                 var row = document.createElement("tr");
 
@@ -220,64 +220,72 @@ block content
             connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
         }
 
-    h1 Here's your Blub status report.
-    button(id='action' onclick='button_handler()') Refresh page
-    h3 These are the admin controls.
-    div(style="display:flex;")
-        div()
-            p(id="sess") Session length: 120 minutes
-            button(class="cPanel" id='sessButton' onclick='sess_handler()') Change session length:
-            input(class="cPanel" id='sessInput' autocomplete="off" name='code' placeholder='Enter number' type='number')
-            br
-            br
-        div(style="border-left:2px solid black; margin-left:30px; padding-left:30px;")
-            p(id="sess") Session grace period: 10 minutes
-            button(class="cPanel" id='graceButton' onclick='grace_handler()') Change grace period:
-            input(class="cPanel" id='graceInput' autocomplete="off" name='code' placeholder='Enter number' type='number')
-            br
-            br
-    div(style="display:flex;")
-        div()
-            button(class="cPanel" id='addCodeButton' onclick='addCode_handler()') Add code to all machines:
-            input(class="cPanel" id='addCodeInput' autocomplete="off" name='code' placeholder='Enter code' type='text')
-            br
-            br
-            button(class="cPanel" id='rmvCodeButton' onclick='removeCode_handler()') Remove code from all machines:
-            input(class="cPanel" id='rmvCodeInput' autocomplete="off" name='code' placeholder='Enter code' type='text')
-            br
-            br
-            button(class="cPanel" id='termCodeButton' onclick='termCode_handler()') Terminate sessions with code:
-            input(class="cPanel" id='termCodeInput' autocomplete="off" name='code' placeholder='Enter code' type='text')
-            br
-            br
-        div(style="border-left:2px solid black; margin-left:30px; padding-left:30px;")
-            button(class="cPanel" id='rmvAllCodeButton' onclick='removeAll_handler()') Remove ALL codes
-            br
-            br
-            button(class="cPanel" id='termAllButton' onclick='termAll_handler()') Terminate ALL sessions
-            br
-            br
-            p(class="chk") I am absolutely sure I want to do this
-            button(class="cPanel chk" id='termAllCheck' onclick='check_handler()') 
-            
+    //---------------------------//
+    //THE ACTUAL PAGE BEGINS HERE//
+    //---------------------------//
     
-    div(style="display:flex;")
+    h1 Register and manage classes here.
+    //TODO: Hide/show this div if a class is currently open
+    div(class="classBox hidden")
         div()
-            h3 Here are the machines in the pool.
-            table(id="machineTable")
-                tr
-                    th Machine
-                    th IP Address
-                    th Current Session
-                    th Reservation Code
-                    th Change Code
-                    th Actions
-                tr
-                    td test!
-                    td test!
-                    td test!
-                    td test!
-        div(style="border-left:2px solid black; margin-left:15px; padding-left:15px; width:20%;")
-            h3 Here is the current queue.
-            div(id='queueinfo')
-        
+            h2 Your class is in session!
+        p [CLASSNAMEHERE] is currently open to students, and will end at [TIMEHERE].
+    br
+    
+    h3 Register a class.
+
+    div()
+        table(id="registerTable")
+            tr
+                th Class Name
+                th Class Code
+                th Date
+                th Start Time
+                th End Time
+                th Computers to Book
+            tr
+                td
+                    input(class="cPanel" id='nameInput' autocomplete="off" name='code' placeholder='Ex. "URI 101 class 1"' type='text')
+                td
+                    input(class="cPanel" id='codeInput' autocomplete="off" name='code' placeholder='Ex. "URI101-C1"' type='text')
+                td
+                    input(class="cPanel" id='dateInput' autocomplete="off" name='code' value='2000-01-01' type='date')
+                td
+                    input(class="cPanel" id='startInput' autocomplete="off" name='code' value='11:00' type='time')
+                td
+                    input(class="cPanel" id='endInput' autocomplete="off" name='code' value='12:15' type='time')
+                td
+                    input(class="cPanel" id='machineInput' autocomplete="off" name='code' placeholder='Enter number' type='number')
+        br
+        p Note: the Class Code is what students will enter to join your class. A good code should be short and unique.
+        button(class="cPanel" id='registerButton' onclick='sess_handler()') Register Class
+        br
+        br
+        br
+        br  
+    
+    //If there are no classes registered, classList is hidden and noClass is shown.
+    div(id="classList")
+        h3 Here are the classes you've registered.
+        table(id="classTable")
+            tr
+                th Name
+                th Class Code
+                th Date
+                th Time
+                th Machines
+                //th Repeat
+                th Actions
+            tr
+                td [Class Name]
+                td [code]
+                td 2000-01-01
+                td 99:99 AM - 99:99 PM
+                td 10
+                //td M/W/F
+
+    div(id="noClass")
+        h3 You haven't registered any classes yet.
+
+    //Not needed on this page, here just in case...
+    //button(id='action' onclick='button_handler()') Refresh page
