@@ -16,6 +16,7 @@ block content
             }
         }
 
+        //THIS WILL BE REFACTORED INTO DISPLAY_CLASSES
         function display_machines(minfo){
             tbl = document.getElementById('machineTable');
             clearTable(tbl);
@@ -111,10 +112,11 @@ block content
         }
         
         connection.onopen = () => {
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'init' } ));
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'queue' } )); 
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'machines' } ));
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } ));
+            //TODO: Adjust
+            connection.send(JSON.stringify( {'endpoint': 'moderator', 'request': 'init' } ));
+            connection.send(JSON.stringify( {'endpoint': 'moderator', 'request': 'queue' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'moderator', 'request': 'machines' } ));
+            connection.send(JSON.stringify( {'endpoint': 'moderator', 'request': 'times' } ));
         }
          
         connection.onerror = (error) => {
@@ -147,9 +149,9 @@ block content
         }
         
         function button_handler() {
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'queue' } )); 
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'machines' } ));
-            connection.send(JSON.stringify( {'endpoint': 'admin', 'request': 'times' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'moderator', 'request': 'queue' } )); 
+            connection.send(JSON.stringify( {'endpoint': 'moderator', 'request': 'machines' } ));
+            connection.send(JSON.stringify( {'endpoint': 'moderator', 'request': 'times' } ));
         }
         
         function changeCode(machine){

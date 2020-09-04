@@ -40,11 +40,11 @@ table{
   }
 
   input.cPanel{
-	width:300px;
+	width:220px;
   }
 
   input[type=time],input[type=number],input[type=date]{
-	width:150px;
+	width:120px;
   }
 
 
