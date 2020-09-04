@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
     if (req.user) {
         if(req.user['memberOf'] != undefined) {
             if (req.user['memberOf'].includes(blubsetup.ldap_moderators)) {
-                res.render('moderator', { title: 'Blub moderator', protocol: ((blubsetup.use_tls) ? 'wss://' : 'ws://'), server: blubsetup.host, endpoint: blubsetup.moderator_endpoint, mini_endpoint: blubsetup.login_endpoint });
+                res.render('moderator', { title: 'Classes - ECC Remote', protocol: ((blubsetup.use_tls) ? 'wss://' : 'ws://'), server: blubsetup.host, endpoint: blubsetup.moderator_endpoint, mini_endpoint: blubsetup.login_endpoint });
             }
             else {
                 next(createError(403));

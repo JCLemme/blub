@@ -43,7 +43,7 @@ passport.deserializeUser(function(user, done) {
   
 router.get('/', function(req, res, next) {
     if (!req.user) {
-        res.render('login', { title: 'Blub login', failureFlash: req.flash('error'), protocol: ((blubsetup.use_tls) ? 'wss://' : 'ws://'), server: blubsetup.host, endpoint: blubsetup.login_endpoint, mini_endpoint: blubsetup.login_endpoint });
+        res.render('login', { title: 'Login - ECC Remote', failureFlash: req.flash('error'), protocol: ((blubsetup.use_tls) ? 'wss://' : 'ws://'), server: blubsetup.host, endpoint: blubsetup.login_endpoint, mini_endpoint: blubsetup.login_endpoint });
     }
     else {
         res.redirect('/');
