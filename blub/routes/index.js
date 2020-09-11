@@ -4,7 +4,7 @@ var blubsetup = require('../blub_setup.js')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Blub @ the ECC', protocol: ((blubsetup.use_tls) ? 'wss://' : 'ws://'), server: blubsetup.host, mini_endpoint: blubsetup.login_endpoint });
+  res.render('index', { title: 'Remote @ the ECC', protocol: ((blubsetup.use_tls) ? 'wss://' : 'ws://'), server: blubsetup.host, mini_endpoint: blubsetup.login_endpoint });
 });
 
 router.get('/logout', function(req, res){

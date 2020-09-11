@@ -3,7 +3,9 @@ var BlubSetup = require('@root/blub_setup.js')
 
 var myrtille_hash = async function(password, callback) {
     var hash = "";
-    
+    callback("hhhhh");
+	return;
+
     var request = await https.get(BlubSetup.myrtille_server + "/myrtille/GetHash.aspx?password=" + encodeURIComponent(password), {rejectUnauthorized: false}, res => {
         res.setEncoding("utf8");
         
