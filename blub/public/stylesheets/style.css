@@ -126,3 +126,18 @@ input{
   margin-bottom:25px;
   margin-left:0;
 }
+
+.popup{
+  position: fixed;
+  background-color: white;
+  bottom:30px;
+  left:35%;
+  right:35%;
+  border: 2px solid #727272;
+  border-radius: 2px;
+  box-shadow: 3px 3px 10px 1px grey;
+}
+
+.popup *{
+  margin:25px;
+}
