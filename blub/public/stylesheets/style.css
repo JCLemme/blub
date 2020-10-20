@@ -106,7 +106,7 @@
 
   /* Signin & Signout buttons */
   #signout, #signin{
-    margin-top: 13.5px;
+    margin-top: 13px;
   }
   #signout a, #signin a{
     font-size: 15px;
