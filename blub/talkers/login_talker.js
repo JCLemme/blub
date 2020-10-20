@@ -57,7 +57,7 @@ wss.on('connection', async (ws, req) => {
                     if (req.session.passport != null){
                         if (req.session.passport.user != null){
                             console.log('User ' + req.session.passport.user['sAMAccountName'] + ' requested all their info');
-                            ws.send(JSON.stringify( { 'endpoint': 'login', 'response': 'info',  'data': req.session.passport.user} ));
+                            ws.send(JSON.stringify( { 'endpoint': 'login', 'response': 'info',  'data': req.session.passport.user, 'check1': BlubSetup.ldap_admins, 'check2': BlubSetup.ldap_moderators} ));
                         }else{
                             console.log("User-info request was made but no user is logged in, sending logged-out message");
                             ws.send(JSON.stringify( { 'endpoint': 'login', 'response': 'info',  'data': 'none'} ));
