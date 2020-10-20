@@ -15,12 +15,21 @@ html
         h1(id='blubHead') ECC Remote
       p ▪
       p(id='userLabel') Logged in as username
-      button(class="textOnly" id='signout' onclick='')
-        a(class="textOnly" href="/logout") (Log out)
-      button(class="textOnly" id='signin' onclick='')
-        a(class="textOnly" href="/login") (Log in)
+      p(class="" id='signout')
+        a(class="lined" href="/logout") (Log out)
+      p(class="" id='signin')
+        a(class="lined" href="/login") (Log in)
 
-      button(class="textOnly" style="float:right;")
+      p(id="bullet1" class="hidden") ▪
+      p(class="hidden" id='mod')
+        a(class="lined" href="/moderator")
+          b Moderator Panel
+      p(id="bullet2" class="hidden") ▪
+      p(class="hidden" id='adm')
+        a(class="lined" href="/admin")
+          b Admin Panel
+
+      //button(class="textOnly" style="float:right;")
         a(class="textOnly unlined" href="/admin" style="color:white;") admin
     hr
 
@@ -28,7 +37,7 @@ html
       const webConnection = new WebSocket('#{protocol}#{server}#{mini_endpoint}')
         
       webConnection.onopen = () => {
-          webConnection.send(JSON.stringify( {'endpoint': 'login', 'request': 'user-info' } )); 
+          webConnection.send(JSON.stringify( {'endpoint': 'login', 'request': 'user-info' } ));
       }
         
       webConnection.onerror = (error) => {
@@ -44,6 +53,16 @@ html
               document.getElementById('userLabel').innerHTML = "Logged in as " + msg["data"]["cn"];
               document.getElementById('signout').classList.remove("hidden");
               document.getElementById('signin').classList.add("hidden");
+              if (msg['data']['memberOf'].includes(msg['check1'])){
+                //Admin
+                document.getElementById('adm').classList.remove("hidden");
+                document.getElementById('bullet1').classList.remove("hidden");
+              }
+              if (msg['data']['memberOf'].includes(msg['check2'])){
+                //Moderator
+                document.getElementById('mod').classList.remove("hidden");
+                document.getElementById('bullet2').classList.remove("hidden");
+              }
             }else{
               //logged out
               console.log("Logged out");

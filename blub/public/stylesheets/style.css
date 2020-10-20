@@ -1,114 +1,119 @@
 /* Main Stylesheet */
 
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
 
-input, button, a{
-  font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
-}
+/* Body and base font */ 
 
-a {
-  color: black;
-  text-decoration: none;
-}
+  body {
+    padding: 50px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  }
 
-a.lined{
-  text-decoration: underline;
-}
+  input, button, a{
+    font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+  }
 
-a.unlined:hover{
-  text-decoration: none;
-}
+  /* Font sizes */
+  h1{
+    font-size:40px;
+  }
+  
+  h2{
+    font-size:33px;
+  }
+  
+  h3{
+    font-size:22px;
+  }
+  
+  p, button, input, label, a{
+    font-size:16px;
+  }
 
-.headBar{
-  display: flex;
-  height:0;
-  padding:0;
-  width:100%;
-  margin:-50px -0px 15px -35px;
-  line-height: 5px;
-}
 
-.headBar p{
-  font-size: 17px;
-  margin-left: 20px;
-  margin-top: 14px;
-}
+/* Basic elements */
 
-#signout a, #signin a{
-  font-size: 15px;
-}
+  /* Hidden class */
+  .hidden{
+    display: none;
+  }
 
-#signout, #signin{
-  margin-top: 4px;
-}
+  /* Horizontal rule */
+  hr{
+    margin-left:-35px;
+    margin-right:-35px;
+    margin-top:40px;
+    margin-bottom:60px;
+    height:1px;
+    border: none;
+    background-color: #cecece;
+  }
 
-#blubHead{
-  font-size: 20px;
-}
+  /* Button */
+  button{
+    width:300px;
+    padding:10px;
+    margin-right:30px;
+    border:2px solid black;
+  }
+  
+  button:hover{
+    background-color: #e9e9e9;
+  }
+  
+  /* Input */
+  input{
+    width:500px;
+    padding:10px;
+    border:2px solid black;
+  }
 
-hr{
-  margin-left:-35px;
-  margin-right:-35px;
-  margin-top:40px;
-  margin-bottom:60px;
-  height:1px;
-  border: none;
-  background-color: #cecece;
-}
 
-.hidden{
-  display: none;
-}
+/* Links */
 
-h1{
-  font-size:40px;
-}
+  a {
+    color: black;
+    text-decoration: none;
+  }
 
-h2{
-  font-size:33px;
-}
+  /* Decorated links (underline) */
+  a.lined:hover{
+    text-decoration: underline;
+  }
 
-h3{
-  font-size:22px;
-}
 
-p, button, input, label, a{
-  font-size:16px;
-}
+/* Header bar flexbox and objects */
 
-button{
-  width:300px;
-  padding:10px;
-  margin-right:30px;
-  border:2px solid black;
-}
+  .headBar{
+    display: flex;
+    height:0;
+    padding:0;
+    width:100%;
+    margin:-50px -0px 15px -35px;
+    line-height: 5px;
+    align-items:stretch;
+  }
 
-button:hover{
-  background-color: #e9e9e9;
-}
+  .headBar p{
+    font-size: 17px;
+    margin-left: 20px;
+    margin-top: 14px;
+  }
 
-input{
-  width:500px;
-  padding:10px;
-  border:2px solid black;
-}
+  /* Home link & hero text */
+  #blubHead{
+    font-size: 20px;
+  }
 
-.textOnly{
-  line-height: 5px;
-  background: none;
-  border:none;
-  font-size: 17px;
-  width:auto;
-}
+  /* Signin & Signout buttons */
+  #signout, #signin{
+    margin-top: 13.5px;
+  }
+  #signout a, #signin a{
+    font-size: 15px;
+  }
 
-.textOnly:hover{
-  background: none;
-  text-decoration: underline;
-}
 
+/* TODO: code and err are both used on the queue page and could be moved into their own stylesheet */
 #code{
   width:250px;
   margin-right:30px;
@@ -118,6 +123,7 @@ input{
   color:red;
 }
 
+/* TODO: Remember where this one is used */
 .break{
   width:550px;
   height:2px;
@@ -127,6 +133,7 @@ input{
   margin-left:0;
 }
 
+/* Session timeout popup */
 .popup{
   position: fixed;
   background-color: white;
