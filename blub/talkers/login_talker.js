@@ -35,7 +35,7 @@ wss.on('connection', async (ws, req) => {
     }
         
         
-    ws.on('message', message => {
+    ws.on('message', async message => {
             
         // Parse the message out
         var msg = JSON.parse(message);
@@ -96,18 +96,25 @@ wss.on('connection', async (ws, req) => {
                     
                     
                     // Runnin shit bouiz
-                    
-                    var machine = MachineWorker.check(req.session.passport.user['sAMAccountName']);
-                    
-                    if(machine == null) {
+                    var user = await UserWorker.user_search(req.session.passport.user['sAMAccountName']);
+
+                    if(user == false) {
+                        // If the user is not logged in
+                        ws.send(JSON.stringify({'status': 'error', 'error': 'no-session'}));
+                        // We'll just send no session again. They shouldn't be able to get here anyway without being logged in so...
+                    }
+                    else if(user['machine'] == null) {
+                        // If the user actually does not have a machine and was lying to us
                         ws.send(JSON.stringify({'status': 'error', 'error': 'no-session'}));
                     }
-                    else{
+                    else {
+                        var machine = await MachineWorker.get_machine(user['machine']);
+
                         var newrdp = {
                             "connection": {
                                 "type": "rdp",
                                 "settings": {
-                                    "hostname": machine['ip'],
+                                    "hostname": machine['host'],
                                     "username": machine['user'],
                                     "password": SessionWorker.credentials(machine['user']),
                                     "security": "any",
